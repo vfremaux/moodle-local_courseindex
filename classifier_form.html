@@ -1,0 +1,81 @@
+<?php
+
+/**
+* this seach form is using the mod/customlabel/classifier method
+*
+*/
+
+$customlabel = new StdClass();
+$customlabel->labelclass = 'courseclassifier';
+$customlabel->title = 'void';
+$customlabel->safecontent = '';
+$classifier = customlabel_load_class($customlabel);
+
+?>
+<a name="classifiersearch"></a>
+<form name="classifierform" action="#results" method="get">
+<script type="text/javascript">
+    function search_form_submit(){
+        var statuschoice = document.forms['statusform'].lpstatus;
+        if (statuschoice){ // might not be in page
+            var statusix = statuschoice.selectedIndex;
+            if(statusix){
+                document.forms['classifierform'].lpstatus.value = statuschoice.options[statusix].value;
+            }
+        }
+        // document.forms['classifierform'].submit();
+    }
+</script>
+<input type="hidden" name="lpstatus" value="" />
+<fieldset>
+<table width="100%" class="generaltable">
+<?php
+    foreach($classifier->fields as $field){
+        if ($field->type == '_error_') continue;
+        // all other field types are not relevant for search engine.
+        if (!preg_match("/(datasource|_error_)$/", $field->type)) {
+            continue;
+        }
+        $fieldname = str_replace('[]', '', $field->name); // must take care it is a multiple field
+        echo "<tr valign=\"top\"><td align=\"right\" width=\"40%\"><b>"; 
+        if (!isset($field->mandatory)){
+            print_string($fieldname, 'customlabel');
+        } else {
+            $mandatories[] = 'menu'.$field->name;
+            echo '<span class="required">'.print_string($fieldname, 'customlabel').'<img class="req" title="Champ requis" alt="Champ requis" src="'.$OUTPUT->pix_url('req').'"></span>';
+        }
+        if (!empty($field->help)) echo " {$field->help}";
+        echo ':</b></td><td>';
+        // Very similar to lists, except options come from an external datasource
+        if ($field->type == '_error_') {
+            echo '<div id="div_menu_'.$field->name.'">';
+            echo $OUTPUT->notification($field->error, 'notifyproblem');
+            echo '</div>';
+            echo '</td></tr>';
+            continue;
+        }
+        $multiple = (isset($field->multiple)) ? $field->multiple : '' ;
+        $options = $classifier->get_datasource_options($field);
+        $script = '';
+        if (!empty($field->constraintson)){
+            $script = " applyconstraints('{$CFG->wwwroot}', '{$classifier->type}', this, '{$field->constraintson}') ";
+        }
+        echo '<div id="div_menu_'.$field->name.'\">';
+        if (empty($multiple)){
+            echo html_writer::select($options, $field->name, $value, array(), array('onchange' => $script));
+        } else {
+            echo html_writer::select($options, "{$field->name}[]", @$form->$fieldname, array(), array('onchange' => $script, 'multiple' => 1));
+        }
+        echo '</div>';
+        echo '</td></tr>';
+    }
+?>
+    <tr valign="top">
+        <td align="right" width="30%"></td>
+        <td align="left">
+            <input type="submit" name="go_search" value="<?php print_string('gosearch', 'local_courseindex') ?>" onclick="search_form_submit();" />
+        </td>
+    </tr>
+</table>
+</fieldset>
+</form>

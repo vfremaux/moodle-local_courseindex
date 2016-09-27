@@ -1,0 +1,62 @@
+<?php
+list($peoplefieldid, $topicfieldid) = $specialfields;
+if (!$peoplefieldid && !$topicfieldid) return;
+?>
+<a name="specialsearch"></a>
+<form name="specialform" action="#results" method="get">
+<script type="text/javascript">
+    function special_form_submit(){
+        var statuschoice = document.forms['statusform'].lpstatus;
+        if (statuschoice){ // might not be in page
+            var statusix = statuschoice.selectedIndex;
+            if(statusix){
+                document.forms['specialform'].lpstatus.value = statuschoice.options[statusix].value;
+            }
+        }
+        // document.forms['specialform'].submit();
+    }
+</script>
+<input type="hidden" name="lpstatus" value="" />
+<fieldset>
+    <table width="100%" class="generaltable">
+        <?php
+        if ($peoplefieldid) {
+        ?>
+        <tr valign="top">
+            <td align="right" width="30%"><b><?php print_string('targets', 'local_courseindex') ?></b></td>
+            <td align="left">
+                <?php
+                    $targets = $DB->get_records_menu($CFG->classification_value_table, array($CFG->classification_value_type_key => $peoplefieldid), 'sortorder', 'id, value');
+                    $targets['0'] = get_string('alltargets', 'local_courseindex');
+                    ksort($targets);
+                    echo html_writer::select($targets, 'targets[]', $form->targets, array(), array('id' => '_targets', 'multiple' => 1, 'size' => 8));
+                ?>
+            </td>
+        </tr>
+        <?php 
+        }
+        if ($topicfieldid) {
+        ?>
+        <tr valign="top">
+            <td align="right" width="30%"><b><?php print_string('topics', 'local_courseindex') ?></b></td>
+            <td align="left">
+                <?php
+                    $topics = $DB->get_records_menu($CFG->classification_value_table, array($CFG->classification_value_type_key => $topicfieldid), 'sortorder', 'id, value');
+                    $topics['0'] = get_string('alltopics', 'local_courseindex');
+                    ksort($topics);
+                    echo html_writer::select($topics, 'topics[]', $form->topics, array(), array('id' => '_topics', 'multiple' => 1, 'size' => 8));
+                ?>
+            </td>
+        </tr>
+        <?php
+        }
+        ?>
+        <tr valign="top">
+            <td align="right" width="30%"></td>
+            <td align="left">
+                <input type="submit" name="go_specialsearch" value="<?php print_string('gospecialsearch', 'local_courseindex') ?>" onclick="special_form_submit();" />
+            </td>
+        </tr>
+    </table>
+</fieldset>
+</form>
