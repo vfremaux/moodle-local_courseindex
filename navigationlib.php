@@ -40,7 +40,9 @@ if (!defined('DISPLAY_FILES_FIRST_LEVEL')) {
     define('DISPLAY_FILES_FIRST_LEVEL', 2);
 }
 
-require_once($CFG->dirroot.'/blocks/course_status/locallib.php');
+if (is_dir($CFG->dirroot.'/blocks/course_status')) {
+    require_once($CFG->dirroot.'/blocks/course_status/locallib.php');
+}
 
 /**
  * make a full navigation category tree. Recursive. @see tao_generate_navigation_rec_tree()
@@ -59,6 +61,9 @@ function local_courseindex_generate_navigation($startcat = null, $catpath = '', 
     $publishconfig = get_config('block_publishflow');
 
     $levels = local_courseindex_get_category_levels();
+    $currentlevel = @$levels[$levelix];
+
+    // Compute some filtering sql from filter selects in the browser.
 
     $filterclauseelm = array();
     if (!empty($filters)) {
@@ -73,6 +78,9 @@ function local_courseindex_generate_navigation($startcat = null, $catpath = '', 
     if (!empty($filterclauseelm)) {
         $filterclause = implode(' ', $filterclauseelm);
     }
+
+    // Compute some restrictions upon metadata values, that is, some metadata values we do not want to use.
+
     if (!empty($restrictions)) {
         foreach ($restrictions as $restid => $filter) {
             // apply only classification filters
@@ -83,54 +91,59 @@ function local_courseindex_generate_navigation($startcat = null, $catpath = '', 
     if (!empty($restrictionclauseelm)) {
         $restrictionclause = ' AND ('. implode(' OR ', $restrictionclauseelm). ')';
     }
+
+    // We shall check for some formats to display.
+
     if (@$publishconfig->moodlenodetype == 'learningarea') {
+        // If we use the publishflow, the publishing status may impact what we can see.
         $filterclause = " AND c.category != {$publishconfig->closedcategory} AND c.category != {$publishconfig->freeuseclosedcategory} AND c.category != {$publishconfig->deploycategory} ";
         $formatclause = '';
         if ($formats = local_courseindex_localbrowse_accept_formats()) {
             foreach ($formats as $format) {
                 $formatclauseitems[] = " c.format = '$format' ";
             }
-            $formatclause = '('.implode('OR', $formatclauseitems). ') AND ';
+            $formatclause = ' AND ('.implode('OR', $formatclauseitems). ') ';
         }
     } else {
+        // This is for standard moodle platforms. 
         $formatclause = '';
         if ($formats = local_courseindex_browser_accept_formats()) {
             foreach ($formats as $format) {
                 $formatclauseitems[] = " c.format = '$format' ";
             }
-            $formatclause = '('.implode('OR', $formatclauseitems). ') AND '; 
+            $formatclause = ' AND ('.implode('OR', $formatclauseitems). ') '; 
         }
     }
+
     if (empty($startcat)) {
+        // this is the main root of the cat tree. Start cat is null.
+
+        // Prepare query for getting subs.
         $sql = "
-            SELECT
+            SELECT DISTINCT
                 c.id,
                 c.category,
-                shortname,
-                fullname,
-                visible,
-                timecreated,
-                summary,
-                bs.approval_status_id,
-                MAX(bs.timestamp)
+                c.shortname,
+                c.fullname,
+                c.visible,
+                c.timecreated,
+                c.summary
             FROM
+                {course} c,
                 {{$config->course_metadata_table}} cc,
-                {course} c
-            LEFT JOIN
-                {block_course_status_history} bs
-            ON
-                bs.courseid = c.id
+                {{$config->classification_value_table}} ccv
             WHERE
                 c.id = cc.{$config->course_metadata_course_key} AND
+                cc.{$config->course_metadata_value_key} = ccv.id AND
+                ccv.typeid = '.$currentlevel->id.'
                 $formatclause
-                (bs.approval_status_id <= ".COURSE_STATUS_PUBLISHED." OR bs.approval_status_id IS NULL)
                 $filterclause
                 $restrictionclause
             GROUP BY
                 c.id
-            HAVING
-                c.id IS NOT NULL
         ";
+
+        // Make the parent root node.
         $rootcat = new StdClass();
         $rootcat->id = 0;
         $rootcat->parent = new StdClass();
@@ -139,6 +152,8 @@ function local_courseindex_generate_navigation($startcat = null, $catpath = '', 
         $rootcat->name = get_string('root', 'local_courseindex');
     } else {
         // get all possible entries in the required catpath
+
+        // Compute the constraints over the category path subpath
         if (!empty($catpath)) {
             $catpathelms = explode(',', $catpath);
         }
@@ -146,40 +161,38 @@ function local_courseindex_generate_navigation($startcat = null, $catpath = '', 
         $i = 1;
         foreach ($catpathelms as $elm) {
             $tablespecs[] = " {{$config->course_metadata_table}} cc$i, ";
-            $constraintspecs[] = "  cc$i.{$config->course_metadata_course_key} = c.id AND\n cc$i.{$config->course_metadata_value_key} = {$elm} AND ";
+            $constraintspecs[] = "  AND cc$i.{$config->course_metadata_course_key} = c.id AND\n cc$i.{$config->course_metadata_value_key} = {$elm} ";
             $i++;
         }
         $tablespecsclause = implode("\n", $tablespecs);
         $constraintspecsclause = implode("\n", $constraintspecs);
+
+        // Prepare SQL for subnodes.
+
         $sql = "
-            SELECT
+            SELECT DISTINCT
                 c.id,
                 c.category,
-                shortname,
-                fullname,
-                visible,
-                timecreated,
-                summary,
-                bs.approval_status_id,
-                MAX(bs.timestamp)
+                c.shortname,
+                c.fullname,
+                c.visible,
+                c.timecreated,
+                c.summary
             FROM
                 $tablespecsclause
                 {course} c
-            LEFT JOIN
-                {block_course_status_history} bs
-            ON
-                bs.courseid = c.id
             WHERE
+                1 = 1
                 $constraintspecsclause
                 $formatclause
-                (approval_status_id <= ".COURSE_STATUS_PUBLISHED." OR approval_status_id IS NULL)
                 $filterclause
                 $restrictionclause
             GROUP BY
                 c.id
-            HAVING
-                c.id IS NOT NULL
         ";
+
+        // Make a root node with the start vcat as parent.
+
         $rootcat = $DB->get_record($config->classification_value_table, array('id' => $startcat));
         $rootcat->name = $rootcat->value;
         // we can compute parent from catpath, as the last id in the path
@@ -190,10 +203,27 @@ function local_courseindex_generate_navigation($startcat = null, $catpath = '', 
         $rootcat->parent->id = $parentpath;
         $rootcat->parent->catpath = $parentcatpath;
     }
+
     // echo $sql;
     if (!$entries = $DB->get_records_sql($sql)) {
         $entries = array();
     }
+
+    // echo "Root : $rootcat->id<br/>";
+    // echo "Root parent : {$rootcat->parent->id}<br/>";
+    // echo "Subs [";
+    foreach (array_keys($entries) as $entryid) {
+        // echo "$entryid,";
+        if (is_dir($CFG->dirroot.'/blocks/course_status')) {
+            // Are we using also course_status block for publishing control ?
+            $laststatetime = $DB->get_field('block_course_status_history', 'MAX(timestamp)', array('courseid' => $entryid));
+            $laststate = $DB->get_field('block_course_status_history', 'approval_status_id', array('courseid' => $entryid, 'timestamp' => $laststatetime));
+            if ($laststate > COURSE_STATUS_PUBLISHED) {
+                unset($entries[$entryid]);
+            }
+        }
+    }
+    // echo "]<br/>";
 
     $branchentries = $entries;
     $rootcat->entries = $entries;
@@ -262,7 +292,9 @@ function local_courseindex_generate_navigation_rec_tree(&$cat, &$branchentries, 
     if ($reclevel > 10) {
         die("Too many recursions");
     }
+
     $topentryids = implode("','", array_keys($branchentries));
+
     $entriesfound = 0;
     // initalize arrays
     $cat->entries = array();
@@ -275,43 +307,44 @@ function local_courseindex_generate_navigation_rec_tree(&$cat, &$branchentries, 
 
     // Get possible entries at this level : one who has the levelcat tag and wich is in topentries.
     $sql = "
-        SELECT
+        SELECT DISTINCT
             c.id,
             c.category,
-            shortname,
-            fullname,
-            visible,
-            timecreated,
-            summary,
-            bs.approval_status_id,
-            MAX(bs.timestamp)
+            c.shortname,
+            c.fullname,
+            c.visible,
+            c.timecreated,
+            c.summary
         FROM
-            {{$config->course_metadata_table}} cc,
-            {course} c
-        LEFT JOIN
-            {block_course_status_history} bs
-        ON
-            bs.courseid = c.id
+            {course} c,
+            {{$config->course_metadata_table}} cc
         WHERE
             cc.{$config->course_metadata_course_key} = c.id AND
             ($formatclause) AND
             cc.{$config->course_metadata_value_key} = '{$cat->id}' AND
-            c.id IN ('$topentryids') AND
-            (approval_status_id <= ".COURSE_STATUS_PUBLISHED." OR approval_status_id IS NULL)
+            c.id IN ('$topentryids')
             $filterclause
-        HAVING c.id IS NOT NULL
-        ORDER BY 
+        ORDER BY
             c.sortorder
     ";
-    
+
     if (!$levelentries = $DB->get_records_sql($sql)) {
         if (empty($levels[$levelix]->displayempty)) {
             // return 0;
         }
         $levelentries = array();
     } else {
-        // discard captured entries from all parents
+        // Discard captured entries from all parents or not having status if course status block is used.
         foreach (array_keys($levelentries) as $entrykey) {
+
+            if (is_dir($CFG->dirroot.'/blocks/course_status')) {
+                $laststatetime = $DB->get_field('block_course_status_history', 'MAX(timestamp)', array('courseid' => $entrykey));
+                $laststate = $DB->get_field('block_course_status_history', 'approval_status_id', array('courseid' => $entrykey, 'timestamp' => $laststatetime));
+                if ($laststate > COURSE_STATUS_PUBLISHED) {
+                    unset($catptr->entries[$entrykey]);
+                }
+            }
+
             $catptr = $cat->parent;
             while ($catptr) {
                 unset($catptr->entries[$entrykey]);
@@ -335,12 +368,18 @@ function local_courseindex_generate_navigation_rec_tree(&$cat, &$branchentries, 
         }
         */
         $cat->entries = $levelentries;
-        $branchentries += $levelentries;
+        foreach($levelentries as $cid => $c) {
+            $branchentries[$cid] = $c;
+        }
     }
     if ($levelix < count($levels) && $levelix < $config->maxnavigationdepth) {
+
+        // Get all subcategories
+        $currentlevel = $levels[$levelix];
+
         $sql = "
             SELECT DISTINCT
-               cv.id, 
+               cv.id,
                cv.value,
                ct.sortorder AS typesortorder
             FROM
@@ -350,14 +389,15 @@ function local_courseindex_generate_navigation_rec_tree(&$cat, &$branchentries, 
             WHERE
                 ct.id = cv.{$config->classification_value_type_key} AND
                 ct.type LIKE '%category' AND
-                ct.sortorder > $cat->typesortorder AND
+                ct.sortorder > ? AND
                 ((cc.value1 = $cat->id AND cc.value2 = cv.id) OR (cc.value2 = $cat->id AND cc.value1 = cv.id)) AND
+                ct.id = ? AND
                 cc.const = 1
             ORDER BY
                 cv.sortorder
         ";
         // echo $sql.'<br/>';
-        if ($levelcats = $DB->get_records_sql($sql)) {
+        if ($levelcats = $DB->get_records_sql($sql, array($cat->typesortorder, $currentlevel->id))) {
             $cat->cats = array();
             foreach($levelcats as $acat) {
                 // echo "taking subcat $acat->value ";
@@ -377,7 +417,7 @@ function local_courseindex_generate_navigation_rec_tree(&$cat, &$branchentries, 
         }
     }
     $reclevel--;
-    return(count($levelentries) + $entriesfound);
+    return (count($levelentries) + $entriesfound);
 }
 
 

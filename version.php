@@ -15,20 +15,19 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * @package     local_courseindex
- * @category    local
- * @author      Valery Fremaux <valery.fremaux@club-internet.fr>
- * @copyright   2015 onwards Valery Fremaux (http://www.mylearningfactory.com)
- * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL
+ * @package    local_courseindex
+ * @author     Valery Fremaux <valery.fremaux@club-internet.fr>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
+ * @copyright  (C) 1999 onwards Martin Dougiamas  http://dougiamas.com
  */
 
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->version  = 2016031900;   // The (date) version of this plugin
-$plugin->requires = 2015050500;   // Requires this Moodle version
+$plugin->requires = 2011120500;   // Requires this Moodle version
 $plugin->component  = 'local_courseindex';   // The (date) version of this plugin
-$plugin->release  = '2.9.0 (Build 2016031900)';   // The (date) version of this plugin
+$plugin->release  = '2.7.0 (Build 2016031900)';   // The (date) version of this plugin
 $plugin->maturity  = MATURITY_BETA;   // The (date) version of this plugin
 
-// Non moodle attributes.
-$plugin->codeincrement = '2.9.0000';
+// Non moodle attributes
+$plugin->codeincrement = '2.7.0000';

@@ -37,12 +37,12 @@ $classifier = customlabel_load_class($customlabel);
             continue;
         }
         $fieldname = str_replace('[]', '', $field->name); // must take care it is a multiple field
-        echo "<tr valign=\"top\"><td align=\"right\" width=\"40%\"><b>"; 
-        if (!isset($field->mandatory)){
-            print_string($fieldname, 'customlabel');
+        echo '<tr valign="top"><td align="right" width="40%"><b>';
+        if (empty($field->mandatory)) {
+            print_string($fieldname, 'customlabeltype_courseclassifier');
         } else {
             $mandatories[] = 'menu'.$field->name;
-            echo '<span class="required">'.print_string($fieldname, 'customlabel').'<img class="req" title="Champ requis" alt="Champ requis" src="'.$OUTPUT->pix_url('req').'"></span>';
+            echo '<span class="required">'.print_string($fieldname, 'customlabeltype_courseclassifier').'<img class="req" title="Champ requis" alt="Champ requis" src="'.$OUTPUT->pix_url('req').'"></span>';
         }
         if (!empty($field->help)) echo " {$field->help}";
         echo ':</b></td><td>';
@@ -54,13 +54,13 @@ $classifier = customlabel_load_class($customlabel);
             echo '</td></tr>';
             continue;
         }
-        $multiple = (isset($field->multiple)) ? $field->multiple : '' ;
+        $multiple = (isset($field->multiple)) ? $field->multiple : '';
         $options = $classifier->get_datasource_options($field);
         $script = '';
         if (!empty($field->constraintson)){
-            $script = " applyconstraints('{$CFG->wwwroot}', '{$classifier->type}', this, '{$field->constraintson}') ";
+            $script = " applyconstraintsmenu('{$CFG->wwwroot}', '{$classifier->type}', this, '{$field->constraintson}') ";
         }
-        echo '<div id="div_menu_'.$field->name.'\">';
+        echo '<div id="div_menu_'.$field->name.'">';
         if (empty($multiple)){
             echo html_writer::select($options, $field->name, $value, array(), array('onchange' => $script));
         } else {

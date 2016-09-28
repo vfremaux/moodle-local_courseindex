@@ -23,12 +23,26 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
+// settings default init
+if (is_dir($CFG->dirroot.'/local/adminsettings')) {
+    // Integration driven code 
+    require_once($CFG->dirroot.'/local/adminsettings/lib.php');
+    list($hasconfig, $hassiteconfig, $capability) = local_adminsettings_access();
+} else {
+    // Standard Moodle code
+    $capability = 'moodle/site:config';
+    $hasconfig = $hassiteconfig = has_capability($capability, context_system::instance());
+}
+
 if ($hassiteconfig) { // needs this condition or there is error on login page
     $settings = new admin_settingpage('local_courseindex', get_string('pluginname', 'local_courseindex'));
     $ADMIN->add('localplugins', $settings);
 
     $settings->add(new admin_setting_configcheckbox('local_courseindex/indexisopen', get_string('configopenindex', 'local_courseindex'),
                        get_string('configopenindex_desc', 'local_courseindex'), 1));
+
+    $settings->add(new admin_setting_configcheckbox('local_courseindex/enableexplorer', get_string('configenableexplorer', 'local_courseindex'),
+                       get_string('configenableexplorer_desc', 'local_courseindex'), 1));
 
     $settings->add(new admin_setting_configtext('local_courseindex/maxnavigationdepth', get_string('configmaxnavigationdepth', 'local_courseindex'),
                        get_string('configmaxnavigationdepth_desc', 'local_courseindex'), 3));

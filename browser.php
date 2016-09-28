@@ -27,13 +27,18 @@ require_once($CFG->dirroot.'/local/courseindex/navigationlib.php');
 $SESSION->courseindex = new StdClass;
 $SESSION->courseindex->noheaders = optional_param('noheaders', @$SESSION->courseindex->noheaders, PARAM_BOOL);
 
+$config = get_config('local_courseindex');
+
 // hidden key to open the catalog to the unlogged area
-if (empty($CFG->coursecatalog_is_open)) {
+if (empty($config->indexisopen)) {
     require_login();
+    $sitecontext = context_course::instance(SITEID);
+    require_capability('local/courseindex:browse', $sitecontext);
 }
 
-$sitecontext = context_course::instance(SITEID);
-require_capability('local/courseindex:browse', $sitecontext);
+$cat = optional_param('cat', '', PARAM_INT);
+$level = optional_param('level', 0, PARAM_INT);
+$catpath = optional_param('catpath', '', PARAM_RAW);
 
 $strheading = get_string('courseindex', 'local_courseindex');
 
@@ -42,12 +47,12 @@ $PAGE->set_url($url);
 $PAGE->set_context(context_system::instance());
 $PAGE->navbar->add(get_string('courseindex', 'local_courseindex'));
 $PAGE->navbar->add(get_string('browse', 'local_courseindex'));
+$PAGE->requires->jquery_plugin('animatenumber', 'local_courseindex');
 
 $PAGE->set_heading($strheading);
 $PAGE->set_title($strheading);
 
 $renderer = $PAGE->get_renderer('local_courseindex');
-$config = get_config('local_courseindex');
 
 $filters = null;
 
@@ -74,30 +79,33 @@ echo '<div class="static">';
 local_print_static_text('coursecatalog_browser_header', $CFG->wwwroot.'/local/courseindex/browser.php');
 echo '</div>';
 
-/// making filters
+// making filters.
 
 $browserurl = '/local/courseindex/browser.php';
-echo '<form name="filtering" action="'.$browserurl.'" method="post">';
-echo '<fieldset>';
-echo '<table cellspacing="10"><tr><td>';
 
-foreach($filters as $key => $afilter) {
-    if ($key != 'wwwroot') {
-        echo '<b><span style="font-size:80%">'.$afilter->name.' :</span></b><br/>';
-        echo html_writer::select($afilter->options, $key, $afilter->value);
-        echo '</td><td>';
+echo '<form name="filtering" action="'.$browserurl.'" method="post">';
+echo '<input type="hidden" name="cat" value="'.$cat.'"/>';
+echo '<input type="hidden" name="level" value="'.$level.'"/>';
+echo '<input type="hidden" name="catpath" value="'.$catpath.'"/>';
+
+if (!empty($filters)) {
+    echo '<fieldset>';
+    echo '<table cellspacing="10"><tr><td>';
+    foreach($filters as $key => $afilter) {
+        if ($key != 'wwwroot') {
+            echo '<b><span style="font-size:80%">'.$afilter->name.' :</span></b><br/>';
+            echo html_writer::select($afilter->options, $key, $afilter->value);
+            echo '</td><td>';
+        }
     }
+    $strreload = get_string('reload', 'local_courseindex');
+    
+    echo '<td><input type="submit" name="go_btn" value="'.$strreload.'" /></td>';
+    echo '</td></tr></table>';
+    echo '</fieldset>';
 }
 
-$strreload = get_string('reload', 'local_courseindex');
-
-echo '<td><input type="submit" name="go_btn" value="'.$strreload.'" /></td>';
-echo '</td></tr></table>';
-echo '</fieldset>';
 echo '</form>';
-$cat = optional_param('cat', '', PARAM_INT);
-$level = optional_param('level', 0, PARAM_INT);
-$catpath = optional_param('catpath', '', PARAM_RAW);
 
 // calling navigation.
 
@@ -118,7 +126,13 @@ if ($simmplenav) {
     // fails in applying constraints at level > 1
     $cattree = local_courseindex_generate_navigation($cat, $catpath, $level, $filters);
     $catlevels = local_courseindex_get_category_levels();
+
+    // echo $renderer->cat_struct_debug($cattree);
+
     local_courseindex_reduce_tree($cattree, $catlevels);
+
+    // echo $renderer->cat_struct_debug($cattree);
+
     $rcpoptions = null;
     $allcoursecount = $renderer->navigation($str, $cattree, $catpath, 2, DISPLAY_FILES_FIRST_LEVEL, 0, false, $rcpoptions);
 
@@ -151,10 +165,12 @@ if ($simmplenav) {
 
 }
 echo '<br/>';
-$searchstr = get_string('searchintree', 'local_courseindex');
-$exploreurl = new moodle_url('/local/courseindex/explorer.php');
-echo '<center><a href="'.$exploreurl.'">'.$searchstr.'</a></center>';
-echo '<br/>';
+if (!empty($config->enableexplorer)) {
+    $searchstr = get_string('searchintree', 'local_courseindex');
+    $exploreurl = new moodle_url('/local/courseindex/explorer.php');
+    echo '<center><a href="'.$exploreurl.'">'.$searchstr.'</a></center>';
+    echo '<br/>';
+}
 
 if (empty($SESSION->courseindex->noheaders)) {
     echo $OUTPUT->footer();
