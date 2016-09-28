@@ -28,6 +28,7 @@ $string['lpstatus'] = 'By learning path status';
 $string['multipleresultsadvice'] = 'Note that due to multiclassing possibilities, and depending on search method used, the same course entry may appear in several result categories.';
 $string['needspassword'] = 'This course needs a password';
 $string['novisiblecoursesinsubtree'] = 'No course available in this section';
+$string['novisiblecourses'] = 'No visible courses with this search';
 $string['pluginname'] = 'Course index';
 $string['openenrol'] = 'this course is free enrol (unless a password is set)';
 $string['configopenindex'] = 'Public catalog';
@@ -41,6 +42,8 @@ $string['configclassificationdisplayemptylevel1_desc'] = '';
 $string['configclassificationdisplayemptylevel2'] = 'Level 2 visible when empty';
 $string['configclassificationdisplayemptylevel2_desc'] = '';
 $string['configmetadatabinding'] = 'Metadata schema binding';
+$string['configenableexplorer'] = 'Enable explorer';
+$string['configenableexplorer_desc'] = 'If not set, the link to the course explorer (advanced search engine) will be hidden.';
 $string['configmetadatabinding_desc'] = '
 <p>The course indexer relies on a capability to index courses with some metadata and classifiers. The course index model uses 4 tables to achieve this feature, and allows binding those tables from any implementation
 the integrator would need. The default binding uses the Customlabel module and its inbound classifier tableset. But the ocurse index might bind to any other model that respects following defs:</p>
@@ -77,6 +80,7 @@ $string['topics'] = 'Topics';
 $string['root'] = 'Catalog root';
 $string['lpsincategory'] = 'Training courses in this category';
 $string['subcatsincat'] = 'Subcategories';
+$string['startdate'] = 'Start date';
 $string['nocourses'] = 'No courses in category';
 $string['backtoroot'] = 'Back to root';
 $string['reload'] = 'Reload';

@@ -30,6 +30,8 @@ defined('MOODLE_INTERNAL') || die();
 function local_courseindex_explore($data) {
     global $CFG, $DB;
 
+    $config = get_config('local_courseindex');
+
     if (!empty($data->specialsearch)) {
         // special search using topic and targets
         $results1 = array();
@@ -207,23 +209,20 @@ function local_courseindex_explore($data) {
         if ($data->level0) {
             $catarr = $data->level0;
             $lastcatid = count($catarr) - 1;
-            $allvalues = classification_get_all_linked_values($catarr[$lastcatid]);
+            $allvalues = local_courseindex_get_all_linked_values($catarr[$lastcatid]);
             $level0list = implode("','", $allvalues);
             $sql = "
                 SELECT DISTINCT
                     c.id,
                     c.shortname,
                     c.fullname,
-                    c.visible,
-                    c.password,
-                    c.enrollable,
-                    c.guest
+                    c.visible
                 FROM
                     {course} c,
-                    {{$CFG->course_metadata_table}} cc
+                    {{$config->course_metadata_table}} cc
                 WHERE
-                    c.id = cc.course AND
-                    cc.{$CFG->course_metadata_value_key} IN ('$level0list')
+                    c.id = cc.courseid AND
+                    cc.{$config->course_metadata_value_key} IN ('$level0list')
                 ORDER BY
                     c.sortorder
             ";
@@ -238,16 +237,13 @@ function local_courseindex_explore($data) {
                     c.id,
                     c.shortname,
                     c.fullname,
-                    c.visible,
-                    c.password,
-                    c.enrollable,
-                    c.guest
+                    c.visible
                 FROM
                     {course} c,
-                    {{$CFG->course_metadata_table}} cc
+                    {{$config->course_metadata_table}} cc
                 WHERE
-                    cc.course = c.id AND
-                    cc.{$CFG->course_metadata_value_key} IN ('$level1list')
+                    cc.courseid = c.id AND
+                    cc.{$config->course_metadata_value_key} IN ('$level1list')
                 ORDER BY
                     c.sortorder
             ";
@@ -283,19 +279,21 @@ function local_courseindex_explore($data) {
  *
  *
  */
-function coursecatalog_get_all_linked_values($valueid) {
+function local_courseindex_get_all_linked_values($valueid) {
     global $CFG, $DB;
 
-    if (!$value = $DB->get_record($CFG->classification_value_table, array('id' => $valueid))) {
+    $config = get_config('local_courseindex');
+
+    if (!$value = $DB->get_record($config->classification_value_table, array('id' => $valueid))) {
         return array($valueid);
     }
-    $valuetypekey = $CFG->classification_value_type_key;
-    $valuetype = $DB->get_record($CFG->classification_type_table, array('id' => $value->$valuetypekey));
-    $subtypes = $DB->get_records_select($CFG->classification_type_table, " sortorder > $valuetype->sortorder AND type LIKE '%category' ", 'sortorder');
+    $valuetypekey = $config->classification_value_type_key;
+    $valuetype = $DB->get_record($config->classification_type_table, array('id' => $value->$valuetypekey));
+    $subtypes = $DB->get_records_select($config->classification_type_table, " sortorder > ? AND type LIKE '%category' ", array($valuetype->sortorder), 'sortorder');
     $values = array();
     $values[] = $valueid;
     foreach($subtypes as $subtype) {
-        $typevalues = $DB->get_records($CFG->classification_value_table, array($valuetypekey => $subtype->id));
+        $typevalues = $DB->get_records($config->classification_value_table, array($valuetypekey => $subtype->id));
         $typevaluelist = implode("','", array_keys($typevalues));
         $sourcelist = implode("','", $values); // exploration is cumulative
         // get impossibilities
@@ -305,9 +303,9 @@ function coursecatalog_get_all_linked_values($valueid) {
                 value1,
                 value2
             FROM
-                {{$CFG->classification_constraint_table}} cc,
-                {{$CFG->classification_value_table}} cv1,
-                {{$CFG->classification_value_table}} cv2
+                {{$config->classification_constraint_table}} cc,
+                {{$config->classification_value_table}} cv1,
+                {{$config->classification_value_table}} cv2
             WHERE
                 cc.value1 = cv1.id AND
                 cc.value2 = cv2.id AND
@@ -335,30 +333,32 @@ function coursecatalog_get_all_linked_values($valueid) {
 function ____coursecatalog_get_classification($filter, $treemap=false) {
     global $CFG, $DB;
 
+    $config = get_config('local_courseindex');
+
     static $classificationbackmap; // caches calculated once classification tree
     if ($treemap && isset($classificationbackmap)) return $classificationbackmap;
-    if (!$degreeclassifierid = $DB->get_field_select($CFG->classification_type_table, 'id', " name LIKE 'Degr%' ")) {
+    if (!$degreeclassifierid = $DB->get_field_select($config->classification_type_table, 'id', " name LIKE 'Degr%' ", array())) {
         error ("No degre classifier ID");
     }
-    if (!$levelclassifierid = $DB->get_field_select($CFG->classification_type_table, 'id', " name LIKE 'Niveau%' ")) {
+    if (!$levelclassifierid = $DB->get_field_select($config->classification_type_table, 'id', " name LIKE 'Niveau%' ",  array())) {
         error ("No level classifier ID");
     }
-    if (!$cycleclassifierid = $DB->get_field_select($CFG->classification_type_table, 'id', " name LIKE 'Cycle%' ")) {
+    if (!$cycleclassifierid = $DB->get_field_select($config->classification_type_table, 'id', " name LIKE 'Cycle%' ", array())) {
         error ("No cycle classifier ID");
     }
-    if (!$disciplinclassifierid = $DB->get_field_select($CFG->classification_type_table, 'id', " name LIKE 'Discipl%' ")) {
+    if (!$disciplinclassifierid = $DB->get_field_select($config->classification_type_table, 'id', " name LIKE 'Discipl%' ", array())) {
         error ("No disciplin classifier ID");
     }
     $included = array();
     $degreeitems = array();
     if (!empty($filter)) {
-        $clvalue = $DB->get_record('classification_value', array('id' => $filter));
+        $clvalue = $DB->get_record($config->classification_value_table, array('id' => $filter));
         if($clvalue->type == $degreeclassifierid) {
             $degreeitems[] = $clvalue->id;
         }
     } else {
         // if nothing given, we get all degrees
-        if ($degrees = $DB->get_records('classification_value', array('type' => $degreeclassifierid))) {
+        if ($degrees = $DB->get_records($config->classification_value_table, array('type' => $degreeclassifierid))) {
             $degreeitems = array_keys($degrees);
         }
     }
@@ -369,9 +369,9 @@ function ____coursecatalog_get_classification($filter, $treemap=false) {
             SELECT 
                 cc.*
             FROM
-                {{$CFG->classification_value_table}} cv
+                {{$config->classification_value_table}} cv
             LEFT JOIN
-                {{$CFG->classification_constraint_table}} cc
+                {{$config->classification_constraint_table}} cc
             ON
                 (cv.id = cc.value1 OR cv.id = cc.value2)
             WHERE
@@ -389,7 +389,7 @@ function ____coursecatalog_get_classification($filter, $treemap=false) {
                     $peervalue = $apeer->value1;
                     $sourcevalue = $apeer->value2;
                 }
-                $apeer->type = $DB->get_field($CFG->classification_value_table, 'type', array('id' => $peervalue));
+                $apeer->type = $DB->get_field($config->classification_value_table, 'type', array('id' => $peervalue));
                 if ($apeer->type == $levelclassifierid) {
                     $levelitems[] = $peervalue;
                     $classificationbackmap["$peervalue"] = $sourcevalue;
@@ -407,9 +407,9 @@ function ____coursecatalog_get_classification($filter, $treemap=false) {
                 SELECT 
                     cc.*
                 FROM
-                    {{$CFG->classification_value_table}} cv
+                    {{$config->classification_value_table}} cv
                 LEFT JOIN
-                    {{$CFG->classification_constraint_table}} cc
+                    {{$config->classification_constraint_table}} cc
                 ON
                     (cv.id = cc.value1 OR cv.id = cc.value2)
                 WHERE
@@ -426,7 +426,7 @@ function ____coursecatalog_get_classification($filter, $treemap=false) {
                         $peervalue = $apeer->value1;
                         $sourcevalue = $apeer->value2;
                     }
-                    $apeer->type = $DB->get_field($CFG->classification_value_table, $CFG->classification_value_type_key, array('id' => $peervalue));
+                    $apeer->type = $DB->get_field($config->classification_value_table, $config->classification_value_type_key, array('id' => $peervalue));
                     if ($apeer->type == $cycleclassifierid) {
                         // echo "indirect $peervalue ";
                         // we are indirectly connected to disciplins, so defer the check to cycle checks
@@ -440,7 +440,7 @@ function ____coursecatalog_get_classification($filter, $treemap=false) {
             }
         }
     }
-    $typekey = $CFG->classification_value_type_key;
+    $typekey = $config->classification_value_type_key;
     if (isset($clvalue) && $clvalue->$typekey == $cycleclassifierid) {
         $cycleitems[] = $clvalue->id;
     }
@@ -452,10 +452,10 @@ function ____coursecatalog_get_classification($filter, $treemap=false) {
                     cc.*,
                     cv.id ".$DB->sql_as()." cvid
                 FROM
-                    {{$CFG->classification_value_table} cv
+                    {{$config->classification_value_table} cv
                 LEFT JOIN
-                    {{$CFG->classification_constraint_table}} cc
-                ON                
+                    {{$config->classification_constraint_table}} cc
+                ON
                     (cv.id = cc.value1 OR cv.id = cc.value2)
                 WHERE
                     (cv.id = $cycleitem) AND const = 1
@@ -491,8 +491,8 @@ function ____coursecatalog_get_classification($filter, $treemap=false) {
 function coursecatalog_has_special_fields(&$fields) {
     global $CFG, $DB;
 
-    $peoplefieldid = $DB->get_field($CFG->classification_type_table, 'id', array('code' => 'PEOPLE'));
-    $topicfieldid = $DB->get_field($CFG->classification_type_table, 'id', array('code' => 'TOPIC'));
+    $peoplefieldid = $DB->get_field($config->classification_type_table, 'id', array('code' => 'PEOPLE'));
+    $topicfieldid = $DB->get_field($config->classification_type_table, 'id', array('code' => 'TOPIC'));
     $fields = array($peoplefieldid, $topicfieldid);
     return $peoplefieldid || $topicfieldid;
 }

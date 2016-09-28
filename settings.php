@@ -30,6 +30,9 @@ if ($hassiteconfig) { // needs this condition or there is error on login page
     $settings->add(new admin_setting_configcheckbox('local_courseindex/indexisopen', get_string('configopenindex', 'local_courseindex'),
                        get_string('configopenindex_desc', 'local_courseindex'), 1));
 
+    $settings->add(new admin_setting_configcheckbox('local_courseindex/enableexplorer', get_string('configenableexplorer', 'local_courseindex'),
+                       get_string('configenableexplorer_desc', 'local_courseindex'), 1));
+
     $settings->add(new admin_setting_configtext('local_courseindex/maxnavigationdepth', get_string('configmaxnavigationdepth', 'local_courseindex'),
                        get_string('configmaxnavigationdepth_desc', 'local_courseindex'), 3));
 

@@ -4,6 +4,7 @@ $string['courseindex:browse'] = 'Peut consulter l\'offre';
 $string['courseindex:manage'] = 'Peut gérer l\'index';
 
 // LP Explorer
+$string['courseindex'] = 'L\'Offre de cours';
 $string['courseindexconfigmaxnavigationdepth'] = 'Rechercher dans l\'offre de formation';
 $string['alllevels'] = 'Tous niveaux';
 $string['alltargets'] = 'tous publics';
@@ -32,11 +33,13 @@ $string['searchintree'] = 'Rechercher des formations';
 $string['searchtext'] = 'Mot ou expression';
 $string['targets'] = 'Publics';
 $string['title'] = 'titre';
+$string['novisiblecourses'] = 'Aucun cours visible avec cette recherche';
 $string['topics'] = 'Thèmes';
 $string['root'] = 'Racine du catalogue';
 $string['lpsincategory'] = 'Formations dans cette catégorie';
 $string['nocourses'] = 'Aucune formation dans cette catégorie';
 $string['backtoroot'] = 'Revenir à la racine';
+$string['startdate'] = 'Date de début';
 $string['reload'] = 'Recharger';
 $string['subcatsincat'] = 'Sous-catégories';
 $string['browseup'] = 'Remonter d\'un niveau';
@@ -55,6 +58,8 @@ $string['configclassificationdisplayemptylevel1_desc'] = '';
 $string['configclassificationdisplayemptylevel2'] = 'Niveau 2 visible lorsque vide';
 $string['configclassificationdisplayemptylevel2_desc'] = '';
 $string['configmetadatabinding'] = 'Schéma de métadonnées';
+$string['configenableexplorer'] = 'Activer la recherche';
+$string['configenableexplorer_desc'] = 'Si cette case n\'est pas cochée, le moteur de recherche ne sera pas publié aux utilisateurs.';
 $string['configmetadatabinding_desc'] = '
 <p>L\'indexation des cours et formations s\'appuie sur la gestion de métadonnées additionnelles de classification. Ce modèle peut être fourni par plusieurs composants potentiels de Moodle,
 voire des tables extérieures à Moodle.

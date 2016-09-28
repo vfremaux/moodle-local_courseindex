@@ -78,7 +78,8 @@ $search = optional_param('go_search', '', PARAM_RAW);
 $freesearch = optional_param('go_freesearch', '', PARAM_RAW);
 $specialsearch = optional_param('go_specialsearch', '', PARAM_RAW);
 
-if ($search || $freesearch){
+if ($search || $freesearch) {
+    $form = new StdClass;
     $form->freesearch = $freesearch;
     $form->lpstatus = optional_param('lpstatus', '', PARAM_INT);
     $form->searchtext = optional_param('searchtext', '', PARAM_RAW);
@@ -87,11 +88,11 @@ if ($search || $freesearch){
     $form->information = optional_param('information', '', PARAM_INT);
     $form->targets = '';
     $form->topics = '';
-    $form->level0 = optional_param('level0', '', PARAM_INT);
-    $form->level1 = optional_param('level1', '', PARAM_INT);
-    $form->level2 = optional_param('level2', '', PARAM_INT);
+    $form->level0 = optional_param_array('level0', '', PARAM_INT);
+    $form->level1 = optional_param_array('level1', '', PARAM_INT);
+    $form->level2 = optional_param_array('level2', '', PARAM_INT);
     $searching = true;
-    $results = tao_lp_explore($form);
+    $results = local_courseindex_explore($form);
 } elseif ($specialsearch) {
     $form->specialsearch = 1;
     $form->lpstatus = optional_param('lpstatus', '', PARAM_INT);
@@ -101,7 +102,7 @@ if ($search || $freesearch){
     $form->information = 0;
     $form->searchtext = '';
     $searching = true;
-    $results = courseindex_explore($form);
+    $results = local_courseindex_explore($form);
 } else {
     $searching = false;
     $form = new StdClass();

@@ -43,7 +43,21 @@
     background-color:#f0f0f0;
     padding:20px;
     display:table-cell;
-    width:100%;
+    width:90%;
+}
+
+.browser-current-category-count {
+    color:#f0f0f0;
+    font-size:24px;
+    background-color:#808080;
+    padding:20px;
+    display:table-cell;
+    width:50px;
+}
+
+.catname .category {
+    padding-top:10px !important;
+    font-size:16px;
 }
 
 #subnav1 > .browser-category-info > .catname {
@@ -62,8 +76,13 @@
 #subnav2 {
     padding-left:15px;
 }
+
 #subnav3 {
     padding-left:30px;
+}
+
+#subnav3 .category {
+    width:80% !important;
 }
 
 .coursecount {
@@ -72,10 +91,10 @@
     color:#808080;
     font-weight:lighter;
     background-color:#f0f0f0;
-    padding-top:3px !important;
+    padding-top:10px !important;
     text-align:center;
-    width:40px !important;
-    height:40px;
+    width:50px !important;
+    height:50px;
     margin: 1px;
     float:right !important;
 }

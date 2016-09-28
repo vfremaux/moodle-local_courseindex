@@ -43,6 +43,8 @@ class local_courseindex_renderer extends plugin_renderer_base {
     function navigation(&$str, &$cattree, $catpath, $depth, $files, $levelix = 0, $rpcoptions = null) {
         global $OUTPUT;
 
+        $allcoursecount = 1;
+
         if (is_null($str)) {
             $str = '';
         }
@@ -62,46 +64,49 @@ class local_courseindex_renderer extends plugin_renderer_base {
                 $subfiles = DISPLAY_CATEGORIES;
         }
 
-        // Top category
-        $allcoursecount = $this->current_category($str, $cattree, $catpath, $depth, $levelix, $rpcoptions);
-
         // Sub categories
+        $substr = '';
         if ($levelix == 0) {
-            $str .= $OUTPUT->heading(get_string('subcatsincat', 'local_courseindex'), 3);
+            $substr .= $OUTPUT->heading(get_string('subcatsincat', 'local_courseindex'), 3);
         }
 
         $countcats = count($cattree->cats);
         $count = 0;
         $first = true;
         $last = false;
-        if ($levelix == 0) {
-            $str .= '<div class="browser-category'.$levelix.'cont container-fluid">';
-            $str .= '<div class="browser-category row-fluid">';
-        }
         if ($countcats) {
+            if ($levelix == 0) {
+                $substr .= '<div class="browser-category'.$levelix.'cont container-fluid">';
+                $substr .= '<div class="browser-category row-fluid">';
+            }
             foreach ($cattree->cats as $cat) {
-                $str .= '<div class="browser-category cell span4">';
+                $substr .= '<div class="browser-category cell span4">';
                 $levelix++;
                 $nextpath = (empty($catpath)) ? $cattree->id : $catpath.','.$cattree->id ;
-                $allcoursecount += $this->subnavigation($str, $cat, $nextpath, $depth - 1, $subfiles, $levelix, $rpcoptions);
+                $allcoursecount += $this->subnavigation($substr, $cat, $nextpath, $depth - 1, $subfiles, $levelix, $rpcoptions);
                 $levelix--;
-                $str .= '</div>';
+                $substr .= '</div>';
                 $count++;
                 if ($count && ($count % 3 == 0) && $levelix == 1) {
                     // New row start each 3 cells
-                    $str .= '</div>';
-                    $str .= '<div class="browser-category row-fluid">';
+                    $substr .= '</div>';
+                    $substr .= '<div class="browser-category row-fluid">';
                 }
             }
             if ($levelix == 0) {
-                $str .= '</div>';
-                $str .= '</div>';
+                $substr .= '</div>';
+                $substr .= '</div>';
             }
         } else {
                 if ($levelix == 0) {
-                    $str .= $OUTPUT->notification(get_string('nosubcats', 'local_courseindex'), 'browseremptysignal');
+                    $substr .= $OUTPUT->notification(get_string('nosubcats', 'local_courseindex'), 'browseremptysignal');
                 }
         }
+
+        // Top category
+        $str .= $this->current_category($cattree, $catpath, $depth, $levelix, $allcoursecount, $rpcoptions);
+
+        $str .= $substr;
 
         // If current category level, print available files
         if ($files && $levelix == 0) {
@@ -112,7 +117,7 @@ class local_courseindex_renderer extends plugin_renderer_base {
             $str .= '</div>';
             $str .= '</div>';
             $entries = $this->navigation_entries($str, $cattree, $rpcoptions);
-            $str .= "</div>\n\n";
+            $str .= '</div>';
         }
         return $allcoursecount;
     }
@@ -135,10 +140,6 @@ class local_courseindex_renderer extends plugin_renderer_base {
             $str = '';
         }
 
-        $str .= '<div id="subnav'.$levelix.'" class="courseindex-browser">';
-
-        $allcoursecount = $this->navigation_category_info($str, $cattree, $catpath, $depth, $levelix, $rpcoptions);
-
         switch ($files) {
             case DISPLAY_FILES_FIRST_LEVEL:
                 $subfiles = DISPLAY_CATEGORIES;
@@ -154,23 +155,25 @@ class local_courseindex_renderer extends plugin_renderer_base {
         $count = 0;
         $first = true;
         $last = false;
+        $substr = '';
+        $allcoursecount = 0;
         if ($countcats) {
             foreach ($cattree->cats as $cat) {
                 $levelix++;
                 $nextpath = (empty($catpath)) ? $cattree->id : $catpath.','.$cattree->id ;
-                $allcoursecount += $this->subnavigation($str, $cat, $nextpath, $depth - 1, $subfiles, $levelix, $rpcoptions);
+                $allcoursecount += $this->subnavigation($substr, $cat, $nextpath, $depth - 1, $subfiles, $levelix, $rpcoptions);
                 $levelix--;
-                $count++;
-                if ($count && ($count % 3 == 0) && $levelix == 1) {
-                }
             }
         }
 
+        $str .= '<div id="subnav'.$levelix.'" class="courseindex-browser">';
+        $this->navigation_category_info($str, $cattree, $catpath, $depth, $levelix, $rpcoptions);
+        $str .= $substr;
         $str .= '</div>';
 
         return $allcoursecount;
     }
-    
+
     /**
      * Prints the category info in indented fashion
      * This function is only used by print_navigation() above
@@ -179,7 +182,7 @@ class local_courseindex_renderer extends plugin_renderer_base {
      * @param array $rpcoptions @see tao_print_navigation()
      * @return the number of printed entries
      */
-    function navigation_entries(&$str, &$cat, $rpcoptions=null) {
+    function navigation_entries(&$str, &$cat, $rpcoptions = null) {
         global $CFG, $USER, $OUTPUT;
         static $strallowguests, $strrequireskey, $strsummary;
     
@@ -189,7 +192,7 @@ class local_courseindex_renderer extends plugin_renderer_base {
             $strsummary = get_string('summary');
         }
         if (!empty($cat->entries)) {
-            $str .= '<div class="courselist row-fuid">';
+            $str .= '<div class="courselist row-fluid">';
             $first = 'first';
             foreach ($cat->entries as $course) {
                 // if hidden and we have no capability to see hiddens
@@ -211,9 +214,8 @@ class local_courseindex_renderer extends plugin_renderer_base {
      * @param object $cat the current category
      * @param object $depth style depth
      * @param object $levelix category level (needed for making link URLs)
-     * @param object $rpcoptions @see tao_print_navigation()
      */
-    function navigation_category_info(&$str, &$cat, $thispath, $depth, $levelix, $rpcoptions=null) {
+    function navigation_category_info(&$str, &$cat, $thispath, $depth, $levelix, $rpcoptions = null) {
         global $CFG, $OUTPUT, $DB;
 
         $config = get_config('local_courseindex');
@@ -245,7 +247,8 @@ class local_courseindex_renderer extends plugin_renderer_base {
             } 
             $hiddencount = $coursecount - $visiblecount;
             if ($visiblecount) {
-                $coursecountstr = $visiblecount;
+                $coursecountstr = '<span id="browser-cat'.$cat->id.'">0</span>';
+;
                 $startlinkstyle = '<b>';
                 $endlinkstyle = '</b>';
             }
@@ -261,10 +264,12 @@ class local_courseindex_renderer extends plugin_renderer_base {
             $catptr = &$catptr->parent;
         }
         $catpath = '';
+
         if (!empty($catpathelms)) {
             // $catpathelms = array_reverse($catpathelms);
             $catpath = implode(',', $catpathelms);
         }
+
         // if at top of the visible tree, but not starting at plain root, make the breadcrumb cat list from root
         $pathacc = '';
         if ($depth > 0 && $levelix > 0) {
@@ -281,7 +286,7 @@ class local_courseindex_renderer extends plugin_renderer_base {
                     // Local category
                     $str .= '<div class="catgrouprow row-fluid">';
                     $str .= '<div class="catgroup span12">';
-                    $browserurl = new moodle_url('/local/courseindex/browser.php', array('cat' => $catpathelms[$j], 'catpath' => $catpathtmp, 'level' => $leveltmp));
+                    $browserurl = new moodle_url('/local/courseindex/browser.php', array('cat' => $catpathelms[$j], 'catpath' => $catpathtmp, 'level' => $leveltmp - 1));
                     $str .= '<a href="'.$browserurl.'" class="breadcrumbcat" >'.format_string($catnametmp).'</a>';
                     $str .= '</div>';
                     $str .= '</div>';
@@ -315,6 +320,7 @@ class local_courseindex_renderer extends plugin_renderer_base {
             $str .= '</div>';
             $str .= '<div class="coursecount span2">';
             $str .= $coursecountstr;
+            $str .= '<script type="text/javascript">$(\'#browser-cat'.$cat->id.'\').animateNumber({ number: '.$visiblecount.'});</script>';
             $str .= '</div>';
             $str .= '</div>';
        } else {
@@ -324,13 +330,13 @@ class local_courseindex_renderer extends plugin_renderer_base {
             $str .= '</div>';
             $str .= '<div class="coursecount span2">';
             $str .= $coursecountstr;
+            $str .= '<script type="text/javascript">$(\'#browser-cat'.$cat->id.'\').animateNumber({ number: '.$visiblecount.'});</script>';
+            // $str .= $coursecountstr;
             $str .= '</div>';
             $str .= '</div>';
         }
 
         $str .= '</div>';
-
-        return $visiblecount;
     }
 
     /**
@@ -345,7 +351,7 @@ class local_courseindex_renderer extends plugin_renderer_base {
      * @return the count of real entries we had in category.
      */
     function navigation_simple(&$str, &$cattree, $catpath = '') {
-        global $CFG;
+        global $CFG, $DB;
     
         static $levelix = 1;
         $coursestr = get_string('course');
@@ -504,22 +510,50 @@ class local_courseindex_renderer extends plugin_renderer_base {
         return $str;
     }
 
-    function current_category(&$str, &$cattree, &$catpath, $depth, $levelix, $rpcoptions) {
+    function current_category(&$cattree, &$catpath, $depth, $levelix, $allcoursecount, $rpcoptions) {
 
-        $allcoursecount = $this->navigation_category_info($buf, $cattree, $catpath, $depth, $levelix, $rpcoptions);
+        $str = '';
 
         $str .= '<div class="browser-current-category row-fluid">';
 
-        $str .= '<div class="browser-current-category-label">';
+        $str .= '<div class="browser-current-category-label span2">';
         $str .= get_string('currentcategory', 'local_courseindex');
         $str .= '</div>';
 
-        $str .= '<div class="browser-current-category-info">';
+        $str .= '<div class="browser-current-category-info span9">';
         $str .= format_string($cattree->name);
         $str .= '</div>';
 
+        $str .= '<div id="browser-cat'.$cattree->id.'" class="browser-current-category-count span1">';
+        // $str .= 0 + $allcoursecount;
+        $str .= '<script type="text/javascript">$(\'#browser-cat'.$cattree->id.'\').animateNumber({ number: '.(0 + @$allcoursecount).' });</script>';
         $str .= '</div>';
 
-        return $allcoursecount;
+        $str .= '</div>';
+
+        return $str;
     }
+
+    function cat_struct_debug($cattree) {
+        $str = '';
+        $indent = 0;
+
+        if (!$indent) {
+            $str .= '<pre>';
+        }
+
+        $str .= str_pad("&nbsp;&nbsp;&nbsp;", $indent).$cattree->id.' '.$cattree->name."\n";
+        foreach ($cattree->cats as $catid => $cat) {
+            $indent++;
+            $str .= $this->cat_struct_debug($cat);
+            $indent--;
+        }
+
+        if (!$indent) {
+            $str .= '</pre>';
+        }
+
+        return $str;
+    }
+
 }
