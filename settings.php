@@ -23,51 +23,74 @@ defined('MOODLE_INTERNAL') || die();
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-if ($hassiteconfig) { // needs this condition or there is error on login page
+if ($hassiteconfig) {
+
+    // Needs this condition or there is error on login page.
+
     $settings = new admin_settingpage('local_courseindex', get_string('pluginname', 'local_courseindex'));
     $ADMIN->add('localplugins', $settings);
 
-    $settings->add(new admin_setting_configcheckbox('local_courseindex/indexisopen', get_string('configopenindex', 'local_courseindex'),
-                       get_string('configopenindex_desc', 'local_courseindex'), 1));
+    $label = get_string('configfeatures', 'local_courseindex');
+    $settings->add(new admin_setting_heading('featureshdr', $label, ''));
 
-    $settings->add(new admin_setting_configcheckbox('local_courseindex/enableexplorer', get_string('configenableexplorer', 'local_courseindex'),
-                       get_string('configenableexplorer_desc', 'local_courseindex'), 1));
+    $key = 'local_courseindex/indexisopen';
+    $label = get_string('configopenindex', 'local_courseindex');
+    $desc = get_string('configopenindex_desc', 'local_courseindex');
+    $settings->add(new admin_setting_configcheckbox($key, $label, $desc, 1));
 
-    $settings->add(new admin_setting_configtext('local_courseindex/maxnavigationdepth', get_string('configmaxnavigationdepth', 'local_courseindex'),
-                       get_string('configmaxnavigationdepth_desc', 'local_courseindex'), 3));
+    $key = 'local_courseindex/enableexplorer';
+    $label = get_string('configenableexplorer', 'local_courseindex');
+    $desc = get_string('configenableexplorer_desc', 'local_courseindex');
+    $settings->add(new admin_setting_configcheckbox($key, $desc, $desc, 1));
 
-    $settings->add(new admin_setting_configcheckbox('local_courseindex/classification_display_empty_level_0', get_string('configclassificationdisplayemptylevel0', 'local_courseindex'),
-                       get_string('configclassificationdisplayemptylevel0_desc', 'local_courseindex'), 1));
+    /* Graphics configuration */
 
-    $settings->add(new admin_setting_configcheckbox('local_courseindex/classification_display_empty_level_1', get_string('configclassificationdisplayemptylevel1', 'local_courseindex'),
-                       get_string('configclassificationdisplayemptylevel1_desc', 'local_courseindex'), 1));
+    $label = get_string('configgraphics', 'local_courseindex');
+    $settings->add(new admin_setting_heading('graphicshdr', $label, ''));
 
-    $settings->add(new admin_setting_configcheckbox('local_courseindex/classification_display_empty_level_2', get_string('configclassificationdisplayemptylevel2', 'local_courseindex'),
-                       get_string('configclassificationdisplayemptylevel2_desc', 'local_courseindex'), 1));
+    $key = 'local_my/rendererimages';
+    $label = get_string('configrendererimages', 'local_courseindex');
+    $desc = get_string('configrendererimages_desc', 'local_courseindex');
+    $options = array('subdirs' => false, 'maxfiles' => 20);
+    $settings->add(new admin_setting_configstoredfile($key, $label, $desc, 'rendererimages', 0, $options));
 
-    $settings->add(new admin_setting_heading('metadatabinding', get_string('configmetadatabinding', 'local_courseindex'), get_string('configmetadatabinding_desc', 'local_courseindex')));
+    $label = get_string('configmetadatabinding', 'local_courseindex');
+    $desc = get_string('configmetadatabinding_desc', 'local_courseindex');
+    $settings->add(new admin_setting_heading('metadatabindinghdr', $label, $desc));
 
-    $settings->add(new admin_setting_configtext('local_courseindex/course_metadata_table', get_string('configcoursemetadatatable', 'local_courseindex'),
-                       get_string('configcoursemetadatatable_desc', 'local_courseindex'), 'customlabel_course_metadata'));
+    $key = 'local_courseindex/course_metadata_table';
+    $label = get_string('configcoursemetadatatable', 'local_courseindex');
+    $desc = get_string('configcoursemetadatatable_desc', 'local_courseindex');
+    $settings->add(new admin_setting_configtext($key, $label, $desc, 'customlabel_course_metadata'));
 
-    $settings->add(new admin_setting_configtext('local_courseindex/course_metadata_course_key', get_string('configcoursemetadatacoursekey', 'local_courseindex'),
-                       get_string('configcoursemetadatacoursekey_desc', 'local_courseindex'), 'courseid'));
+    $key = 'local_courseindex/course_metadata_course_key';
+    $label = get_string('configcoursemetadatacoursekey', 'local_courseindex');
+    $desc = get_string('configcoursemetadatacoursekey_desc', 'local_courseindex');
+    $settings->add(new admin_setting_configtext($key, $label, $desc, 'courseid'));
 
-    $settings->add(new admin_setting_configtext('local_courseindex/course_metadata_value_key', get_string('configcoursemetadatavaluekey', 'local_courseindex'),
-                       get_string('configcoursemetadatavaluekey_desc', 'local_courseindex'), 'valueid'));
+    $key = 'local_courseindex/course_metadata_value_key';
+    $label = get_string('configcoursemetadatavaluekey', 'local_courseindex');
+    $desc = get_string('configcoursemetadatavaluekey_desc', 'local_courseindex');
+    $settings->add(new admin_setting_configtext($key, $label, $desc, 'valueid'));
 
-    $settings->add(new admin_setting_configtext('local_courseindex/classification_value_table', get_string('configclassificationvaluetable', 'local_courseindex'),
-                       get_string('configclassificationvaluetable_desc', 'local_courseindex'), 'customlabel_mtd_value'));
+    $key = 'local_courseindex/classification_value_table';
+    $label = get_string('configclassificationvaluetable', 'local_courseindex');
+    $desc = get_string('configclassificationvaluetable_desc', 'local_courseindex');
+    $settings->add(new admin_setting_configtext($key, $label, $desc, 'customlabel_mtd_value'));
 
-    $settings->add(new admin_setting_configtext('local_courseindex/classification_value_type_key', get_string('configclassificationvaluetypekey', 'local_courseindex'),
-                       get_string('configclassificationvaluetypekey_desc', 'local_courseindex'), 'typeid'));
+    $key = 'local_courseindex/classification_value_type_key';
+    $label = get_string('configclassificationvaluetypekey', 'local_courseindex');
+    $desc = get_string('configclassificationvaluetypekey_desc', 'local_courseindex');
+    $settings->add(new admin_setting_configtext($key, $label, $desc, 'typeid'));
 
-    $settings->add(new admin_setting_configtext('local_courseindex/classification_type_table', get_string('configclassificationtypetable', 'local_courseindex'),
-                       get_string('configclassificationtypetable_desc', 'local_courseindex'), 'customlabel_mtd_type'));
+    $key = 'local_courseindex/classification_type_table';
+    $label = get_string('configclassificationtypetable', 'local_courseindex');
+    $desc = get_string('configclassificationtypetable_desc', 'local_courseindex');
+    $settings->add(new admin_setting_configtext($key, $label, $desc, 'customlabel_mtd_type'));
 
-    $settings->add(new admin_setting_configtext('local_courseindex/classification_constraint_table', get_string('configclassificationconstrainttable', 'local_courseindex'),
-                       get_string('configclassificationconstrainttable_desc', 'local_courseindex'), 'customlabel_mtd_constraint'));
-
-
+    $key = 'local_courseindex/classification_constraint_table';
+    $label = get_string('configclassificationconstrainttable', 'local_courseindex');
+    $desc = get_string('configclassificationconstrainttable_desc', 'local_courseindex');
+    $settings->add(new admin_setting_configtext($key, $label, $desc, 'customlabel_mtd_constraint'));
 }
 

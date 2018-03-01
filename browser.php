@@ -29,15 +29,14 @@ $SESSION->courseindex->noheaders = optional_param('noheaders', @$SESSION->course
 
 $config = get_config('local_courseindex');
 
-// hidden key to open the catalog to the unlogged area
+// hidden key to open the catalog to the unlogged area.
 if (empty($config->indexisopen)) {
     require_login();
     $sitecontext = context_course::instance(SITEID);
     require_capability('local/courseindex:browse', $sitecontext);
 }
 
-$cat = optional_param('cat', '', PARAM_INT);
-$level = optional_param('level', 0, PARAM_INT);
+$catid = optional_param('catid', '', PARAM_INT);
 $catpath = optional_param('catpath', '', PARAM_RAW);
 
 $strheading = get_string('courseindex', 'local_courseindex');
@@ -47,7 +46,11 @@ $PAGE->set_url($url);
 $PAGE->set_context(context_system::instance());
 $PAGE->navbar->add(get_string('courseindex', 'local_courseindex'));
 $PAGE->navbar->add(get_string('browse', 'local_courseindex'));
+$PAGE->requires->jquery();
 $PAGE->requires->jquery_plugin('animatenumber', 'local_courseindex');
+$PAGE->requires->jquery_plugin('slick', 'local_courseindex');
+$PAGE->requires->css('/local/courseindex/jquery/slick/slick.css');
+$PAGE->requires->js('/local/courseindex/js/slickinit.js');
 
 $PAGE->set_heading($strheading);
 $PAGE->set_title($strheading);
@@ -58,11 +61,36 @@ $filters = null;
 
 // getting all filters
 
-$classificationfilters = local_courseindex_get_category_filters();
+$classificationfilters = \local_courseindex\navigator::get_category_filters();
 
 $i = 0;
 foreach ($classificationfilters as $afilter) {
-    $options = $DB->get_records_menu($config->classification_value_table, array($config->classification_value_type_key => $afilter->id), 'value', 'id,value');
+
+    $optionsql = "
+        SELECT
+            cv.id,
+            CONCAT(cv.value, ' (',COUNT(cm.id),')') as value
+        FROM
+            {{$config->classification_value_table}} cv
+        LEFT JOIN
+            {{$config->course_metadata_table}} cm
+        ON
+            {$config->course_metadata_value_key} = cv.id
+        LEFT JOIN
+            {course} c
+        ON
+            cm.courseid = c.id
+        WHERE
+            {$config->classification_value_type_key} = ? AND
+            c.visible = 1
+        GROUP BY
+            cv.id
+        ORDER BY
+            cv.sortorder
+    ";
+
+    $options = $DB->get_records_sql_menu($optionsql, array($afilter->id));
+
     $filters["f$i"] = new StdClass;
     $filters["f$i"]->name = $afilter->name;
     $filters["f$i"]->options = $options;
@@ -75,101 +103,38 @@ if (empty($SESSION->courseindex->noheaders)) {
 }
 
 echo $OUTPUT->heading(get_string('courseindex', 'local_courseindex'), 2);
-echo '<div class="static">';
-local_print_static_text('coursecatalog_browser_header', $CFG->wwwroot.'/local/courseindex/browser.php');
-echo '</div>';
+
+if (is_dir($CFG->dirroot.'/local/staticguitexts')) {
+    // If static gui texts are installed, add a static text to be edited by administrator.
+    echo '<div class="static">';
+    local_print_static_text('coursecatalog_browser_header', $CFG->wwwroot.'/local/courseindex/browser.php');
+    echo '</div>';
+}
 
 // making filters.
 
-$browserurl = '/local/courseindex/browser.php';
+echo $renderer->filters($catid, $catpath, $filters);
 
-echo '<form name="filtering" action="'.$browserurl.'" method="post">';
-echo '<input type="hidden" name="cat" value="'.$cat.'"/>';
-echo '<input type="hidden" name="level" value="'.$level.'"/>';
-echo '<input type="hidden" name="catpath" value="'.$catpath.'"/>';
+// Calling navigation.
 
-if (!empty($filters)) {
-    echo '<fieldset>';
-    echo '<table cellspacing="10"><tr><td>';
-    foreach($filters as $key => $afilter) {
-        if ($key != 'wwwroot') {
-            echo '<b><span style="font-size:80%">'.$afilter->name.' :</span></b><br/>';
-            echo html_writer::select($afilter->options, $key, $afilter->value);
-            echo '</td><td>';
-        }
+$catlevels = \local_courseindex\navigator::get_category_levels();
+$cattree = \local_courseindex\navigator::generate_navigation($catid, $catpath, $catlevels, $filters);
+
+// local_courseindex_reduce_tree($cattree, $catlevels);
+
+echo $renderer->category($cattree, $catpath, \local_courseindex\navigator::count_entries_rec($cattree), 'current', true, $filters);
+
+if ($catid) {
+    // Root of the catalog cannot have courses.
+    if (!empty($cattree->entries)) {
+        echo $renderer->courses_slider(array_keys($cattree->entries));
     }
-    $strreload = get_string('reload', 'local_courseindex');
-    
-    echo '<td><input type="submit" name="go_btn" value="'.$strreload.'" /></td>';
-    echo '</td></tr></table>';
-    echo '</fieldset>';
 }
 
-echo '</form>';
+echo $renderer->children($cattree, $catpath, $filters);
 
-// calling navigation.
-
-$simmplenav = false;
-if ($simmplenav) {
-    $cattree = local_courseindex_generate_navigation($cat, $catpath, $level, $filters);
-    $str = '';
-    $catlevels = local_courseindex_get_category_levels();
-    local_courseindex_reduce_tree($cattree, $catlevels);
-    $renderer->navigation_simple($str, $cattree);
-    echo '<br/>';
-    echo $str;
-    echo '<br/>';
-    echo '<br/>';
-} else {
-    $str = '';
-    // TODO Actually not completely fixed. Category browsing
-    // fails in applying constraints at level > 1
-    $cattree = local_courseindex_generate_navigation($cat, $catpath, $level, $filters);
-    $catlevels = local_courseindex_get_category_levels();
-
-    // echo $renderer->cat_struct_debug($cattree);
-
-    local_courseindex_reduce_tree($cattree, $catlevels);
-
-    // echo $renderer->cat_struct_debug($cattree);
-
-    $rcpoptions = null;
-    $allcoursecount = $renderer->navigation($str, $cattree, $catpath, 2, DISPLAY_FILES_FIRST_LEVEL, 0, false, $rcpoptions);
-
-    echo $OUTPUT->box_start('lpbrowsingarea');
-    echo $str;
-    echo '<br/>';
-    echo '<br/>';
-    $parentcat = $cattree->parent->id;
-    $parentcatpath = $cattree->parent->catpath;
-    $browseparent = '';
-
-    if ($level > 0) {
-        $parentlevel = $level - 1;
-        $browseupstr = get_string('browseup', 'local_courseindex');
-        $browserurl = new moodle_url('/local/courseindex/browser.php', array('cat' => $parentcat, 'catpath' => $parentcatpath, 'level' => $parentlevel));
-        $browseparent = ' - <a href="'.$browserurl.'">'.$browseupstr.'</a>';
-    }
-
-    if ($cat) {
-        // print back to root
-        $strbacktoroot = get_string('backtoroot', 'local_courseindex');
-        $topcatbrowserurl = new moodle_url('/local/courseindex/browser.php', array('cat' => 0));
-        echo '<div id="backtorootlink" style="text-align:center"><a href="'.$topcatbrowserurl.'">'.$strbacktoroot.'</a>'.$browseparent.'</div>';
-    }
-    echo '<br/>';
-    if (!$allcoursecount) {
-        echo $OUTPUT->notification(get_string('novisiblecoursesinsubtree', 'local_courseindex'));
-    }
-    echo $OUTPUT->box_end();
-
-}
-echo '<br/>';
 if (!empty($config->enableexplorer)) {
-    $searchstr = get_string('searchintree', 'local_courseindex');
-    $exploreurl = new moodle_url('/local/courseindex/explorer.php');
-    echo '<center><a href="'.$exploreurl.'">'.$searchstr.'</a></center>';
-    echo '<br/>';
+    echo $renderer->explorerlink();
 }
 
 if (empty($SESSION->courseindex->noheaders)) {

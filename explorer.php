@@ -30,8 +30,10 @@ require_once($CFG->dirroot.'/mod/customlabel/locallib.php');
 $SESSION->courseindex = new StdClass;
 $SESSION->courseindex->headers = optional_param('headers', @$SESSION->courseindex->headers, PARAM_BOOL);
 
+$config = get_config('local_courseindex');
+
 // hidden key to open the catalog to the unlogged area
-if (empty($CFG->courseindex_is_open)) {
+if (empty($config->indexisopen)) {
     require_login();
 }
 
@@ -58,11 +60,12 @@ $filters = NULL;
 
 /// getting all filters
 
-$classificationfilters = local_courseindex_get_category_filters();
+$classificationfilters = \local_courseindex\navigator::get_category_filters();
+$catlevels = \local_courseindex\navigator::get_category_levels();
 
 $i = 0;
 foreach ($classificationfilters as $afilter) {
-    $options = $DB->get_records_menu($CFG->classification_value_table, array($CFG->classification_value_type_key => $afilter->id), 'value', 'id,value');
+    $options = $DB->get_records_menu($config->classification_value_table, array($config->classification_value_type_key => $afilter->id), 'value', 'id,value');
     $filters["f$i"] = new StdClass();
     $filters["f$i"]->name = $afilter->name;
     $filters["f$i"]->options = $options;
@@ -70,10 +73,10 @@ foreach ($classificationfilters as $afilter) {
     $i++;
 }
 
-/// including page text
+// Including page text.
 local_print_static_text('courseindex_explore_courses_text', $CFG->wwwroot.'/local/courseindex/explorer.php');
 
-/// print search engine
+// Print search engine.
 $search = optional_param('go_search', '', PARAM_RAW);
 $freesearch = optional_param('go_freesearch', '', PARAM_RAW);
 $specialsearch = optional_param('go_specialsearch', '', PARAM_RAW);
@@ -92,8 +95,8 @@ if ($search || $freesearch) {
     $form->level1 = optional_param_array('level1', '', PARAM_INT);
     $form->level2 = optional_param_array('level2', '', PARAM_INT);
     $searching = true;
-    $results = local_courseindex_explore($form);
-} elseif ($specialsearch) {
+    $results = \local_courseindex\explorer::explore($form);
+} else if ($specialsearch) {
     $form->specialsearch = 1;
     $form->lpstatus = optional_param('lpstatus', '', PARAM_INT);
     $form->targets = optional_param('targets', array(), PARAM_INT);
@@ -102,7 +105,7 @@ if ($search || $freesearch) {
     $form->information = 0;
     $form->searchtext = '';
     $searching = true;
-    $results = local_courseindex_explore($form);
+    $results = \local_courseindex\explorer::explore($form);
 } else {
     $searching = false;
     $form = new StdClass();
@@ -129,7 +132,7 @@ local_print_static_text('courseindex_explore_freetext_text', $CFG->wwwroot.'/loc
 
 include_once $CFG->dirroot.'/local/courseindex/textsearch_form.html';
 
-if (local_courseindex_classification_has_special_fields($specialfields)) {
+if (\local_courseindex\explorer::has_special_fields($specialfields)) {
     echo $OUTPUT->heading(get_string('byspecialcriteria', 'local_courseindex'));
     local_print_static_text('courseindex_explore_targets_text', $CFG->wwwroot.'/local/courseindex/explorer.php');
     include_once $CFG->dirroot.'/local/courseindex/special_form.html';
@@ -150,11 +153,7 @@ if (!empty($results)) {
 
     // $filters = array();
 
-    $cattree = local_courseindex_generate_navigation(0, '', 0, $filters);
-    $catlevels = local_courseindex_get_category_levels();
-
-    $str = '';
-    $entrycount = local_courseindex_reduce_tree($cattree, $catlevels, array_keys($results));
+    $cattree = \local_courseindex\navigator::generate_navigation(0, '', 0, $filters);
 
     if ($entrycount) {
         echo $renderer->navigation_simple($str, $cattree);
@@ -172,12 +171,6 @@ if (!empty($results)) {
     }
 }
 
-echo '<br/>';
-
-$browserstr = get_string('browsealltree', 'local_courseindex');
-$browserurl = new moodle_url('/local/courseindex/browser.php');
-echo '<center><a href="'.$browserurl.'">'.$browserstr.'</a></center>';
-
-echo '<br/>';
+echo $renderer->browserlink();
 
 echo $OUTPUT->footer();

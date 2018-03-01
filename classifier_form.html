@@ -61,7 +61,7 @@ $classifier = customlabel_load_class($customlabel);
             $script = " applyconstraintsmenu('{$CFG->wwwroot}', '{$classifier->type}', this, '{$field->constraintson}') ";
         }
         echo '<div id="div_menu_'.$field->name.'">';
-        if (empty($multiple)){
+        if (empty($multiple)) {
             echo html_writer::select($options, $field->name, $value, array(), array('onchange' => $script));
         } else {
             echo html_writer::select($options, "{$field->name}[]", @$form->$fieldname, array(), array('onchange' => $script, 'multiple' => 1));

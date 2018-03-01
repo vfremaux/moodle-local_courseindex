@@ -32,27 +32,69 @@
     color:#b0b0b0;
     font-weight:lighter;
     background-color:#f8f8f8;
-    padding:20px;
+    padding:10px;
     width:150px;
     display:table-cell;
+    height:40px;
 }
 
 .browser-current-category-info {
     color:#808080;
     font-size:24px;
     background-color:#f0f0f0;
-    padding:20px;
+    padding:10px;
     display:table-cell;
     width:90%;
+    height:40px;
 }
 
 .browser-current-category-count {
     color:#f0f0f0;
     font-size:24px;
     background-color:#808080;
-    padding:20px;
+    padding:10px;
     display:table-cell;
     width:50px;
+    height:40px;
+}
+
+.browser-sub-category-label {
+    font-size:18px;
+    color:#b0b0b0;
+    font-weight:lighter;
+    background-color:#f8f8f8;
+    padding:10px;
+    width:150px;
+    display:table-cell;
+}
+
+.browser-sub-category-info {
+    color:#808080;
+    font-size:18px;
+    background-color:#f0f0f0;
+    padding:10px;
+    display:table-cell;
+    width:90%;
+}
+
+.browser-sub-category-count {
+    color:#f0f0f0;
+    font-size:18px;
+    background-color:#808080;
+    padding:10px;
+    display:table-cell;
+    width:50px;
+}
+
+.courseindex-browse-up {
+    height: 24px;
+    width: 24px;
+}
+
+#browser-link-to-explorer,
+#browser-link-to-browser {
+    margin-top:20px;
+    text-align: center;
 }
 
 .catname .category {
@@ -97,4 +139,8 @@
     height:50px;
     margin: 1px;
     float:right !important;
+}
+
+.browser-filters td {
+    padding-left:15px;
 }

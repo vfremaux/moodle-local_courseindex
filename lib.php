@@ -14,23 +14,23 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
+defined('MOODLE_INTERNAL') || die();
+
 /**
- * Version details.
+ * This file contains necessary functions to output
+ * cms content on site or course level.
  *
  * @package    local_courseindex
  * @category   local
- * @author     Valery Fremaux <valery.fremaux@gmail.com>
- * @copyright  2010 onwards Valery Fremaux <valery.fremaux@gmail.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
+ * @author Gustav Delius
+ * @author     Moodle 2.x Valery Fremaux <valery.fremaux@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-defined('MOODLE_INTERNAL') || die();
-
-$plugin->version = 2016031900;   // The (date) version of this plugin.
-$plugin->requires = 2017110800;   // Requires this Moodle version.
-$plugin->component = 'local_courseindex';
-$plugin->release = '3.4.0 (Build 2016031900)';
-$plugin->maturity = MATURITY_RC;
-
-// Non moodle attributes.
-$plugin->codeincrement = '3.4.0000';
+/**
+ * This function is not implemented in thos plugin, but is needed to mark
+ * the vf documentation custom volume availability.
+ */
+function local_courseindex_supports_feature() {
+    assert(1);
+}
