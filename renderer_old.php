@@ -400,9 +400,9 @@ class local_courseindex_renderer extends plugin_renderer_base {
                     $keystr = get_string('needspassword', 'local_courseindex');
                     $gueststr = get_string('guestallowed', 'local_courseindex');
                     $enrolstr = get_string('openenrol', 'local_courseindex');
-                    $keyed = ($entry->password) ? '<img src="'.$OUTPUT->pix_url('i/key').'" title="'.$keystr.'" />' : '';
-                    $guest = ($entry->guest) ? ' <img src="'.$OUTPUT->pix_url('i/guest').'" title="'.$gueststr.'" />' : '';
-                    $enrol = ($entry->enrollable) ? ' <img src="'.$OUTPUT->pix_url('t/manual_item').'" title="'.$enrolstr.'" />' : '';
+                    $keyed = ($entry->password) ? $OUTPUT->pix_icon('i/key', $keystr) : '';
+                    $guest = ($entry->guest) ? ' '.$OUTPUT->pix_icon('i/guest', $gueststr) : '';
+                    $enrol = ($entry->enrollable) ? ' '.$OUTPUT->pix_icon('t/manual_item', $enrolstr) : '';
                     $courseurl = new moodle_url('/course/view.php', array('id' => $entry->id));
                     $str .= '<div class="browser category row-fluid">';
                     $str .= '<div class="courseline lpcourse'.$levelix.' cell">';

@@ -59,7 +59,7 @@ class local_courseindex_renderer extends plugin_renderer_base {
                 $params[$key] = $afilter->value;
             }
             $template->upcaturl = new moodle_url('/local/courseindex/browser.php', $params);
-            $template->uppixurl = $this->pix_url('up', 'local_courseindex');
+            $template->uppixurl = $this->image_url('up', 'local_courseindex');
             $template->catspan = 9;
         } else {
             $template->catspan = 11;
@@ -256,9 +256,9 @@ class local_courseindex_renderer extends plugin_renderer_base {
         }
 
         if ($PAGE->theme->resolve_image_location($imgname, 'theme', true)) {
-            $imgurl = $this->output->pix_url($imgname, 'theme');
+            $imgurl = $this->output->image_url($imgname, 'theme');
         } else {
-            return $this->output->pix_url($imgname, 'local_courseindex');
+            return $this->output->image_url($imgname, 'local_courseindex');
         }
 
         return $imgurl;
