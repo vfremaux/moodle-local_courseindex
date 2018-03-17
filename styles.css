@@ -1,0 +1,146 @@
+
+/* Course block */
+
+.browser-courseblock {
+    margin:5px;
+    border:1px solid #f0f0f0;
+    border-radius:5px;
+    padding:0px;
+}
+
+.browser-courseblock .title {
+    font-size:24px;
+    font-family:Verdana,sans-serif;
+    padding:20px;
+    background-color:#f0f0f0;
+    font-weight:thin;
+}
+
+.browser-courseblock .courseimage {
+    padding:20px;
+}
+
+.browser-courseblock .summary {
+    font-size:12px;
+    font-family:Verdana,sans-serif;
+    padding:10px;
+    background-color:#f8f8f8;
+}
+
+.browser-current-category-label {
+    font-size:24px;
+    color:#b0b0b0;
+    font-weight:lighter;
+    background-color:#f8f8f8;
+    padding:10px;
+    width:150px;
+    display:table-cell;
+    height:40px;
+}
+
+.browser-current-category-info {
+    color:#808080;
+    font-size:24px;
+    background-color:#f0f0f0;
+    padding:10px;
+    display:table-cell;
+    width:90%;
+    height:40px;
+}
+
+.browser-current-category-count {
+    color:#f0f0f0;
+    font-size:24px;
+    background-color:#808080;
+    padding:10px;
+    display:table-cell;
+    width:50px;
+    height:40px;
+}
+
+.browser-sub-category-label {
+    font-size:18px;
+    color:#b0b0b0;
+    font-weight:lighter;
+    background-color:#f8f8f8;
+    padding:10px;
+    width:150px;
+    display:table-cell;
+}
+
+.browser-sub-category-info {
+    color:#808080;
+    font-size:18px;
+    background-color:#f0f0f0;
+    padding:10px;
+    display:table-cell;
+    width:90%;
+}
+
+.browser-sub-category-count {
+    color:#f0f0f0;
+    font-size:18px;
+    background-color:#808080;
+    padding:10px;
+    display:table-cell;
+    width:50px;
+}
+
+.courseindex-browse-up {
+    height: 24px;
+    width: 24px;
+}
+
+#browser-link-to-explorer,
+#browser-link-to-browser {
+    margin-top:20px;
+    text-align: center;
+}
+
+.catname .category {
+    padding-top:10px !important;
+    font-size:16px;
+}
+
+#subnav1 > .browser-category-info > .catname {
+    font-size:24px;
+    color:#b0b0b0;
+    font-weight:lighter;
+    background-color:#f8f8f8;
+    padding:15px;
+    border:3px solid white;
+}
+
+#subnav1 > .courseindex-browser {
+    width: 100%;
+}
+
+#subnav2 {
+    padding-left:15px;
+}
+
+#subnav3 {
+    padding-left:30px;
+}
+
+#subnav3 .category {
+    width:80% !important;
+}
+
+.coursecount {
+    font-family: Verdana, sans-serif;
+    font-size:24px;
+    color:#808080;
+    font-weight:lighter;
+    background-color:#f0f0f0;
+    padding-top:10px !important;
+    text-align:center;
+    width:50px !important;
+    height:50px;
+    margin: 1px;
+    float:right !important;
+}
+
+.browser-filters td {
+    padding-left:15px;
+}
