@@ -37,7 +37,8 @@ if (empty($config->indexisopen)) {
     require_login();
 }
 
-$PAGE->requires->js('/mod/customlabel/js/applyconstraints.js');
+$PAGE->requires->js_call_amd('mod_customlabel/customlabel', 'init');
+$PAGE->requires->js_call_amd('local_courseindex/courseindex', 'init');
 
 $strheading = get_string('explore', 'local_courseindex');
 
@@ -56,7 +57,7 @@ echo $OUTPUT->header();
 
 echo $OUTPUT->heading(get_string('lpsearch', 'local_courseindex'));
 
-$filters = NULL;
+$filters = null;
 
 /// getting all filters
 
@@ -125,17 +126,109 @@ if (local_has_capability_somewhere('block/course_status:viewcoursestatus')) {
 echo $OUTPUT->heading(get_string('bycategory', 'local_courseindex'));
 local_print_static_text('courseindex_explore_classifier_text', $CFG->wwwroot.'/local/courseindex/explorer.php');
 
-include($CFG->dirroot.'/local/courseindex/classifier_form.html');
+$customlabel = new StdClass();
+$customlabel->labelclass = 'courseclassifier';
+$customlabel->title = 'void';
+$customlabel->safecontent = '';
+$classifier = customlabel_load_class($customlabel);
+
+$template = new StdClass;
+foreach ($classifier->fields as $field) {
+    if ($field->type == '_error_') {
+        continue;
+    }
+
+    // All other field types are not relevant for search engine.
+    if (!preg_match("/(datasource|_error_)$/", $field->type)) {
+        continue;
+    }
+
+    $classifiertpl = new Stdclass;
+
+    $classifiertpl->fieldname = str_replace('[]', '', $field->name); // must take care it is a multiple field
+    if (!empty($field->isfilter)) {
+        $classifiertpl->fieldlabel = $field->label;
+    } else {
+        $classifiertpl->fieldlabel = get_string($fieldname, 'customlabeltype_courseclassifier');
+    }
+
+    if (!empty($field->mandatory)) {
+        $classifiertpl->mandatory = true;
+        $classifiertpl->pixurl = $OUTPUT->pix_url('req');
+    }
+    if (!empty($field->help)) {
+        $classifiertpl->fieldhelp = $field->help;
+    }
+
+    // Very similar to lists, except options come from an external datasource
+    /*
+    if ($field->type == '_error_') {
+        echo '<div id="div_menu_'.$field->name.'">';
+        echo $OUTPUT->notification($field->error, 'notifyproblem');
+        echo '</div>';
+        echo '</td></tr>';
+        continue;
+    }
+    */
+    $multiple = (isset($field->multiple)) ? $field->multiple : '';
+    $options = $classifier->get_datasource_options($field);
+    $params = array();
+    if (!empty($field->constraintson)) {
+        $params['class'] = 'constrained';
+    }
+    if (empty($multiple)) {
+        $classifiertpl->searchselect = html_writer::select($options, $field->name, $value, $params);
+    } else {
+        $params['multiple'] = 1;
+        $classifiertpl->searchselect = html_writer::select($options, "{$field->name}[]", @$form->$fieldname, array(), $params);
+    }
+
+    $template->classifiers[] = $classifiertpl;
+}
+echo $OUTPUT->render_from_template('local_courseindex/indexsearchform', $template);
 
 echo $OUTPUT->heading(get_string('bykeyword', 'local_courseindex'));
 local_print_static_text('courseindex_explore_freetext_text', $CFG->wwwroot.'/local/courseindex/explorer.php');
 
-include_once $CFG->dirroot.'/local/courseindex/textsearch_form.html';
+$template = new StdClass;
+
+$template->searchtext = $form->searchtext;
+$template->titlechecked = ($form->title) ? 'checked="checked"' : '' ;
+$template->descchecked = ($form->description) ? 'checked="checked"' : '' ;
+$template->infochecked = ($form->information) ? 'checked="checked"' : '' ;
+
+echo $OUTPUT->render_from_template('local_courseindex/textsearchform', $template);
 
 if (\local_courseindex\explorer::has_special_fields($specialfields)) {
     echo $OUTPUT->heading(get_string('byspecialcriteria', 'local_courseindex'));
     local_print_static_text('courseindex_explore_targets_text', $CFG->wwwroot.'/local/courseindex/explorer.php');
-    include_once $CFG->dirroot.'/local/courseindex/special_form.html';
+
+    $template = new StdClass;
+
+    list($peoplefieldid, $topicfieldid) = $specialfields;
+    if ($peoplefieldid || $topicfieldid) {
+
+        if ($peoplefieldid) {
+            $template->peoplefieldid = $peoplefieldid;
+            $params = array($CFG->classification_value_type_key => $peoplefieldid);
+            $targets = $DB->get_records_menu($CFG->classification_value_table, $params, 'sortorder', 'id, value');
+            $targets['0'] = get_string('alltargets', 'local_courseindex');
+            ksort($targets);
+            $attrs = array('id' => '_targets', 'multiple' => 1, 'size' => 8);
+            $template->targesselect = html_writer::select($targets, 'targets[]', $form->targets, array(), $attrs);
+        }
+        if ($topicfieldid) {
+            $template->topicfieldid = $topicfieldid;
+            $params = array($CFG->classification_value_type_key => $topicfieldid);
+            $topics = $DB->get_records_menu($CFG->classification_value_table, $params, 'sortorder', 'id, value');
+            $topics['0'] = get_string('alltopics', 'local_courseindex');
+            ksort($topics);
+            $attrs = array('id' => '_topics', 'multiple' => 1, 'size' => 8);
+            $template->topicsselect = html_writer::select($topics, 'topics[]', $form->topics, array(), $attrs);
+        }
+
+        echo $OUTPUT->render_from_template('local_courseindex/specialsearchform', $template);
+    }
 }
 
 if (!empty($results)) {

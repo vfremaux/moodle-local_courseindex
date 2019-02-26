@@ -1,0 +1,44 @@
+
+
+<!-- local_courseindex/specialsearchform -->
+<a name="specialsearch"></a>
+<form name="specialform" action="#results" method="get">
+<input type="hidden" name="lpstatus" value="" />
+<fieldset>
+    <table width="100%" class="generaltable">
+        {{#peoplefieldid}}
+        <tr valign="top">
+            <td align="right" width="30%">
+                <b>{{#str}}targets, local_courseindex{{/str}}</b>
+            </td>
+            <td align="left">
+                    {{{targetsselect}}}
+                ?>
+            </td>
+        </tr>
+        {{/peoplefieldid}}
+
+        {{#topicfieldid}}
+        <tr valign="top">
+            <td align="right" width="30%">
+                <b>{{#str}}topics, local_courseindex{{/str}}</b>
+            </td>
+            <td align="left">
+                    {{{topicsselect}}}
+            </td>
+        </tr>
+        {{/topicfieldid}}
+
+        <tr valign="top">
+            <td align="right" width="30%"></td>
+            <td align="left">
+                <input type="submit"
+                       id="id-courseindex-special-submit"
+                       name="go_specialsearch"
+                       value="{{#str}}gospecialsearch, local_courseindex{{/str}}" />
+            </td>
+        </tr>
+    </table>
+</fieldset>
+</form>
+<!-- /local_courseindex/specialsearchform -->
