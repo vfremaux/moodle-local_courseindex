@@ -60,7 +60,7 @@ define(['jquery', 'core/log'], function($, log) {
             var statuschoice = document.forms['statusform'].lpstatus;
             if (statuschoice){ // might not be in page
                 var statusix = statuschoice.selectedIndex;
-                if(statusix){
+                if (statusix) {
                     document.forms['specialform'].lpstatus.value = statuschoice.options[statusix].value;
                 }
             }

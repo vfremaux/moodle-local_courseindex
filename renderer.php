@@ -40,7 +40,7 @@ class local_courseindex_renderer extends plugin_renderer_base {
      * @param boolean $up
      * @param array $filters
      */
-    function category(&$cat, &$catpath, $coursecount, $current = 'current', $up = false, $filters = array()) {
+    public function category(&$cat, &$catpath, $coursecount, $current = 'current', $up = false, $filters = array()) {
 
         $template = new StdClass;
         $template->current = $current;
@@ -113,24 +113,7 @@ class local_courseindex_renderer extends plugin_renderer_base {
 
                 $coursetpl->courseurl = new moodle_url('/course/view.php', array('id' => $courseid ));
 
-                if ($course instanceof stdClass) {
-                    $course = new \core_course_list_element($course);
-                }
-
-                $coursetpl->imgurl = false; // Initiate search.
-                $context = context_course::instance($course->id);
-
-                foreach ($course->get_course_overviewfiles() as $file) {
-                    if ($isimage = $file->is_valid_image()) {
-                        $path = '/'. $file->get_contextid(). '/'. $file->get_component().'/';
-                        $path .= $file->get_filearea().$file->get_filepath().$file->get_filename();
-                        $coursetpl->imgurl = file_encode_url("$CFG->wwwroot/pluginfile.php", $path, !$isimage);
-                        break;
-                    }
-                }
-                if (!$coursetpl->imgurl) {
-                    $coursetpl->imgurl = $this->get_image_url('coursedefaultimage');
-                }
+                $coursetpl->imgurl = $this->get_course_image_url($course);
 
                 $template->courses[] = $coursetpl;
             }
@@ -216,6 +199,125 @@ class local_courseindex_renderer extends plugin_renderer_base {
         $template->hasfilters = count($template->filters);
 
         return $this->output->render_from_template('local_courseindex/filters', $template);
+    }
+
+    public function search_results($results) {
+        global $DB;
+
+        $config = get_config('local_courseindex');
+
+        foreach ($results as $result) {
+            $coursetpl = $result;
+
+            $sql = "
+                SELECT
+                   cct.code,
+                   cct.name,
+                   GROUP_CONCAT(ccv.value, ', ') as value
+                FROM
+                    {{$config->course_metadata_table}} cc,
+                    {{$config->classification_value_table}} ccv,
+                    {{$config->classification_type_table}} cct
+                WHERE
+                    cct.id = ccv.typeid AND
+                    ccv.id = cc.valueid AND
+                    cc.courseid = ?
+                GROUP BY
+                    cct.code
+                ORDER BY
+                    cct.sortorder, ccv.sortorder
+            ";
+
+            if ($mtds = $DB->get_records_sql($sql, array($result->id))) {
+                foreach ($mtds as $mtd) {
+                    $tagtpl = new Stdclass;
+                    $tagtpl->name = $mtd->name;
+                    $tagtpl->value = $mtd->value;
+                    $coursetpl->tags[] = $tagtpl;
+                }
+            }
+
+            $coursetpl->description = format_text($DB->get_field('course', 'summary', array('id' => $result->id)));
+            $coursetpl->imgurl = $this->get_course_image_url($result);
+            $coursetpl->courseurl = new moodle_url('/course/view.php', array('id' => $result->id));
+
+            $template->courses[] = $coursetpl;
+        }
+
+        return $this->output->render_from_template('local_courseindex/searchresults', $template);
+    }
+
+    /**
+     * Navigator category rendering.
+     * @param objectref &$cat
+     * @param string &$catpath
+     * @param int $coursecount
+     * @param string $current
+     * @param boolean $up
+     * @param array $filters
+     *
+    public function category_tree(&$cat, &$catpath, $coursecount, $filters = array(), $astemplate = false) {
+        static $level = -1;
+
+        $level++;
+        $template = new StdClass;
+
+        $template->catname = format_string($cat->name);
+        $template->catid = $cat->id;
+
+        $template->issub = ($current == 'sub');
+        if ($template->issub) {
+            $params = array('catid' => $cat->id, 'catpath' => $nextpath);
+            if (!empty($filters)) {
+                foreach ($filters as $key => $afilter) {
+                    $params[$key] = $afilter->value;
+                }
+            }
+            $template->caturl = new moodle_url('/local/courseindex/browser.php', $params);
+        }
+
+        if (!empty($cat->entries)) {
+            
+        }
+
+        if (!empty($cat->cats)) {
+            foreach ($cat->cats as $child) {
+                $template->cats[] = $this->category_tree($child, $catpath, $filters, true);
+            }
+        }
+
+        if ($astemplate) {
+            $level--;
+            return $template;
+        }
+        $level--;
+        return $this->output->render_from_template('local_courseindex/category', $template);
+    }
+    */
+
+    protected function get_course_image_url($course) {
+        global $CFG;
+
+        if ($course instanceof stdClass) {
+            $course = new \core_course_list_element($course);
+        }
+
+        $imgurl = false; // Initiate search.
+        $context = context_course::instance($course->id);
+
+        foreach ($course->get_course_overviewfiles() as $file) {
+            if ($isimage = $file->is_valid_image()) {
+                $path = '/'. $file->get_contextid(). '/'. $file->get_component().'/';
+                $path .= $file->get_filearea().$file->get_filepath().$file->get_filename();
+                $imgurl = file_encode_url("$CFG->wwwroot/pluginfile.php", $path, !$isimage);
+                break;
+            }
+        }
+        if (!$imgurl) {
+            $imgurl = $this->get_image_url('coursedefaultimage');
+        }
+
+        return $imgurl;
     }
 
     /**

@@ -208,3 +208,18 @@
     max-width: 100%;
 }
 
+.explorer-course-line {
+    display: flex;
+    margin-bottom: 50px;
+}
+
+.explorer-course-line:hover {
+    background-color: #eee;
+}
+
+.explorer-course-line img {
+    max-height: 80px;
+    height: 80px;
+    width: 140px;
+    padding-right: 40px
+}
