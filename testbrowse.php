@@ -24,7 +24,7 @@
 
 require('../../config.php');
 require_once($CFG->dirroot.'/local/lib.php');
-require_once($CFG->dirroot.'/local/courseindex/rpclib.php';
+require_once($CFG->dirroot.'/local/courseindex/rpclib.php');
 
 $url = new moodle_url('/local/courseindex/testbrowse.php');
 $PAGE->set_url($url);
