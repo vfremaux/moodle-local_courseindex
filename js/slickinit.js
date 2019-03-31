@@ -1,5 +1,5 @@
 $(document).ready(function(){
-  $('.local-my-carousel').slick({
+  $('.local-courseindex-carousel').slick({
     dots: true,
     arrows: false,
     infinite: true,
