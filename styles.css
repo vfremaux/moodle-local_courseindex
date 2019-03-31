@@ -54,7 +54,7 @@
     background-color:#808080;
     padding:10px;
     display:table-cell;
-    width:50px;
+    width:55px;
     height:40px;
 }
 
@@ -83,7 +83,7 @@
     background-color:#808080;
     padding:10px;
     display:table-cell;
-    width:50px;
+    width:55px;
 }
 
 .courseindex-browse-up {
@@ -143,4 +143,83 @@
 
 .browser-filters td {
     padding-left:15px;
+}
+
+.local-courseindex-fp-coursename a img,
+.local-courseindex-fp-coursethumb a img {
+    height: 150px !important;
+    width:auto;
+    margin:auto;
+}
+
+.local-courseindex-promowrap {
+    background-color: #f0f0f0;
+    box-shadow: 0 1px 4px 0 rgba(0,0,0,0.4);
+    margin: 10px;
+    display: inline-block;
+    float: none;
+    vertical-align: bottom;
+    min-height: 250px !important;
+}
+
+.local-courseindex-fp-coursethumb {
+    width: 100%;
+    padding-right: 0;
+    padding-top: 0;
+    padding-left: 0;
+    padding-bottom: 5px;
+    overflow: hidden;
+}
+
+.local-courseindex-fp-coursename {
+    text-align: center;
+    padding-bottom: 5px;
+}
+
+.local-courseindex-fp-courseinfo {
+    text-align: center;
+    padding: 5px;
+}
+
+.local-courseindex-fp-coursebox {
+    text-align: center;
+    margin: 0;
+    padding: 0;
+}
+
+@media (max-width: 900px) {
+    .local-courseindex-fp-summary {
+        display: none;
+        height: auto;
+        text-align: left;
+    }
+}
+
+.local-courseindex-fp-summary {
+    text-align: left;
+    max-width: 450px;
+    margin: auto;
+    padding: 8px;
+}
+
+.local-courseindex-fp-coursename a img,
+.local-courseindex-fp-coursethumb a img {
+    width: fit-content;
+    max-width: 100%;
+}
+
+.explorer-course-line {
+    display: flex;
+    margin-bottom: 50px;
+}
+
+.explorer-course-line:hover {
+    background-color: #eee;
+}
+
+.explorer-course-line img {
+    max-height: 80px;
+    height: 80px;
+    width: 140px;
+    padding-right: 40px
 }

@@ -37,7 +37,8 @@ if (empty($config->indexisopen)) {
     require_login();
 }
 
-$PAGE->requires->js('/mod/customlabel/js/applyconstraints.js');
+$PAGE->requires->js_call_amd('mod_customlabel/customlabel', 'init');
+$PAGE->requires->js_call_amd('local_courseindex/courseindex', 'init');
 
 $strheading = get_string('explore', 'local_courseindex');
 
@@ -56,7 +57,7 @@ echo $OUTPUT->header();
 
 echo $OUTPUT->heading(get_string('lpsearch', 'local_courseindex'));
 
-$filters = NULL;
+$filters = null;
 
 /// getting all filters
 
@@ -74,26 +75,39 @@ foreach ($classificationfilters as $afilter) {
 }
 
 // Including page text.
-local_print_static_text('courseindex_explore_courses_text', $CFG->wwwroot.'/local/courseindex/explorer.php');
+local_print_static_text('courseindex_explore_courses_text', $url);
 
 // Print search engine.
 $search = optional_param('go_search', '', PARAM_RAW);
 $freesearch = optional_param('go_freesearch', '', PARAM_RAW);
 $specialsearch = optional_param('go_specialsearch', '', PARAM_RAW);
 
-if ($search || $freesearch) {
-    $form = new StdClass;
+$indexform = \local_courseindex\explorer::prepare_form('indexsearch');
+
+$form = new StdClass;
+if ($search) {
+    $form->lpstatus = optional_param('lpstatus', '', PARAM_INT);
+    foreach($indexform->fields as $f) {
+        $key = $f->name;
+        if ($f->multiple) {
+            $form->$key = optional_param_array($key, '', PARAM_TEXT);
+        } else {
+            $form->$key = optional_param($key, '', PARAM_TEXT);
+        }
+    }
+    $form->searchtext = '';
+    $form->title = 1;
+    $form->description = '';
+    $form->information = '';
+    $searching = true;
+    $results = \local_courseindex\explorer::explore($form);
+} else if ($freesearch) {
     $form->freesearch = $freesearch;
     $form->lpstatus = optional_param('lpstatus', '', PARAM_INT);
-    $form->searchtext = optional_param('searchtext', '', PARAM_RAW);
-    $form->title = optional_param('title', '', PARAM_INT);
+    $form->searchtext = optional_param('searchtext', '', PARAM_TEXT);
+    $form->title = optional_param('title', 1, PARAM_INT);
     $form->description = optional_param('description', '', PARAM_INT);
     $form->information = optional_param('information', '', PARAM_INT);
-    $form->targets = '';
-    $form->topics = '';
-    $form->level0 = optional_param_array('level0', '', PARAM_INT);
-    $form->level1 = optional_param_array('level1', '', PARAM_INT);
-    $form->level2 = optional_param_array('level2', '', PARAM_INT);
     $searching = true;
     $results = \local_courseindex\explorer::explore($form);
 } else if ($specialsearch) {
@@ -111,7 +125,7 @@ if ($search || $freesearch) {
     $form = new StdClass();
     $form->lpstatus = 0;
     $form->title = 1;
-    $form->description = 1;
+    $form->description = 0;
     $form->information = 0;
     $form->searchtext = '';
     $form->targets = '';
@@ -123,19 +137,52 @@ if (local_has_capability_somewhere('block/course_status:viewcoursestatus')) {
 }
 
 echo $OUTPUT->heading(get_string('bycategory', 'local_courseindex'));
-local_print_static_text('courseindex_explore_classifier_text', $CFG->wwwroot.'/local/courseindex/explorer.php');
+local_print_static_text('courseindex_explore_classifier_text', $url);
 
-include($CFG->dirroot.'/local/courseindex/classifier_form.html');
+echo $indexform->html;
 
 echo $OUTPUT->heading(get_string('bykeyword', 'local_courseindex'));
-local_print_static_text('courseindex_explore_freetext_text', $CFG->wwwroot.'/local/courseindex/explorer.php');
+local_print_static_text('courseindex_explore_freetext_text', $url);
 
-include_once $CFG->dirroot.'/local/courseindex/textsearch_form.html';
+$template = new StdClass;
+
+$template->searchtext = $form->searchtext;
+$template->titlechecked = ($form->title) ? 'checked="checked"' : '' ;
+$template->descchecked = ($form->description) ? 'checked="checked"' : '' ;
+$template->infochecked = ($form->information) ? 'checked="checked"' : '' ;
+
+echo $OUTPUT->render_from_template('local_courseindex/textsearchform', $template);
 
 if (\local_courseindex\explorer::has_special_fields($specialfields)) {
     echo $OUTPUT->heading(get_string('byspecialcriteria', 'local_courseindex'));
-    local_print_static_text('courseindex_explore_targets_text', $CFG->wwwroot.'/local/courseindex/explorer.php');
-    include_once $CFG->dirroot.'/local/courseindex/special_form.html';
+    local_print_static_text('courseindex_explore_targets_text', $url);
+
+    $template = new StdClass;
+
+    list($peoplefieldid, $topicfieldid) = $specialfields;
+    if ($peoplefieldid || $topicfieldid) {
+
+        if ($peoplefieldid) {
+            $template->peoplefieldid = $peoplefieldid;
+            $params = array($CFG->classification_value_type_key => $peoplefieldid);
+            $targets = $DB->get_records_menu($CFG->classification_value_table, $params, 'sortorder', 'id, value');
+            $targets['0'] = get_string('alltargets', 'local_courseindex');
+            ksort($targets);
+            $attrs = array('id' => '_targets', 'multiple' => 1, 'size' => 8);
+            $template->targesselect = html_writer::select($targets, 'targets[]', $form->targets, array(), $attrs);
+        }
+        if ($topicfieldid) {
+            $template->topicfieldid = $topicfieldid;
+            $params = array($CFG->classification_value_type_key => $topicfieldid);
+            $topics = $DB->get_records_menu($CFG->classification_value_table, $params, 'sortorder', 'id, value');
+            $topics['0'] = get_string('alltopics', 'local_courseindex');
+            ksort($topics);
+            $attrs = array('id' => '_topics', 'multiple' => 1, 'size' => 8);
+            $template->topicsselect = html_writer::select($topics, 'topics[]', $form->topics, array(), $attrs);
+        }
+
+        echo $OUTPUT->render_from_template('local_courseindex/specialsearchform', $template);
+    }
 }
 
 if (!empty($results)) {
@@ -143,7 +190,6 @@ if (!empty($results)) {
     // Calling navigation.
     echo '<a name="results"></a>';
 
-    echo $OUTPUT->box_start('searchresults');
     echo $OUTPUT->heading(get_string('results', 'local_courseindex'));
 
     print_string('multipleresultsadvice', 'local_courseindex');
@@ -153,17 +199,8 @@ if (!empty($results)) {
 
     // $filters = array();
 
-    $cattree = \local_courseindex\navigator::generate_navigation(0, '', 0, $filters);
-
-    if ($entrycount) {
-        echo $renderer->navigation_simple($str, $cattree);
-        echo '<br/>';
-        echo $str;
-    } else {
-        if ($searching) {
-            echo $OUTPUT->notification(get_string('novisiblecourses', 'local_courseindex'));
-        }
-    }
+    echo $OUTPUT->box_start('search-results');
+    echo $renderer->search_results($results);
     echo $OUTPUT->box_end();
 } else {
     if ($searching) {
