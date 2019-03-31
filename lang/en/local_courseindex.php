@@ -24,6 +24,9 @@
 $string['courseindex:browse'] = 'Can browse courses';
 $string['courseindex:manage'] = 'Can manage course index';
 
+// Privacy.
+$string['privacy:metadata'] = "The Course Index local plugin does not store any data belonging to users";
+
 // LP Explorer.
 $string['alllevels'] = 'All levels';
 $string['allowguests'] = 'Allow guest access';

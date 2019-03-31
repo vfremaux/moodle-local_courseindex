@@ -282,6 +282,9 @@ class navigator {
                     $entriesfound = false;
                     foreach ($allcourses as $cid => $c) {
                         if (!empty($allcoursesbytag[$acat->id]) && in_array($c->id, array_keys($allcoursesbytag[$acat->id]))) {
+                            if ($debug) {
+                                echo "Catching course $cid in cat $acat->id<br/>";
+                            }
                             $catobj->entries[$cid] = $c;
                             $coursescatchedbysubcat[$cid] = true;
                             $entriesfound = true;
@@ -294,9 +297,12 @@ class navigator {
                 }
             }
 
-            // finally cleanup rootcategory entries from course that are actually in subats.
+            // finally cleanup rootcategory entries from course that are actually in subcats.
             foreach ($allcourses as $cid => $c) {
-                if (in_array($c->id, $coursescatchedbysubcat)) {
+                if (array_key_exists($c->id, $coursescatchedbysubcat)) {
+                    if ($debug) {
+                        echo "Discard $cid as catched by subcat ";
+                    }
                     unset($allcourses[$cid]);
                 }
             }

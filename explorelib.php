@@ -16,7 +16,7 @@
 
 /**
  * @package    local_courseindex
- * @author     Valery Fremaux <valery.fremaux@club-internet.fr>
+ * @author     Valery Fremaux <valery.fremaux@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @copyright  (C) 1999 onwards Martin Dougiamas  http://dougiamas.com
  *
@@ -46,10 +46,7 @@ class explorer {
                         c.id,
                         c.shortname,
                         c.fullname,
-                        c.visible,
-                        c.password,
-                        c.enrollable,
-                        c.guest
+                        c.visible
                     FROM
                         {course} c,
                         {{$CFG->course_metadata_table}} cc
@@ -70,10 +67,7 @@ class explorer {
                         c.id,
                         c.shortname,
                         c.fullname,
-                        c.visible,
-                        c.password,
-                        c.enrollable,
-                        c.guest
+                        c.visible
                     FROM
                         {course} c,
                         {{$CFG->course_metadata_table}} cc
@@ -83,7 +77,6 @@ class explorer {
                     ORDER BY
                         c.sortorder
                 ";
-                debug_trace("Query 2 search in topics " . $sql);
                 $results2 = $DB->get_records_sql($sql);
             }
 
@@ -110,7 +103,7 @@ class explorer {
 
         } else if (!empty($data->freesearch)) {
 
-            // free search implementation
+            // Free search implementation.
             if ($tokens = preg_split("/\\s+/", $data->searchtext)) {
                 $i = 0; // we need to keep orderfrom the search string.
                 $resultspertoken = array();
@@ -129,10 +122,7 @@ class explorer {
                             c.id,
                             c.shortname,
                             c.fullname,
-                            c.visible,
-                            c.password,
-                            c.enrollable,
-                            c.guest
+                            c.visible
                         FROM
                             {course} c
                         WHERE
@@ -142,7 +132,7 @@ class explorer {
                             sortorder
                     ";
 
-                    if(!$results1 = $DB->get_records_sql($sql)) {
+                    if (!$results1 = $DB->get_records_sql($sql)) {
                         $results1 = array();
                     }
                     $results2 = array();
@@ -152,10 +142,7 @@ class explorer {
                                 c.id,
                                 c.shortname,
                                 c.fullname,
-                                c.visible,
-                                c.password,
-                                c.enrollable,
-                                c.guest
+                                c.visible
                             FROM
                                 {customlabel} cl,
                                 {course} c
@@ -177,7 +164,7 @@ class explorer {
                 }
                 if (!empty($resultspertoken)) {
 
-                    // implements a manual array intersecction as array_instersect fails with associative arrays
+                    // implements a manual array intersection as array_instersect fails with associative arrays
                     $results = $resultspertoken[0];
                     $set = array_keys($results);
                     for ($i = 1 ; $i < count($resultspertoken) ; $i++) {
@@ -208,30 +195,76 @@ class explorer {
 
         } else {
             // list driven implementation
-            $results1 = array();
-            if ($data->level0) {
-                $catarr = $data->level0;
-                $lastcatid = count($catarr) - 1;
-                $allvalues = self::get_all_linked_values($catarr[$lastcatid]);
-                $level0list = implode("','", $allvalues);
-                $sql = "
-                    SELECT DISTINCT
-                        c.id,
-                        c.shortname,
-                        c.fullname,
-                        c.visible
-                    FROM
-                        {course} c,
-                        {{$config->course_metadata_table}} cc
-                    WHERE
-                        c.id = cc.courseid AND
-                        cc.{$config->course_metadata_value_key} IN ('$level0list')
-                    ORDER BY
-                        c.sortorder
-                ";
 
-                $results1 = $DB->get_records_sql($sql);
+            $customlabel = new \StdClass();
+            $customlabel->labelclass = 'courseclassifier';
+            $customlabel->title = 'void';
+            $customlabel->safecontent = '';
+            $classifier = customlabel_load_class($customlabel);
+
+            $masterresults = null;
+
+            foreach ($classifier->fields as $field) {
+                $classifierkey = $field->name;
+                if (!isset($data->$classifierkey)) {
+                    continue;
+                }
+
+                $input = $data->$classifierkey;
+                if (!empty($input)) {
+                    if (is_array($input)) {
+                        $inputarr = $input;
+                    } else {
+                        $inputarr = array($input);
+                    }
+
+                    list($insql, $inparams) = $DB->get_in_or_equal($inputarr);
+
+                    /*
+                    // OLD
+                    $catarr = $data->level0;
+                    $lastcatid = count($catarr) - 1;
+                    $allvalues = self::get_all_linked_values($catarr[$lastcatid]);
+                    $level0list = implode("','", $allvalues);
+                    */
+                    $sql = "
+                        SELECT DISTINCT
+                            c.id,
+                            c.shortname,
+                            c.fullname,
+                            c.visible
+                        FROM
+                            {course} c,
+                            {{$config->course_metadata_table}} cc
+                        WHERE
+                            c.id = cc.courseid AND
+                            cc.{$config->course_metadata_value_key} $insql
+                        ORDER BY
+                            c.sortorder
+                    ";
+
+                    $results = $DB->get_records_sql($sql, $inparams);
+
+                    // Intersect.
+                    if (is_null($masterresults)) {
+                        $masterresults = $results;
+                    } else {
+                        foreach (array_keys($masterresults) as $rid) {
+                            if (!array_key_exists($rid, $results)) {
+                                // Substract all entries that are NOT in further results. (reduce).
+                                unset($masterresults[$rid]);
+                            }
+                        }
+                    }
+                }
             }
+
+            if (is_null($masterresults)) {
+                return array();
+            }
+            return $masterresults;
+
+            /*
             $results2 = array();
             if (!empty($data->level1) && !(count($data->level1) == 1 && $data->level1[0] == 0)) {
                 $level1list = implode("','", $data->level1);
@@ -254,8 +287,9 @@ class explorer {
                 $results2 = $DB->get_records_sql($sql);
             }
 
-            // debug_trace(debug_capture($results1));
-            // debug_trace(debug_capture($results2));
+            // debug_trace($results1);
+            // debug_trace($results2);
+
             // manual intersect of results1 in results 2
             if (!empty($results1) && !empty($results2)) {
                 $res2keys = array_keys($results2);
@@ -275,6 +309,7 @@ class explorer {
                 return $results1;
             }
             return array();
+            */
         }
     }
 
@@ -344,5 +379,80 @@ class explorer {
         $topicfieldid = $DB->get_field($config->classification_type_table, 'id', array('code' => 'TOPIC'));
         $fields = array($peoplefieldid, $topicfieldid);
         return $peoplefieldid || $topicfieldid;
+    }
+
+    public static function prepare_form($formname) {
+        global $OUTPUT;
+
+        $form = new \StdClass;
+
+        if ($formname == 'indexsearch') {
+            $customlabel = new \StdClass();
+            $customlabel->labelclass = 'courseclassifier';
+            $customlabel->title = 'void';
+            $customlabel->safecontent = '';
+            $classifier = customlabel_load_class($customlabel);
+
+            $template = new \StdClass;
+            foreach ($classifier->fields as $field) {
+
+                if ($field->type == '_error_') {
+                    continue;
+                }
+
+                // All other field types are not relevant for search engine.
+                if (!preg_match("/(datasource|_error_)$/", $field->type)) {
+                    continue;
+                }
+
+                $form->fields[] = $field;
+
+                $classifiertpl = new \Stdclass;
+
+                $classifiertpl->fieldname = str_replace('[]', '', $field->name); // must take care it is a multiple field
+                if (!empty($field->isfilter)) {
+                    $classifiertpl->fieldlabel = $field->label;
+                } else {
+                    $classifiertpl->fieldlabel = get_string($field->name, 'customlabeltype_courseclassifier');
+                }
+
+                if (!empty($field->mandatory)) {
+                    $classifiertpl->mandatory = true;
+                    $classifiertpl->pixurl = $OUTPUT->pix_url('req');
+                }
+                if (!empty($field->help)) {
+                    $classifiertpl->fieldhelp = $field->help;
+                }
+
+                // Very similar to lists, except options come from an external datasource
+                /*
+                if ($field->type == '_error_') {
+                    echo '<div id="div_menu_'.$field->name.'">';
+                    echo $OUTPUT->notification($field->error, 'notifyproblem');
+                    echo '</div>';
+                    echo '</td></tr>';
+                    continue;
+                }
+                */
+                $multiple = (isset($field->multiple)) ? $field->multiple : '';
+                $options = $classifier->get_datasource_options($field);
+                $params = array();
+                if (!empty($field->constraintson)) {
+                    $params['class'] = 'constrained';
+                }
+                if (empty($multiple)) {
+                    $classifiertpl->searchselect = \html_writer::select($options, $field->name, $value, $params);
+                } else {
+                    $params['multiple'] = 1;
+                    $classifiertpl->searchselect = \html_writer::select($options, "{$field->name}[]", @$form->$fieldname, array(), $params);
+                }
+
+                $template->classifiers[] = $classifiertpl;
+            }
+
+            $form->html = $OUTPUT->render_from_template('local_courseindex/indexsearchform', $template);
+        }
+
+        return $form;
     }
 }

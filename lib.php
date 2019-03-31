@@ -34,3 +34,31 @@ defined('MOODLE_INTERNAL') || die();
 function local_courseindex_supports_feature() {
     assert(1);
 }
+
+/**
+ * Cut the String content content.
+ *
+ * @param $str
+ * @param $n
+ * @param $end_char
+ * @return string
+ */
+function local_courseindex_course_trim_char($str, $n = 500, $endchar = '&#8230;') {
+    if (strlen($str) < $n) {
+        return $str;
+    }
+
+    $str = preg_replace("/\s+/", ' ', str_replace(array("\r\n", "\r", "\n"), ' ', $str));
+    if (strlen($str) <= $n) {
+        return $str;
+    }
+
+    $out = "";
+    $small = substr($str, 0, $n);
+    $out = $small.$endchar;
+    return $out;
+}
+
+function local_courseindex_strip_html_tags($text, $format) {
+    return strip_tags($text);
+}
