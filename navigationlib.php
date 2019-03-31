@@ -238,7 +238,7 @@ class navigator {
                         if ($debug) {
                             echo "Discard $cid by status<br>";
                         }
-                        continue 2;
+                        continue;
                     }
                 }
             }

@@ -15,6 +15,7 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 defined('MOODLE_INTERNAL') or die();
+require_once($CFG->dirroot.'/local/courseindex/lib.php');
 
 /**
  * @package    local_courseindex
@@ -55,8 +56,10 @@ class local_courseindex_renderer extends plugin_renderer_base {
         $template->hasup = ($up && !is_null($cat->parent));
         if ($template->hasup) {
             $params = array('catid' => $cat->parent->id, 'catpath' => $prevpath);
-            foreach ($filters as $key => $afilter) {
-                $params[$key] = $afilter->value;
+            if ($filters) {
+                foreach ($filters as $key => $afilter) {
+                    $params[$key] = $afilter->value;
+                }
             }
             $template->upcaturl = new moodle_url('/local/courseindex/browser.php', $params);
             $template->uppixurl = $this->image_url('up', 'local_courseindex');
@@ -103,8 +106,8 @@ class local_courseindex_renderer extends plugin_renderer_base {
                 $course = get_course($courseid);
 
                 $summary = local_my_strip_html_tags($course->summary);
-                $coursetpl->summary = local_my_course_trim_char($summary, 200);
-                $coursetpl->trimtitle = local_my_course_trim_char($course->fullname, 25);
+                $coursetpl->summary = local_courseindex_course_trim_char($summary, 200);
+                $coursetpl->trimtitle = local_courseindex_course_trim_char($course->fullname, 45);
 
                 $coursetpl->courseurl = new moodle_url('/course/view.php', array('id' => $courseid ));
 
