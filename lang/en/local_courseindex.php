@@ -23,6 +23,7 @@
 
 $string['courseindex:browse'] = 'Can browse courses';
 $string['courseindex:manage'] = 'Can manage course index';
+$string['courseindex:seecourseattributes'] = 'Can see course enrol and other attributes';
 
 // Privacy.
 $string['privacy:metadata'] = "The Course Index local plugin does not store any data belonging to users";
@@ -56,6 +57,16 @@ $string['configmaxnavigationdepth'] = 'Max nav depth';
 $string['configmetadatabinding'] = 'Metadata schema binding';
 $string['configopenindex'] = 'Public catalog';
 $string['configrendererimages'] = 'Images for renderers';
+$string['configlayoutmodel'] = 'Layout model';
+$string['configlayoutmodel_desc'] = 'Choose a layout model for the browser page.';
+$string['configeffectopacity'] = "Opacity effect";
+$string['configeffecthalo'] = "Halo effect";
+$string['configtrimmode'] = 'Trim mode';
+$string['configtrimmode_desc'] = 'The algorithm used to trim texts';
+$string['configtrimlength1'] = 'Trim length 1';
+$string['configtrimlength1_desc'] = 'Trim length units for short strings';
+$string['configtrimlength2'] = 'Trim length 2';
+$string['configtrimlength2_desc'] = 'Trim length units for descriptions or summaries texts (note that trim do remove all tags)';
 $string['courseindex'] = 'Course catalog';
 $string['currentcategory'] = 'Category';
 $string['description'] = 'description';
@@ -93,6 +104,14 @@ $string['subcatsincat'] = 'Subcategories';
 $string['targets'] = 'Targets';
 $string['title'] = 'title';
 $string['topics'] = 'Topics';
+$string['standard'] = 'Standard layout';
+$string['magistere'] = 'Magistere layout';
+$string['domains'] = 'Domains';
+$string['notrim'] = "No trim";
+$string['trimchars'] = "Trim on chars";
+$string['trimwords'] = "Trim on words";
+$string['entries'] = " results";
+$string['readmore'] = "Read more";
 
 $string['configenableexplorer_desc'] = 'If not set, the link to the course explorer (advanced search engine) will be hidden.';
 

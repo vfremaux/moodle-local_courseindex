@@ -62,3 +62,29 @@ function local_courseindex_course_trim_char($str, $n = 500, $endchar = '&#8230;'
 function local_courseindex_strip_html_tags($text, $format) {
     return strip_tags($text);
 }
+
+/**
+ * Local clone of local/my for modularity.
+ */
+function local_courseindex_is_selfenrolable_course($course) {
+    global $DB;
+
+    $params = array('courseid' => $course->id, 'enrol' => 'self', 'status' => 0);
+    if ($DB->count_records('enrol', $params)) {
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Local clone of local/my for modularity.
+ */
+function local_courseindex_is_guestenrolable_course($course) {
+    global $DB;
+
+    $params = array('courseid' => $course->id, 'enrol' => 'guest', 'status' => 0);
+    if ($DB->count_records('enrol', $params)) {
+        return true;
+    }
+    return false;
+}

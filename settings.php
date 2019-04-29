@@ -92,5 +92,44 @@ if ($hassiteconfig) {
     $label = get_string('configclassificationconstrainttable', 'local_courseindex');
     $desc = get_string('configclassificationconstrainttable_desc', 'local_courseindex');
     $settings->add(new admin_setting_configtext($key, $label, $desc, 'customlabel_mtd_constraint'));
+
+    $key = 'local_courseindex/layoutmodel';
+    $label = get_string('configlayoutmodel', 'local_courseindex');
+    $desc = get_string('configlayoutmodel_desc', 'local_courseindex');
+    $default = 'standard';
+    $layoutoptions = array('standard' => get_string('standard', 'local_courseindex'),
+                           'magistere' => get_string('magistere', 'local_courseindex'));
+    $settings->add(new admin_setting_configselect($key, $label, $desc, 'standard', $layoutoptions));
+
+    $key = 'local_courseindex/effect_opacity';
+    $label = get_string('configeffectopacity', 'local_courseindex');
+    $desc = '';
+    $settings->add(new admin_setting_configcheckbox($key, $label, $desc, 0));
+
+    $key = 'local_courseindex/effect_halo';
+    $label = get_string('configeffecthalo', 'local_courseindex');
+    $desc = '';
+    $settings->add(new admin_setting_configcheckbox($key, $label, $desc, 0));
+
+    $key = 'local_courseindex/trimmode';
+    $label = get_string('configtrimmode', 'local_courseindex');
+    $desc = get_string('configtrimmode_desc', 'local_courseindex');
+    $options = array('' => get_string('notrim', 'local_courseindex'),
+                     'chars' => get_string('trimchars', 'local_courseindex'),
+                     'words' => get_string('trimwords', 'local_courseindex'));
+    $default = 'chars';
+    $settings->add(new admin_setting_configselect($key, $label, $desc, $default, $options));
+
+    $key = 'local_courseindex/trimlength1';
+    $label = get_string('configtrimlength1', 'local_courseindex');
+    $desc = get_string('configtrimlength1_desc', 'local_courseindex');
+    $default = 40;
+    $settings->add(new admin_setting_configtext($key, $label, $desc, $default));
+
+    $key = 'local_courseindex/trimlength2';
+    $label = get_string('configtrimlength2', 'local_courseindex');
+    $desc = get_string('configtrimlength2_desc', 'local_courseindex');
+    $default = 250;
+    $settings->add(new admin_setting_configtext($key, $label, $desc, $default));
 }
 

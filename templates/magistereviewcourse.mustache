@@ -1,0 +1,61 @@
+{{!
+    This file is part of The Courseindex plugin
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_courseindex/magistereviewcourse
+
+    Shows displayes rendering of a a course information.
+
+    Classes required for JS:
+    * none
+
+}}
+<!-- local_courseindex/magistereviewcourse -->
+
+<h1>{{fullname}}</h1>
+
+{{#hasimage}}
+<div class="course-image">
+    <img src="{{{thumburl}}}" style="width:100%" />
+</div>
+{{/hasimage}}
+
+<div class="course-summary">
+    {{{description}}}
+</div>
+
+{{#usecustomlabelmtd}}
+{{#hasauthors}}
+<table width="100%">
+    <caption>{{#str}}authors, local_courseindex{{/str}}</caption>
+{{#authors}}
+    <tr>
+        <td class="courseindex-author">{{thumb}} {{author}}</td>
+        <td class="courseindex-institution">{{institution}}</td>
+        <td class="courseindex-department">{{department}}</td>
+    </tr>
+{{/authors}}
+{{#contributors}}
+    <tr>
+        <td>{{#str}}othercontributors, local_courseindex{{/str}}</td>
+        <td span="2" class="courseindex-contributors">{{{contributors}}}</td>
+    </tr>
+{{/contributors}}
+</table>
+{{/hasauthors}}
+
+{{/usecustomlabelmtd}}
+<!-- /local_courseindex/magistereviewcourse -->

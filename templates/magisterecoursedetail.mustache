@@ -1,0 +1,25 @@
+
+
+
+<!-- local_courseindex/magisterecoursedetail -->
+<div class="course-caption">
+    <h1>{{fullname}}</h1>
+</div>
+
+<div class="actions">
+    {{#hasleaflet}}
+    <div class="course-leaflet">
+        <a href="{{{leafleturl}}}" target="_blank">{{#str}}getpdf, local_courseindex{{/str}}</a>
+    </div>
+    {{/hasleaflet}}
+    {{#canenrol}}
+    <div class="course-self-enrol">
+        <a href="{{{courseenrolurl}}}" target="_blank">{{#str}}enrolme, local_courseindex{{/str}}</a>
+    </div>
+    {{/canenrol}}
+</div>
+
+<div id="course-detail-info">
+    {{{detail}}}
+</div>
+<!-- /local_courseindex/magisterecoursedetail -->

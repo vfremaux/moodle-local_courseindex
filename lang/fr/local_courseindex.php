@@ -16,13 +16,14 @@
 
 /**
  * @package    local_courseindex
- * @author     Valery Fremaux <valery.fremaux@club-internet.fr>
+ * @author     Valery Fremaux <valery.fremaux@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @copyright  (C) 1999 onwards Martin Dougiamas  http://dougiamas.com
  */
 
 $string['courseindex:browse'] = 'Peut consulter l\'offre';
 $string['courseindex:manage'] = 'Peut gérer l\'index';
+$string['courseindex:seecourseattributes'] = 'Peut voir les attributs de cours';
 
 // LP Explorer.
 $string['alllevels'] = 'Tous niveaux';
@@ -48,8 +49,18 @@ $string['configmaxnavigationdepth'] = 'Profondeur maximum de navigation';
 $string['configmetadatabinding'] = 'Schéma de métadonnées';
 $string['configopenindex'] = 'Catalogue public';
 $string['configrendererimages'] = 'Images pour les renderer';
+$string['configlayoutmodel'] = 'Mise en page';
+$string['configlayoutmodel_desc'] = 'Sélectionne une mise en page pour l\'écran de navigation.';
+$string['configeffectopacity'] = 'Effet d\'opacité';
+$string['configeffecthalo'] = 'Effet de halo';
 $string['courseindex'] = 'L\'Offre de cours';
 $string['courseindexconfigmaxnavigationdepth'] = 'Rechercher dans l\'offre de formation';
+$string['configtrimmode'] = 'Méthode de césure';
+$string['configtrimmode_desc'] = 'L\'algorithme utilisé pour couper les textes';
+$string['configtrimlength1'] = 'Césure 1';
+$string['configtrimlength1_desc'] = 'La longueur admise (en unités de césure) pour les textes courts (titres)';
+$string['configtrimlength2'] = 'Césure 2';
+$string['configtrimlength2_desc'] = 'La longueur admise (en unités de césure) pour les textes longs (descriptifs, les balises html sont supprimées)';
 $string['currentcategory'] = 'Catégorie';
 $string['description'] = 'description';
 $string['explore'] = 'Explorateur de formations';
@@ -82,6 +93,14 @@ $string['subcatsincat'] = 'Sous-catégories';
 $string['targets'] = 'Publics';
 $string['title'] = 'titre';
 $string['topics'] = 'Thèmes';
+$string['standard'] = 'Mise en page standard';
+$string['magistere'] = 'Mise en page Magistere';
+$string['domains'] = 'Domaines';
+$string['notrim'] = 'Pas de césure';
+$string['trimchars'] = 'Caractères';
+$string['trimwords'] = 'Mots';
+$string['entries'] = " resultats";
+$string['readmore'] = "Lire plus...";
 
 $string['configopenindex_desc'] = 'Si autorisé, au public, les personnes non connectées peuvent voir l\'offre de cours';
 

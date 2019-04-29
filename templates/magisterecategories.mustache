@@ -1,0 +1,50 @@
+{{!
+    This file is part of The Courseindex plugin
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_courseindex/categories
+
+    Shows displayes rendering of a a course category level
+
+    Classes required for JS:
+    * none
+
+}}
+<!-- local_courseindex/magisterecategories -->
+<div id="courseindex-category{{catidpath}}" class="courseindex-category">
+
+    {{^hascats}}
+    <div class="category-name  {{currentclass}}">
+    <a href="{{{caturl}}}" class="indent-{{level}}">{{name}}</a>
+    </div>
+    {{/hascats}}
+
+    {{#hascats}}
+    <div class="category-name  {{currentclass}}">
+    <a href="{{{caturl}}}" class="indent-{{level}}">{{name}}</a>
+    {{^isroot}}
+    <span id="ftoggle-handle{{catidpath}}" class="ftoggle-handle" data-toggle="toggle{{catidpath}}">{{#pix}}t/collapsed{{/pix}}</span>
+    {{/isroot}}
+    </div>
+    <div class="subcats" id="toggle{{catidpath}}" style="{{display}}">
+    {{#cats}}
+    {{> local_courseindex/magisterecategories}}
+    {{/cats}}
+    </div>
+    {{/hascats}}
+
+</div>
+<!-- /local_courseindex/magisterecategories -->

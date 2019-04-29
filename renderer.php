@@ -175,11 +175,10 @@ class local_courseindex_renderer extends plugin_renderer_base {
      * @param int $catpath the comma separated parent path from root till current catid
      * @param int $filters the set of filters.
      */
-    public function filters($catid, $catpath, &$filters) {
+    public function filters($catid, $catpath, &$filters, $layout = 'standard') {
 
         $template = new StdClass;
 
-        $template->browserurl = new moodle_url('/local/courseindex/browser.php', array('catid' => $catid));
         $template->filters = array();
 
         $template->catid = $catid;
@@ -191,14 +190,40 @@ class local_courseindex_renderer extends plugin_renderer_base {
                 $ftpl = new Stdclass;
                 $ftpl->isnotwwwroot = ($key != 'wwwroot');
                 $ftpl->fname = $afilter->name;
-                $ftpl->fselect = html_writer::select($afilter->options, $key, $afilter->value);
+
+                $filtervalue = optional_param_array($key, '', PARAM_INT);
+
+                // For magistere template.
+                $ftpl->fcode = $key;
+                $flatoptions = [];
+                foreach ($afilter->options as $k => $opt) {
+                    $optiontpl = new StdClass;
+                    $optiontpl->name = $k;
+                    $optiontpl->id = $opt->id;
+                    $optiontpl->value = $opt->value;
+                    $optiontpl->counter = $opt->counter;
+                    $optiontpl->checked = '';
+                    if (is_array($filtervalue) && in_array($opt->id, $filtervalue)) {
+                        $optiontpl->checked = 'checked="checked"';
+                    }
+                    $ftpl->options[] = $optiontpl;
+                    $flatoptions[$k] = "{$opt->value} ({$opt->counter})";
+                }
+
+                // For standard template.
+                $ftpl->fselect = html_writer::select($flatoptions, $key, $afilter->value);
+
                 $template->filters[] = $ftpl;
             }
         }
 
         $template->hasfilters = count($template->filters);
 
-        return $this->output->render_from_template('local_courseindex/filters', $template);
+        if ($layout == 'standard') {
+            return $this->output->render_from_template('local_courseindex/filters', $template);
+        } else {
+            return $this->output->render_from_template('local_courseindex/magisterefilters', $template);
+        }
     }
 
     public function search_results($results) {
@@ -246,54 +271,6 @@ class local_courseindex_renderer extends plugin_renderer_base {
 
         return $this->output->render_from_template('local_courseindex/searchresults', $template);
     }
-
-    /**
-     * Navigator category rendering.
-     * @param objectref &$cat
-     * @param string &$catpath
-     * @param int $coursecount
-     * @param string $current
-     * @param boolean $up
-     * @param array $filters
-     *
-    public function category_tree(&$cat, &$catpath, $coursecount, $filters = array(), $astemplate = false) {
-        static $level = -1;
-
-        $level++;
-        $template = new StdClass;
-
-        $template->catname = format_string($cat->name);
-        $template->catid = $cat->id;
-
-        $template->issub = ($current == 'sub');
-        if ($template->issub) {
-            $params = array('catid' => $cat->id, 'catpath' => $nextpath);
-            if (!empty($filters)) {
-                foreach ($filters as $key => $afilter) {
-                    $params[$key] = $afilter->value;
-                }
-            }
-            $template->caturl = new moodle_url('/local/courseindex/browser.php', $params);
-        }
-
-        if (!empty($cat->entries)) {
-            
-        }
-
-        if (!empty($cat->cats)) {
-            foreach ($cat->cats as $child) {
-                $template->cats[] = $this->category_tree($child, $catpath, $filters, true);
-            }
-        }
-
-        if ($astemplate) {
-            $level--;
-            return $template;
-        }
-        $level--;
-        return $this->output->render_from_template('local_courseindex/category', $template);
-    }
-    */
 
     protected function get_course_image_url($course) {
         global $CFG;
@@ -368,5 +345,198 @@ class local_courseindex_renderer extends plugin_renderer_base {
         }
 
         return $imgurl;
+    }
+
+    public function magistere_layout($catid, $catpath, &$cattree, &$courses, &$filters) {
+        global $DB;
+
+        $config = get_config('local_courseindex');
+
+        $template = new StdClass;
+
+        $template->currentcatid = optional_param('catid', '', PARAM_INT);
+        $template->currentcatpath = optional_param('catpath', '', PARAM_TEXT);
+
+        $catids = explode(',', $template->currentcatpath);
+        array_shift($catids);
+        $template->category = '';
+        $catnames = [];
+        if (!empty($catids)) {
+            foreach ($catids as $cid) {
+                $catnames[] = $DB->get_field($config->classification_value_table, 'value', ['id' => $cid]);
+            }
+            $template->category = implode(' / ', $catnames);
+        }
+
+        $template->entriescount = count($courses);
+
+        if (!empty($config->effect_opacity)) {
+            $template->withopacityeffect = 'with-opacity-effect';
+        }
+
+        if (!empty($config->effect_halo)) {
+            $template->withhaloeffect = 'with-halo-effect';
+        }
+
+        $template->filters = $this->filters($catid, $catpath, $filters, 'magistere');
+
+        $template->categorytree[0] = $cattree;
+
+        if (empty($courses)) {
+            $template->hascourses = false;
+            $template->nocourses = $this->output->notification(get_string('nocourses', 'local_courseindex'));
+        } else {
+            $template->hascourses = true;
+            foreach ($courses as $cid => $c) {
+                $coursetpl = $this->coursebox($c);
+                $template->coursegridelms[] = $coursetpl;
+            }
+        }
+
+        return $this->output->render_from_template('local_courseindex/magisterepanel', $template);
+    }
+
+    public function coursebox($courseorid) {
+        global $CFG, $USER;
+
+        $config = get_config('local_courseindex');
+
+        if (is_object($courseorid)) {
+            $courseid = $courseorid->id;
+        } else {
+            $courseid = $courseorid;
+        }
+
+        $coursetpl = new StdClass;
+        $course = get_course($courseid);
+        $context = context_course::instance($course->id);
+
+        $coursetpl->courseid = $courseid;
+        $coursetpl->fullname = format_string($course->fullname);
+        if ($config->trimmode == 'words') {
+            $coursetpl->trimtitle = $this->trim_words(format_string($course->fullname), $config->trimlength1);
+        } else {
+            $coursetpl->trimtitle = $this->trim_char(format_string($course->fullname), $config->trimlength1);
+        }
+
+        $courseurl = new moodle_url('/course/view.php', array('id' => $courseid ));
+        $coursetpl->courseurl = ''.$courseurl;
+        $coursetpl->format = $course->format;
+
+        $coursetpl->hasattributes = false;
+        if (\local_courseindex\navigator::course_is_visible($course)) {
+            $coursetpl->hiddenclass = '';
+            $coursetpl->hiddenattribute = '';
+        } else {
+            $coursetpl->hasattributes = true;
+            $coursetpl->hiddenattribute = $this->output->pix_icon('hidden', get_string('ishidden', 'local_my'), 'local_my');
+            $coursetpl->hiddenclass = 'dimmed';
+        }
+        if (has_capability('moodle/course:manageactivities', $context, $USER, false)) {
+            $coursetpl->hasattributes = true;
+            $coursetpl->editingclass = 'can-edit';
+            $coursetpl->editingattribute = $this->output->pix_icon('editing', get_string('canedit', 'local_my'), 'local_my');
+        } else {
+            $coursetpl->editingclass = '';
+            $coursetpl->editingattribute = '';
+        }
+        if (local_courseindex_is_selfenrolable_course($course)) {
+            $coursetpl->hasattributes = true;
+            $coursetpl->selfenrolclass = 'selfenrol';
+            $coursetpl->selfattribute = $this->output->pix_icon('unlocked', get_string('selfenrol', 'local_my'), 'local_my');
+        } else {
+            $coursetpl->selfenrolclass = '';
+            $coursetpl->selfattribute = '';
+        }
+        if (local_courseindex_is_guestenrolable_course($course)) {
+            $coursetpl->hasattributes = true;
+            $coursetpl->guestenrolclass = 'guestenrol';
+            $coursetpl->guestattribute = $this->output->pix_icon('guest', get_string('guestenrol', 'local_my'), 'local_my');
+        } else {
+            $coursetpl->guestenrolclass = '';
+            $coursetpl->guestattribute = '';
+        }
+        if ($course->startdate > time()) {
+            $coursetpl->hasattributes = true;
+            $coursetpl->futureclass = 'future';
+            $coursetpl->futureattribute = $this->output->pix_icon('future', get_string('future', 'local_my'), 'local_my');
+        } else {
+            $coursetpl->futureclass = '';
+            $coursetpl->futureattribute = '';
+        }
+
+        if (!has_capability('local/courseindex:seecourseattributes', $context)) {
+            // Hide all attributes if requested by capability.
+            $coursetpl->hasattributes = false;
+        }
+
+        if ($course instanceof stdClass) {
+            $course = new \core_course_list_element($course);
+        }
+
+        $context = context_course::instance($course->id);
+
+        foreach ($course->get_course_overviewfiles() as $file) {
+            if ($isimage = $file->is_valid_image()) {
+                $path = '/'. $file->get_contextid(). '/'. $file->get_component().'/';
+                $path .= $file->get_filearea().$file->get_filepath().$file->get_filename();
+                $coursetpl->imgurl = ''.file_encode_url("$CFG->wwwroot/pluginfile.php", $path, !$isimage);
+                break;
+            }
+        }
+        if (empty($coursetpl->imgurl)) {
+            $coursetpl->imgurl = ''.$this->get_image_url('coursedefaultimage');
+        }
+
+        return $coursetpl;
+    }
+
+    /**
+     * Cut the Course content.
+     *
+     * @param $str
+     * @param $n
+     * @param $end_char
+     * @return string
+     */
+    function trim_char($str, $n = 500, $endchar = '...') {
+        if (strlen($str) < $n) {
+            return $str;
+        }
+
+        $str = preg_replace("/\s+/", ' ', str_replace(array("\r\n", "\r", "\n"), ' ', $str));
+        if (strlen($str) <= $n) {
+            return $str;
+        }
+
+        $out = "";
+        $small = substr($str, 0, $n);
+        $out = $small.$endchar;
+        return $out;
+    }
+
+    /**
+     * Cut the Course content by words.
+     *
+     * @param $str input string
+     * @param $n number of words max
+     * @param $endchar unfinished string suffix
+     * @return the shortened string
+     */
+    function trim_words($str, $w = 10, $endchar = '...') {
+
+        // Preformatting.
+        $str = str_replace(array("\r\n", "\r", "\n"), ' ', $str); // Remove all endlines
+        $str = preg_replace('/\s+/', ' ', $str); // Reduce spaces.
+
+        $words = explode(' ', $str);
+
+        if (count($words) <= $w) {
+            return $str;
+        }
+
+        $shortened = array_slice($words, 0, $w);
+        $out = implode(' ', $shortened).' '.$endchar;
+        return $out;
     }
 }
