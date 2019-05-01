@@ -103,6 +103,7 @@ $string['novisiblecoursesinsubtree'] = 'No course available in this section';
 $string['novisiblecoursesinsubtree'] = 'No visible courses in subtree';
 $string['openenrol'] = 'this course is free enrol (unless a password is set)';
 $string['pluginname'] = 'Course index';
+$string['profeatures'] = 'Additional Pro Features';
 $string['reload'] = 'Reload';
 $string['requireskey'] = 'Requires key';
 $string['results'] = 'Search Results';

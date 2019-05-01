@@ -93,6 +93,7 @@ $string['novisiblecourses'] = 'Aucun cours visible avec cette recherche';
 $string['novisiblecoursesinsubtree'] = 'Aucune formation dans cette section';
 $string['openenrol'] = 'L\'inscription à ce cours est libre (sauf si un mot de passe est signalé)';
 $string['pluginname'] = 'Catalogue de cours';
+$string['profeatures'] = 'Fonctionnalités additionnelles en version "Pro"';
 $string['reload'] = 'Recharger';
 $string['results'] = 'Résultats de recherche';
 $string['root'] = 'Racine du catalogue';

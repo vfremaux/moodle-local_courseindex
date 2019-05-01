@@ -234,6 +234,18 @@ class local_courseindex_renderer extends plugin_renderer_base {
         foreach ($results as $result) {
             $coursetpl = $result;
 
+            if ($config->trimmode == 'words') {
+                if (empty($config->trimlength1)) {
+                    $config->trimlength1 = 20;
+                }
+                $coursetpl->fullname = $this->trim_words($coursetpl->fullname, $config->trimlength1);
+            } else if ($config->trimmode == 'chars') {
+                if (empty($config->trimlength1)) {
+                    $config->trimlength1 = 80;
+                }
+                $coursetpl->fullname = $this->trim_char($coursetpl->fullname, $config->trimlength1);
+            }
+
             $sql = "
                 SELECT
                    cct.code,
@@ -262,7 +274,19 @@ class local_courseindex_renderer extends plugin_renderer_base {
                 }
             }
 
-            $coursetpl->description = format_text($DB->get_field('course', 'summary', array('id' => $result->id)));
+            $description = format_text($DB->get_field('course', 'summary', array('id' => $result->id)));
+            if ($config->trimmode == 'words') {
+                if (empty($config->trimlength2)) {
+                    $config->trimlength2 = 120;
+                }
+                $description = $this->trim_words($description, $config->trimlength2);
+            } else if ($config->trimmode == 'chars') {
+                if (empty($config->trimlength2)) {
+                    $config->trimlength2 = 400;
+                }
+                $description = $this->trim_char($description, $config->trimlength2);
+            }
+            $coursetpl->description = $description;
             $coursetpl->imgurl = $this->get_course_image_url($result);
             $coursetpl->courseurl = new moodle_url('/course/view.php', array('id' => $result->id));
 
