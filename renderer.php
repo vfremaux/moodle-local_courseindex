@@ -408,6 +408,7 @@ class local_courseindex_renderer extends plugin_renderer_base {
 
         $context = context_course::instance($courseorid);
 
+        $template->canaccess = false;
         if (isloggedin() && !isguestuser()) {
             if (is_enrolled($context, $USER->id) || has_capability('moodle/course:viewhiddencourses', $context)) {
                 $template->canaccess = true;
@@ -435,12 +436,12 @@ class local_courseindex_renderer extends plugin_renderer_base {
                 include_once($CFG->dirroot.'/local/shop/classes/Catalog.class.php');
                 include_once($CFG->dirroot.'/local/shop/classes/CatalogItem.class.php');
                 $relatedproduct = local_shop_related_product($courseorid);
-                $catalog = new \local_shop\Catalog($relatedproduct->catalogid);
-                $params = ['id' => $catalog->shopid, 'view' => 'shop', $relatedproduct->code => 1, 'origin' => 'courseindex'];
-                $template->purchaseproducturl = new moodle_url('/local/shop/front/view.php', $params);
-                $template->hasshop = 1;
-
                 if ($relatedproduct) {
+                    $catalog = new \local_shop\Catalog($relatedproduct->catalogid);
+                    $params = ['id' => $catalog->shopid, 'view' => 'shop', $relatedproduct->code => 1, 'origin' => 'courseindex'];
+                    $template->purchaseproducturl = new moodle_url('/local/shop/front/view.php', $params);
+                    $template->hasshop = 1;
+
                     if ($leafleturl = $relatedproduct->get_leaflet_url()) {
                         $template->hasleaflet = true;
                         $template->leafleturl = $leafleturl;

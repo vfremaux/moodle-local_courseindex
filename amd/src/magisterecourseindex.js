@@ -30,7 +30,7 @@ define(['jquery', 'core/log', 'core/config'], function($, log, cfg) {
             $('.courseindex-coursename.direct').bind('click', this.goto_course);
             $('.courseindex-coursethumb.detailed').bind('click', this.load_course_detail);
             $('.courseindex-coursename.detailed').bind('click', this.load_course_detail);
-            $('.courseindex-readmorelink.detailed').bind('click', this.load_course_detail);
+            $('.courseindex-readmorelink').bind('click', this.load_course_detail);
             $('.modal-close').bind('click', this.close_course_detail);
 
             $('.ftoggle-handle').bind('click', this.toggle);
@@ -86,6 +86,8 @@ define(['jquery', 'core/log', 'core/config'], function($, log, cfg) {
             $('#courseindex-course-detail-actions').html(waiter);
             var coursebox = that.closest('.local-courseindex-fp-coursebox');
 
+            // Self adapts when "page" format is installed.
+            // @see https://github.com/vfremaux/moodle-format_page
             if (coursebox.attr('data-format') === 'page') {
                 // invokes a pure page content view. with no side blocks.
                 var url = cfg.wwwroot + '/course/format/page/viewpage.php';
@@ -97,7 +99,7 @@ define(['jquery', 'core/log', 'core/config'], function($, log, cfg) {
                 }, 'html');
             } else {
                 // invokes a standard course info panel.
-                var url = cfg.wwwroot + '/local/courseindex/ajax/viewcourse.php';
+                var url = cfg.wwwroot + '/local/courseindex/pro/ajax/viewcourse.php';
                 url += '?id=' + coursebox.attr('data-course');
 
                 $.get(url, function(data) {
@@ -106,7 +108,7 @@ define(['jquery', 'core/log', 'core/config'], function($, log, cfg) {
             }
 
             // Invokes the action fragment.
-            var url = cfg.wwwroot + '/local/courseindex/ajax/courseactions.php';
+            var url = cfg.wwwroot + '/local/courseindex/pro/ajax/courseactions.php';
             url += '?id=' + coursebox.attr('data-course');
 
             $.get(url, function(data) {

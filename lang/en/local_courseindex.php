@@ -82,6 +82,11 @@ $string['guestallowed'] = 'This course allows guest entry';
 $string['quicktextsearch'] = 'Quick search';
 $string['hiddencourses'] = ' <span class=\"smalltext\">(hidden : $a)</span>';
 $string['information'] = 'information';
+$string['licensestatus'] = 'Pro License status';
+$string['licenseprovider'] = 'Pro License provider';
+$string['licenseprovider_desc'] = 'Input here your provider key';
+$string['licensekey'] = 'Pro license key';
+$string['licensekey_desc'] = 'Input here the product license key you got from your provider';
 $string['lpcatalog'] = 'Search in the Learning Offer ';
 $string['lpsearch'] = 'Course Search';
 $string['lpsincategory'] = 'Training courses in this category';
@@ -157,3 +162,11 @@ $string['configopenindex_desc'] = 'If enabled, catalog browsing or exploring req
 on "guest" credentials';
 
 $string['configrendererimages_desc'] = 'Use this file area to store alternative graphic resources used by this component. ';
+
+$string['plugindist'] = 'Plugin distribution';
+$string['plugindist_desc'] = '
+<p>This plugin is the community version and is published for anyone to use as is and check the plugin\'s
+core application. A "pro" version of this plugin exists and is distributed under conditions to feed the life cycle, upgrade, documentation
+and improvement effort.</p>
+<p>Please contact one of our distributors to get "Pro" version support.</p>
+<p><a href="http://www.mylearningfactory.com/index.php/documentation/Distributeurs?lang=en_utf8">MyLF Distributors</a></p>';

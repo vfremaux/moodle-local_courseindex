@@ -131,5 +131,14 @@ if ($hassiteconfig) {
     $desc = get_string('configtrimlength2_desc', 'local_courseindex');
     $default = 250;
     $settings->add(new admin_setting_configtext($key, $label, $desc, $default));
+
+    if (local_courseindex_supports_feature('emulate/community') == 'pro') {
+        include_once($CFG->dirroot.'/local/courseindex/pro/prolib.php');
+        \local_courseindex\pro_manager::add_settings($ADMIN, $settings);
+    } else {
+        $label = get_string('plugindist', 'local_courseindxex');
+        $desc = get_string('plugindist_desc', 'local_courseindex');
+        $settings->add(new admin_setting_heading('plugindisthdr', $label, $desc));
+    }
 }
 

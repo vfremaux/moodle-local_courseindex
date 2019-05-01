@@ -22,6 +22,7 @@
  *
  */
 require('../../config.php');
+require_once($CFG->dirroot.'/local/courseindex/lib.php');
 require_once($CFG->dirroot.'/local/courseindex/classes/navigator.class.php');
 
 $SESSION->courseindex = new StdClass;
@@ -61,7 +62,11 @@ if ($config->layoutmodel == 'standard') {
 $PAGE->set_heading($strheading);
 $PAGE->set_title($strheading);
 
-$renderer = $PAGE->get_renderer('local_courseindex');
+if (local_courseindex_supports_feature('layout/magistere')) {
+    $renderer = $PAGE->get_renderer('local_courseindex', 'extended');
+} else {
+    $renderer = $PAGE->get_renderer('local_courseindex');
+}
 
 // getting all filters
 

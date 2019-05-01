@@ -75,6 +75,11 @@ $string['goto'] = 'Aller au cours';
 $string['guestallowed'] = 'Ce cours est accessible aux invités';
 $string['hiddencourses'] = ' <span class=\"smalltext\">(caché(s) : $a)</span>';
 $string['information'] = 'information';
+$string['licensestatus'] = 'Etat de la license d\'exploitation';
+$string['licenseprovider'] = 'Fournisseur version Pro';
+$string['licenseprovider_desc'] = 'Entrez la clef de votre distributeur.';
+$string['licensekey'] = 'Clef de license pro';
+$string['licensekey_desc'] = 'Entrez ici la clef de produit que vous avez reçu de votre distributeur.';
 $string['lpsearch'] = 'Moteur de recherche de formations';
 $string['lpsincategory'] = 'Formations dans cette catégorie';
 $string['lpstatus'] = 'Par état de publication';
@@ -150,3 +155,11 @@ les champs "type", "id", et les types utilisés par le catalogue sont "coursefil
 
 $string['rendererimages_desc'] = 'Toutes les images par défaut pour l\'interface de ce composant. Images attendues
 "coursedefaultimage.&lt;ext&gt;". Les images peuvent être en .svg, .png, .jp ou .gif.';
+
+$string['plugindist'] = 'Distribution du plugin';
+$string['plugindist_desc'] = '
+<p>Ce plugin est distribué dans la communauté Moodle pour l\'évaluation de ses fonctions centrales
+correspondant à une utilisation courante du plugin. Une version "professionnelle" de ce plugin existe et est distribuée
+sous certaines conditions, afin de soutenir l\'effort de développement, amélioration; documentation et suivi des versions.</p>
+<p>Contactez un distributeur pour obtenir la version "Pro" et son support.</p>
+<p><a href="http://www.mylearningfactory.com/index.php/documentation/Distributeurs?lang=fr_utf8">Distributeurs MyLF</a></p>';

@@ -28,11 +28,58 @@ defined('MOODLE_INTERNAL') || die();
  */
 
 /**
- * This function is not implemented in thos plugin, but is needed to mark
- * the vf documentation custom volume availability.
+ * This is part of the dual release distribution system.
+ * Tells wether a feature is supported or not. Gives back the
+ * implementation path where to fetch resources.
+ * @param string $feature a feature key to be tested.
  */
-function local_courseindex_supports_feature() {
-    assert(1);
+function local_courseindex_supports_feature($feature = null) {
+    global $CFG;
+    static $supports;
+
+    $config = get_config('local_courseindex');
+
+    if (!isset($supports)) {
+        $supports = array(
+            'pro' => array(
+                'layout' => array('magistere'),
+                'bindings' => array('shop'),
+            ),
+            'community' => array(
+            ),
+        );
+    }
+
+    // Check existance of the 'pro' dir in plugin.
+    if (is_dir(__DIR__.'/pro')) {
+        if ($feature == 'emulate/community') {
+            return 'pro';
+        }
+        if (empty($config->emulatecommunity)) {
+            $versionkey = 'pro';
+        } else {
+            $versionkey = 'community';
+        }
+    } else {
+        $versionkey = 'community';
+    }
+
+    if (empty($feature)) {
+        // Just return version.
+        return $versionkey;
+    }
+
+    list($feat, $subfeat) = explode('/', $feature);
+
+    if (!array_key_exists($feat, $supports[$versionkey])) {
+        return false;
+    }
+
+    if (!in_array($subfeat, $supports[$versionkey][$feat])) {
+        return false;
+    }
+
+    return $versionkey;
 }
 
 /**
