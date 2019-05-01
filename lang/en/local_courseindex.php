@@ -23,6 +23,7 @@
 
 $string['courseindex:browse'] = 'Can browse courses';
 $string['courseindex:manage'] = 'Can manage course index';
+$string['courseindex:seecourseattributes'] = 'Can see course enrol and other attributes';
 
 // Privacy.
 $string['privacy:metadata'] = "The Course Index local plugin does not store any data belonging to users";
@@ -56,17 +57,36 @@ $string['configmaxnavigationdepth'] = 'Max nav depth';
 $string['configmetadatabinding'] = 'Metadata schema binding';
 $string['configopenindex'] = 'Public catalog';
 $string['configrendererimages'] = 'Images for renderers';
+$string['configlayoutmodel'] = 'Layout model';
+$string['configlayoutmodel_desc'] = 'Choose a layout model for the browser page.';
+$string['configeffectopacity'] = "Opacity effect";
+$string['configeffecthalo'] = "Halo effect";
+$string['configtrimmode'] = 'Trim mode';
+$string['configtrimmode_desc'] = 'The algorithm used to trim texts';
+$string['configtrimlength1'] = 'Trim length 1';
+$string['configtrimlength1_desc'] = 'Trim length units for short strings';
+$string['configtrimlength2'] = 'Trim length 2';
+$string['configtrimlength2_desc'] = 'Trim length units for descriptions or summaries texts (note that trim do remove all tags)';
 $string['courseindex'] = 'Course catalog';
 $string['currentcategory'] = 'Category';
 $string['description'] = 'description';
-$string['explore'] = 'Course Explorer';
+$string['explore'] = 'Detailed search';
+$string['enrolme'] = 'Enrol me';
+$string['purchase'] = 'Purchase';
 $string['gofreesearch'] = 'Search';
 $string['gosearch'] = 'Search';
 $string['gospecialsearch'] = 'Search';
+$string['goto'] = 'Browse to course';
 $string['gotometadataadmin'] = 'Goto metadata administration';
 $string['guestallowed'] = 'This course allows guest entry';
+$string['quicktextsearch'] = 'Quick search';
 $string['hiddencourses'] = ' <span class=\"smalltext\">(hidden : $a)</span>';
 $string['information'] = 'information';
+$string['licensestatus'] = 'Pro License status';
+$string['licenseprovider'] = 'Pro License provider';
+$string['licenseprovider_desc'] = 'Input here your provider key';
+$string['licensekey'] = 'Pro license key';
+$string['licensekey_desc'] = 'Input here the product license key you got from your provider';
 $string['lpcatalog'] = 'Search in the Learning Offer ';
 $string['lpsearch'] = 'Course Search';
 $string['lpsincategory'] = 'Training courses in this category';
@@ -93,6 +113,14 @@ $string['subcatsincat'] = 'Subcategories';
 $string['targets'] = 'Targets';
 $string['title'] = 'title';
 $string['topics'] = 'Topics';
+$string['standard'] = 'Standard layout';
+$string['magistere'] = 'Magistere layout';
+$string['domains'] = 'Domains';
+$string['notrim'] = "No trim";
+$string['trimchars'] = "Trim on chars";
+$string['trimwords'] = "Trim on words";
+$string['entries'] = " results";
+$string['readmore'] = "Read more";
 
 $string['configenableexplorer_desc'] = 'If not set, the link to the course explorer (advanced search engine) will be hidden.';
 
@@ -134,3 +162,11 @@ $string['configopenindex_desc'] = 'If enabled, catalog browsing or exploring req
 on "guest" credentials';
 
 $string['configrendererimages_desc'] = 'Use this file area to store alternative graphic resources used by this component. ';
+
+$string['plugindist'] = 'Plugin distribution';
+$string['plugindist_desc'] = '
+<p>This plugin is the community version and is published for anyone to use as is and check the plugin\'s
+core application. A "pro" version of this plugin exists and is distributed under conditions to feed the life cycle, upgrade, documentation
+and improvement effort.</p>
+<p>Please contact one of our distributors to get "Pro" version support.</p>
+<p><a href="http://www.mylearningfactory.com/index.php/documentation/Distributeurs?lang=en_utf8">MyLF Distributors</a></p>';

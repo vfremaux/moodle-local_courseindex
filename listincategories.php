@@ -23,7 +23,7 @@
  * learning path list - meant to duplicate http://aoc.ssatrust.org.uk/index?s=13
  */
 require('../../../config.php');
-require_once($CFG->dirroot.'/local/courseindex/navigationlib.php');
+require_once($CFG->dirroot.'/local/courseindex/classes/navigator.class.php');
 
 $url = new moodle_url('/local/courseindex/listincategories.php');
 $PAGE->set_url($url);

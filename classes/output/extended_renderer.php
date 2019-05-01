@@ -15,23 +15,22 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details.
- *
- * @package    local_courseindex
- * @category   local
- * @author     Valery Fremaux <valery.fremaux@gmail.com>
- * @copyright  2010 onwards Valery Fremaux <valery.fremaux@gmail.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
+ * @package     local_courseindex
+ * @category    local
+ * @author      Valery Fremaux <valery.fremaux@gmail.com>
+ * @copyright   Valery Fremaux <valery.fremaux@gmail.com> (MyLearningFactory.com)
+ * @license     http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+namespace local_courseindex\output;
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2019042600;   // The (date) version of this plugin.
-$plugin->requires = 2018112800;   // Requires this Moodle version.
-$plugin->component = 'local_courseindex';
-$plugin->release = '3.6.0 (Build 2019042600)';
-$plugin->maturity = MATURITY_RC;
+require_once($CFG->dirroot.'/local/courseindex/pro/renderer.php');
 
-// Non moodle attributes.
-$plugin->codeincrement = '3.6.0001';
-$plugin->privacy = 'dualrelease';
+/**
+ * this is just a class wrapper in standard codespace to pro extended features. It will be
+ * only used and loaded if pro features are present. It is imlplemented for the standard
+ * $PAGE->get_renderer(pluginname, 'extended') call to succeed.
+ */
+class extended_renderer extends \local_courseindex_renderer_extended {
+}
