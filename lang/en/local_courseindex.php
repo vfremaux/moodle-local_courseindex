@@ -70,12 +70,16 @@ $string['configtrimlength2_desc'] = 'Trim length units for descriptions or summa
 $string['courseindex'] = 'Course catalog';
 $string['currentcategory'] = 'Category';
 $string['description'] = 'description';
-$string['explore'] = 'Course Explorer';
+$string['explore'] = 'Detailed search';
+$string['enrolme'] = 'Enrol me';
+$string['purchase'] = 'Purchase';
 $string['gofreesearch'] = 'Search';
 $string['gosearch'] = 'Search';
 $string['gospecialsearch'] = 'Search';
+$string['goto'] = 'Browse to course';
 $string['gotometadataadmin'] = 'Goto metadata administration';
 $string['guestallowed'] = 'This course allows guest entry';
+$string['quicktextsearch'] = 'Quick search';
 $string['hiddencourses'] = ' <span class=\"smalltext\">(hidden : $a)</span>';
 $string['information'] = 'information';
 $string['lpcatalog'] = 'Search in the Learning Offer ';

@@ -48,7 +48,7 @@ if ($hassiteconfig) {
     $label = get_string('configgraphics', 'local_courseindex');
     $settings->add(new admin_setting_heading('graphicshdr', $label, ''));
 
-    $key = 'local_my/rendererimages';
+    $key = 'local_courseindex/rendererimages';
     $label = get_string('configrendererimages', 'local_courseindex');
     $desc = get_string('configrendererimages_desc', 'local_courseindex');
     $options = array('subdirs' => false, 'maxfiles' => 20);

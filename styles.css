@@ -285,6 +285,33 @@
 
 #courseindex-courses {
     width: 70%;
+    padding: 0px;
+}
+
+#courseindex-courses-panel {
+    padding: 20px;
+}
+
+#courseindex-search {
+    background-color: #dbe0e4;
+    height: 55px;
+    font-size: 14px;
+    padding-left: 20px;
+}
+
+#courseindex-search input {
+    background-color: #cdeaf8;
+    border: 0;
+    padding: 10px 5px;
+    margin: 0;
+    transition: unset;
+    width: 60%;
+    height: 100%;
+    display: inline;
+    font-size: 18px;
+    color: #0095db;
+    opacity: 1;
+    margin-right:30px;
 }
 
 .ftoggle-handle {
@@ -359,7 +386,37 @@
     margin: 10px;
 }
 
+.modal-close .icon {
+    width: 32px;
+    height: 32px;
+}
+
 body.magistere > #page-wrapper > #page {
     margin:50px 0 0 0 !important;
     padding:0 0 0 0 !important;
+}
+
+body.magistere #page-content {
+    padding: 0;
+}
+
+body.magistere .d-flex {
+    display: none !important;
+}
+
+body.magistere #region-main {
+    border: none;
+}
+
+.course-actions {
+    padding: 10px;
+}
+
+.course-actions div {
+    display: inline-block;
+    margin: 10px;
+}
+
+.standard-course-detail {
+    padding: 20px;
 }

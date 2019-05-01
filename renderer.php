@@ -354,6 +354,7 @@ class local_courseindex_renderer extends plugin_renderer_base {
 
         $template = new StdClass;
 
+        $template->explorerurl = new moodle_url('/local/courseindex/explorer.php');
         $template->currentcatid = optional_param('catid', '', PARAM_INT);
         $template->currentcatpath = optional_param('catpath', '', PARAM_TEXT);
 
@@ -396,6 +397,61 @@ class local_courseindex_renderer extends plugin_renderer_base {
         return $this->output->render_from_template('local_courseindex/magisterepanel', $template);
     }
 
+    public function course_actions($courseorid) {
+        global $CFG, $USER;
+
+        if (is_object($courseorid)) {
+            $courseorid = $courseorid->id;
+        }
+
+        $template = new Stdclass;
+
+        $context = context_course::instance($courseorid);
+
+        if (isloggedin() && !isguestuser()) {
+            if (is_enrolled($context, $USER->id) || has_capability('moodle/course:viewhiddencourses', $context)) {
+                $template->canaccess = true;
+                $template->courseurl = new moodle_url('/course/view.php', ['id' => $courseorid]);
+            }
+        }
+
+        if (!$template->canaccess) {
+
+            if (local_courseindex_is_selfenrolable_course($courseorid)) {
+
+                if (is_object($courseorid)) {
+                    $courseorid = $courseorid->id;
+                }
+
+                $template->canenrol = true;
+                $template->enrolurl = new moodle_url('/course/view.php', ['id' => $courseorid]);
+            }
+
+            $fs = get_file_storage();
+
+            // Is shop installed ?
+            if (is_dir($CFG->dirroot.'/local/shop')) {
+                include_once($CFG->dirroot.'/local/shop/xlib.php');
+                include_once($CFG->dirroot.'/local/shop/classes/Catalog.class.php');
+                include_once($CFG->dirroot.'/local/shop/classes/CatalogItem.class.php');
+                $relatedproduct = local_shop_related_product($courseorid);
+                $catalog = new \local_shop\Catalog($relatedproduct->catalogid);
+                $params = ['id' => $catalog->shopid, 'view' => 'shop', $relatedproduct->code => 1, 'origin' => 'courseindex'];
+                $template->purchaseproducturl = new moodle_url('/local/shop/front/view.php', $params);
+                $template->hasshop = 1;
+
+                if ($relatedproduct) {
+                    if ($leafleturl = $relatedproduct->get_leaflet_url()) {
+                        $template->hasleaflet = true;
+                        $template->leafleturl = $leafleturl;
+                    }
+                }
+            }
+        }
+
+        return $this->output->render_from_template('local_courseindex/magisterecourseactions', $template);
+    }
+
     public function coursebox($courseorid) {
         global $CFG, $USER;
 
@@ -417,6 +473,11 @@ class local_courseindex_renderer extends plugin_renderer_base {
             $coursetpl->trimtitle = $this->trim_words(format_string($course->fullname), $config->trimlength1);
         } else {
             $coursetpl->trimtitle = $this->trim_char(format_string($course->fullname), $config->trimlength1);
+        }
+
+        $template->accessmode = 'detailed';
+        if (has_capability('moodle/course:view', $context)) {
+            $template->accessmode = 'direct';
         }
 
         $courseurl = new moodle_url('/course/view.php', array('id' => $courseid ));
@@ -478,8 +539,8 @@ class local_courseindex_renderer extends plugin_renderer_base {
 
         foreach ($course->get_course_overviewfiles() as $file) {
             if ($isimage = $file->is_valid_image()) {
-                $path = '/'. $file->get_contextid(). '/'. $file->get_component().'/';
-                $path .= $file->get_filearea().$file->get_filepath().$file->get_filename();
+                $path = '/'. $file->get_contextid(). '/local_courseindex/';
+                $path .= $file->get_filearea().'/0/'.$file->get_filepath().$file->get_filename();
                 $coursetpl->imgurl = ''.file_encode_url("$CFG->wwwroot/pluginfile.php", $path, !$isimage);
                 break;
             }

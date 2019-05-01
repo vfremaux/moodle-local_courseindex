@@ -26,9 +26,11 @@ define(['jquery', 'core/log', 'core/config'], function($, log, cfg) {
     var magisterecourseindex = {
 
         init: function() {
-            $('.courseindex-coursethumb').bind('click', this.load_course_detail);
-            $('.courseindex-coursename').bind('click', this.load_course_detail);
-            $('.courseindex-readmorelink').bind('click', this.load_course_detail);
+            $('.courseindex-coursethumb.direct').bind('click', this.goto_course);
+            $('.courseindex-coursename.direct').bind('click', this.goto_course);
+            $('.courseindex-coursethumb.detailed').bind('click', this.load_course_detail);
+            $('.courseindex-coursename.detailed').bind('click', this.load_course_detail);
+            $('.courseindex-readmorelink.detailed').bind('click', this.load_course_detail);
             $('.modal-close').bind('click', this.close_course_detail);
 
             $('.ftoggle-handle').bind('click', this.toggle);
@@ -81,6 +83,7 @@ define(['jquery', 'core/log', 'core/config'], function($, log, cfg) {
             var waiter = '<div class="centered"><center><img id="detail-waiter" src="';
             waiter += cfg.wwwroot + '/pix/i/ajaxloader.gif" /></center></div>';
             $('#courseindex-course-detail-content').html(waiter);
+            $('#courseindex-course-detail-actions').html(waiter);
             var coursebox = that.closest('.local-courseindex-fp-coursebox');
 
             if (coursebox.attr('data-format') === 'page') {
@@ -102,6 +105,14 @@ define(['jquery', 'core/log', 'core/config'], function($, log, cfg) {
                 }, 'html');
             }
 
+            // Invokes the action fragment.
+            var url = cfg.wwwroot + '/local/courseindex/ajax/courseactions.php';
+            url += '?id=' + coursebox.attr('data-course');
+
+            $.get(url, function(data) {
+                $('#courseindex-course-detail-actions').html(data);
+            }, 'html');
+
             $('body').addClass('courseindex-detail-open');
             $('#courseindex-modal-shadow').css('display', 'block');
         },
@@ -109,6 +120,15 @@ define(['jquery', 'core/log', 'core/config'], function($, log, cfg) {
         close_course_detail: function() {
             $('body').removeClass('courseindex-detail-open');
             $('#courseindex-modal-shadow').css('display', 'none');
+        },
+
+        goto_course: function() {
+            var that = $(this);
+
+            var coursebox = that.closest('.local-courseindex-fp-coursebox');
+            var url = cfg.wwwroot + '/course/view.php';
+            url += '?id=' + coursebox.attr('data-course');
+            window.location = url;
         },
 
         toggle: function() {

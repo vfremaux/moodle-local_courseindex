@@ -1,0 +1,27 @@
+
+
+
+<!-- local_courseindex/magisterecourseactions -->
+<div class="course-actions">
+    {{#hasleaflet}}
+    <div class="course-leaflet">
+        <a href="{{{leafleturl}}}" target="_blank"><button class="btn" value="{{#str}}getleaflet, local_courseindex{{/str}}" >{{#str}}getleaflet, local_courseindex{{/str}}</button></a>
+    </div>
+    {{/hasleaflet}}
+    {{#canaccess}}
+    <div class="course-access">
+        <a href="{{{courseurl}}}"><button class="btn" title="{{#str}}goto, local_courseindex{{/str}}">{{#str}}goto, local_courseindex{{/str}}</button></a>
+    </div>
+    {{/canaccess}}
+    {{#canenrol}}
+    <div class="course-self-enrol">
+        <a href="{{{courseenrolurl}}}"><button class="btn" title="{{#str}}enrolme, local_courseindex{{/str}}">{{#str}}enrolme, local_courseindex{{/str}}</button></a>
+    </div>
+    {{/canenrol}}
+    {{#hasshop}}
+    <div class="course-self-shop">
+        <a href="{{{purchaseproducturl}}}" target="_blank"><button class="btn" title="{{#str}}purchase, local_courseindex{{/str}}">{{#str}}purchase, local_courseindex{{/str}}</button></a>
+    </div>
+    {{/hasshop}}
+</div>
+<!-- /local_courseindex/magisterecourseactions -->

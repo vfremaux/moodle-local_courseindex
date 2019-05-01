@@ -24,38 +24,27 @@
 
 }}
 <!-- local_courseindex/magistereviewcourse -->
+<div class="standard-course-detail">
+    <h1>{{fullname}}</h1>
 
-<h1>{{fullname}}</h1>
+    {{#hasimage}}
+    <div class="course-image">
+        <img src="{{{thumburl}}}" style="width:100%" />
+    </div>
+    {{/hasimage}}
 
-{{#hasimage}}
-<div class="course-image">
-    <img src="{{{thumburl}}}" style="width:100%" />
+    <div class="course-summary">
+        {{{description}}}
+    </div>
+
+    {{#usecustomlabelmtd}}
+
+    {{{authors}}}
+
+    {{{metadata}}}
+
+    {{{classifiers}}}
+
+    {{/usecustomlabelmtd}}
 </div>
-{{/hasimage}}
-
-<div class="course-summary">
-    {{{description}}}
-</div>
-
-{{#usecustomlabelmtd}}
-{{#hasauthors}}
-<table width="100%">
-    <caption>{{#str}}authors, local_courseindex{{/str}}</caption>
-{{#authors}}
-    <tr>
-        <td class="courseindex-author">{{thumb}} {{author}}</td>
-        <td class="courseindex-institution">{{institution}}</td>
-        <td class="courseindex-department">{{department}}</td>
-    </tr>
-{{/authors}}
-{{#contributors}}
-    <tr>
-        <td>{{#str}}othercontributors, local_courseindex{{/str}}</td>
-        <td span="2" class="courseindex-contributors">{{{contributors}}}</td>
-    </tr>
-{{/contributors}}
-</table>
-{{/hasauthors}}
-
-{{/usecustomlabelmtd}}
 <!-- /local_courseindex/magistereviewcourse -->

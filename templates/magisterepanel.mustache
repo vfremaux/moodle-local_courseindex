@@ -27,7 +27,7 @@
 <div id="courseindex-container">
 
     <div id="courseindex-nav">
-        <form name="filtering" action="{{{browserurl}}}" method="get">
+        <form name="indexfiltering" action="{{{browserurl}}}" method="get">
         <input type="hidden" name="catid" value="{{currentcatid}}"/>
         <input type="hidden" name="catpath" value="{{currentcatpath}}"/>
 
@@ -46,17 +46,25 @@
     </div>
 
     <div id="courseindex-courses">
-        {{#category}}
-        <h2>{{category}}</h2>
-        {{/category}}
-
-        <div class="category-data">
-            <div class="cat-count">
-                {{entriescount}} {{#str}}entries, local_courseindex{{/str}}
-            </div>
+        <div id="courseindex-search">
+            <i class="fa fa-search icon"></i>
+            <input type="text" id="search-input" placeholder="{{#str}}quicktextsearch, local_courseindex{{/str}}">
+            <a href="{{{explorerurl}}}">{{#str}}explore, local_courseindex{{/str}}</a>
         </div>
 
-        {{> local_courseindex/magisterecoursegrid}}
+        <div id="courseindex-courses-panel">
+            {{#category}}
+            <h2>{{category}}</h2>
+            {{/category}}
+
+            <div class="category-data">
+                <div class="cat-count">
+                    {{entriescount}} {{#str}}entries, local_courseindex{{/str}}
+                </div>
+            </div>
+
+            {{> local_courseindex/magisterecoursegrid}}
+        </div>
     </div>
 
     <!-- dynamically loadable panel -->
@@ -64,7 +72,9 @@
         <div class="modal-close">
             {{#pix}}close, local_courseindex{{/pix}}
         </div>
-        <div id="courseindex-course-detail-content" style="z-index:12000">
+        <div id="courseindex-course-detail-actions">
+        </div>
+        <div id="courseindex-course-detail-content">
         </div>
     </div>
 

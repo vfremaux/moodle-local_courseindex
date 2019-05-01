@@ -66,12 +66,16 @@ function local_courseindex_strip_html_tags($text, $format) {
 /**
  * Local clone of local/my for modularity.
  */
-function local_courseindex_is_selfenrolable_course($course) {
+function local_courseindex_is_selfenrolable_course($courseorid) {
     global $DB;
 
-    $params = array('courseid' => $course->id, 'enrol' => 'self', 'status' => 0);
-    if ($DB->count_records('enrol', $params)) {
-        return true;
+    if (is_object($courseorid)) {
+        $courseorid = $courseorid->id;
+    }
+
+    $params = array('courseid' => $courseorid, 'enrol' => 'self', 'status' => 0);
+    if ($enrol = $DB->get_records('enrol', $params)) {
+        return $enrol;
     }
     return false;
 }
@@ -79,12 +83,52 @@ function local_courseindex_is_selfenrolable_course($course) {
 /**
  * Local clone of local/my for modularity.
  */
-function local_courseindex_is_guestenrolable_course($course) {
+function local_courseindex_is_guestenrolable_course($courseorid) {
     global $DB;
 
-    $params = array('courseid' => $course->id, 'enrol' => 'guest', 'status' => 0);
+    if (is_object($courseorid)) {
+        $courseorid = $courseorid->id;
+    }
+
+    $params = array('courseid' => $courseorid, 'enrol' => 'guest', 'status' => 0);
     if ($DB->count_records('enrol', $params)) {
         return true;
     }
     return false;
+}
+
+/**
+ * Willby pass internal course protections for course description attached files or thumbnails.
+ */
+function local_courseindex_pluginfile($course, $cmid, $context, $filearea, $args, $forcedownload, array $options = array()) {
+
+    $systemcontext = context_system::instance();
+
+    // Filearea must contain a real area.
+    if (!in_array($filearea, ['overviewfiles', 'rendererimages'])) {
+        return false;
+    }
+
+    $itemid = (int)array_shift($args);
+
+    $fs = get_file_storage();
+    $relativepath = implode('/', $args);
+    if ($filearea == 'overviewfiles') {
+        if ($context->contextlevel != CONTEXT_COURSE) {
+            return false;
+        }
+        $fullpath = "/$context->id/course/$filearea/$itemid/$relativepath";
+    } else {
+        if ($context->contextlevel != CONTEXT_SYSTEM) {
+            return false;
+        }
+        $fullpath = "/{$systemcontext->id}/local_courseindex/$filearea/$itemid/$relativepath";
+    }
+
+    if (!$file = $fs->get_file_by_hash(sha1($fullpath))) {
+        return false;
+    }
+
+    // Finally send the file.
+    send_stored_file($file, 0, 0, true, $options); // Download MUST be forced - security!
 }
