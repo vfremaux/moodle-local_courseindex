@@ -1,0 +1,55 @@
+
+<!-- local_courseindex/indexsearchform -->
+<a name="classifiersearch"></a>
+<form name="classifierform" action="#results" method="get">
+<input type="hidden" name="lpstatus" value="" />
+
+<fieldset>
+    <table width="100%" class="generaltable">
+
+        {{#classifiers}}
+        <tr valign="top">
+            <td align="right" width="40%"><b>{{fieldlabel}}</b>
+                {{#mandatory}}
+                <span class="required">
+                {{{fieldlabel}}}
+                <img class="req"
+                    title="{{#str}}requiredfield, customlabel{{/str}}"
+                    alt="{{#str}}requiredfield, customlabel{{/str}}"
+                    src="{{{pixurl}}}">
+                </span>
+                {{/mandatory}}
+
+                {{{help}}}
+                </b>
+            </td>
+
+            <td>
+                {{#iserror}}
+                <div id="div_menu_'{{fieldname}}">
+                    {{{fielderror}}}
+                </div>
+                {{/iserror}}
+
+                {{^iserror}}
+                <div id="div_menu_{{fieldname}}">
+                    {{{searchselect}}}
+                </div>
+                {{/iserror}}
+            </td>
+        </tr>
+        {{/classifiers}}
+
+        <tr valign="top">
+            <td align="right" width="30%"></td>
+            <td align="left">
+                <input type="submit"
+                       id="id-courseindex-search-submit"
+                       name="go_search"
+                       value="{{#str}}gosearch, local_courseindex{{/str}}" />
+            </td>
+        </tr>
+    </table>
+</fieldset>
+</form>
+<!-- /local_courseindex/indexsearchform -->

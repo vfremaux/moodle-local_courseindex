@@ -22,7 +22,7 @@
  *
  */
 require('../../config.php');
-require_once($CFG->dirroot.'/local/courseindex/navigationlib.php');
+require_once($CFG->dirroot.'/local/courseindex/classes/navigator.class.php');
 require_once($CFG->dirroot.'/local/courseindex/explorelib.php');
 require_once($CFG->dirroot.'/mod/customlabel/lib.php');
 require_once($CFG->dirroot.'/mod/customlabel/locallib.php');
@@ -56,6 +56,10 @@ $renderer = $PAGE->get_renderer('local_courseindex');
 echo $OUTPUT->header();
 
 echo $OUTPUT->heading(get_string('lpsearch', 'local_courseindex'));
+
+if (empty($config->enabled)) {
+    print_error('disabled', 'local_courseindex');
+}
 
 $filters = null;
 

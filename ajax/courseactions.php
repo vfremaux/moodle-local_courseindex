@@ -15,23 +15,25 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
- * Version details.
  *
- * @package    local_courseindex
- * @category   local
- * @author     Valery Fremaux <valery.fremaux@gmail.com>
- * @copyright  2010 onwards Valery Fremaux <valery.fremaux@gmail.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
+ * @package local_courseindex
+ * @category local
+ * @author Valery Fremaux
+ * @version $Id: format.php,v 1.10 2012-07-30 15:02:46 vf Exp $
+ * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
  */
+require('../../../config.php');
 
-defined('MOODLE_INTERNAL') || die();
+$id = required_param('id', PARAM_INT);
 
-$plugin->version = 2019042600;   // The (date) version of this plugin.
-$plugin->requires = 2018042700;   // Requires this Moodle version.
-$plugin->component = 'local_courseindex';
-$plugin->release = '3.5.0 (Build 2019042600)';
-$plugin->maturity = MATURITY_RC;
+if (!$course = $DB->get_record('course', ['id' => $id])) {
+    print_error('coursemisconf');
+}
 
-// Non moodle attributes.
-$plugin->codeincrement = '3.5.0002';
-$plugin->privacy = 'dualrelease';
+$url = new moodle_url('/local/courseindex/ajax/courseactions.php', ['id' => $id]);
+$context = context_course::instance($course->id);
+$PAGE->set_context($context);
+
+$renderer = $PAGE->get_renderer('local_courseindex');
+
+echo $renderer->course_actions($id);

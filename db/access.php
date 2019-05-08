@@ -42,9 +42,22 @@ $capabilities = array(
 
         'riskbitmask' => RISK_SPAM,
 
-        'captype' => 'write',
+        'captype' => 'read',
         'contextlevel' => CONTEXT_COURSE,
         'archetypes' => array(
+            'editingteacher' => CAP_ALLOW,
+            'manager' => CAP_ALLOW
+        )
+    ),
+
+    'local/courseindex:seecourseattributes' => array(
+
+        'riskbitmask' => RISK_SPAM,
+
+        'captype' => 'read',
+        'contextlevel' => CONTEXT_COURSE,
+        'archetypes' => array(
+            'teacher' => CAP_ALLOW,
             'editingteacher' => CAP_ALLOW,
             'manager' => CAP_ALLOW
         )
