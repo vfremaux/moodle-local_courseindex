@@ -41,7 +41,7 @@ $string['browseup'] = 'Browse up one level';
 $string['bycategory'] = 'By category';
 $string['bykeyword'] = 'By keywords';
 $string['byspecialcriteria'] = 'Special criteria';
-$string['config'] = 'Maximume depth in navigation tree';
+$string['configenabled'] = 'Enabled';
 $string['configclassificationconstrainttable'] = 'Constraint table';
 $string['configclassificationtypetable'] = 'Table for classifier types';
 $string['configclassificationvaluetable'] = 'Table for classification values';
@@ -61,6 +61,7 @@ $string['configlayoutmodel'] = 'Layout model';
 $string['configlayoutmodel_desc'] = 'Choose a layout model for the browser page.';
 $string['configeffectopacity'] = "Opacity effect";
 $string['configeffecthalo'] = "Halo effect";
+$string['configtopcourselist'] = 'Top course list';
 $string['configtrimmode'] = 'Trim mode';
 $string['configtrimmode_desc'] = 'The algorithm used to trim texts';
 $string['configtrimlength1'] = 'Trim length 1';
@@ -70,6 +71,7 @@ $string['configtrimlength2_desc'] = 'Trim length units for descriptions or summa
 $string['courseindex'] = 'Course catalog';
 $string['currentcategory'] = 'Category';
 $string['description'] = 'description';
+$string['disabled'] = 'This service is disabled';
 $string['emulatecommunity'] = 'Emulate the community version.';
 $string['emulatecommunity_desc'] = 'Switches the code to the community version. The result will be more compatible, but some features will not be available anymore.';
 $string['explore'] = 'Detailed search';
@@ -120,6 +122,7 @@ $string['standard'] = 'Standard layout';
 $string['magistere'] = 'Magistere layout';
 $string['domains'] = 'Domains';
 $string['notrim'] = "No trim";
+$string['topcourses'] = "Top course list";
 $string['trimchars'] = "Trim on chars";
 $string['trimwords'] = "Trim on words";
 $string['entries'] = " results";
@@ -165,6 +168,8 @@ $string['configopenindex_desc'] = 'If enabled, catalog browsing or exploring req
 on "guest" credentials';
 
 $string['configrendererimages_desc'] = 'Use this file area to store alternative graphic resources used by this component. ';
+
+$string['configtopcourselist_desc'] = 'You can give an ordered, coma separated, list of course ids that will appear at the top root';
 
 $string['plugindist'] = 'Plugin distribution';
 $string['plugindist_desc'] = '

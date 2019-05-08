@@ -30,11 +30,13 @@ $string['alllevels'] = 'Tous niveaux';
 $string['alltargets'] = 'tous publics';
 $string['alltopics'] = 'tous thèmes';
 $string['backtoroot'] = 'Revenir à la racine';
+$string['browse'] = 'Navigateur';
 $string['browsealltree'] = 'Afficher tout le catalogue';
 $string['browseup'] = 'Remonter d\'un niveau';
 $string['bycategory'] = 'Par catégorie';
 $string['bykeyword'] = 'Par mots clefs';
 $string['byspecialcriteria'] = 'Autres critères';
+$string['configenabled'] = 'Activé';
 $string['configclassificationconstrainttable'] = 'Table des contraintes';
 $string['configclassificationtypetable'] = 'Table des critères';
 $string['configclassificationvaluetable'] = 'Table des valeurs de critères';
@@ -55,6 +57,7 @@ $string['configeffectopacity'] = 'Effet d\'opacité';
 $string['configeffecthalo'] = 'Effet de halo';
 $string['courseindex'] = 'L\'Offre de cours';
 $string['courseindexconfigmaxnavigationdepth'] = 'Rechercher dans l\'offre de formation';
+$string['configtopcourselist'] = 'Liste des cours racine';
 $string['configtrimmode'] = 'Méthode de césure';
 $string['configtrimmode_desc'] = 'L\'algorithme utilisé pour couper les textes';
 $string['configtrimlength1'] = 'Césure 1';
@@ -63,6 +66,7 @@ $string['configtrimlength2'] = 'Césure 2';
 $string['configtrimlength2_desc'] = 'La longueur admise (en unités de césure) pour les textes longs (descriptifs, les balises html sont supprimées)';
 $string['currentcategory'] = 'Catégorie';
 $string['description'] = 'description';
+$string['disabled'] = 'Ce service est désactivé';
 $string['emulatecommunity'] = 'Emuler la version communautaire';
 $string['emulatecommunity_desc'] = 'Bascule le code sur la version communautaire. Le résultat est plus compatible avec d\'autres installations, mais certaines fonctionnalités avancées ne seront plus disponibles.';
 $string['explore'] = 'Recherche approfondie';
@@ -105,6 +109,7 @@ $string['subcatsincat'] = 'Sous-catégories';
 $string['targets'] = 'Publics';
 $string['title'] = 'titre';
 $string['topics'] = 'Thèmes';
+$string['topcourses'] = "A la une";
 $string['standard'] = 'Mise en page standard';
 $string['magistere'] = 'Mise en page Magistere';
 $string['domains'] = 'Domaines';
@@ -138,6 +143,9 @@ dans tout modèle qui respecte les définitions suivantes :</p>
 $string['configclassificationconstrainttable_desc'] = 'La table des contraintes verrouille les combinaisons valides de valeurs
 entre les différents critères. Ces associations permettent de dessiner les "branches" de classement pertinente en éliminant
 les combinaisons qui ne le sont pas.';
+
+$string['configtopcourselist_desc'] = 'Vous pouvez préciser ici une liste d\'id numériques de cours (séparés par une virgule) qui apparaitront
+dans l\'ordre à la racine absolue du catalogue.';
 
 $string['configcoursemetadatatable_desc'] = 'Cette table gère la relaiton entre un identifiant de cours et une valeur particulière
 de critère.';
