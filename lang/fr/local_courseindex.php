@@ -16,24 +16,27 @@
 
 /**
  * @package    local_courseindex
- * @author     Valery Fremaux <valery.fremaux@club-internet.fr>
+ * @author     Valery Fremaux <valery.fremaux@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @copyright  (C) 1999 onwards Martin Dougiamas  http://dougiamas.com
  */
 
 $string['courseindex:browse'] = 'Peut consulter l\'offre';
 $string['courseindex:manage'] = 'Peut gérer l\'index';
+$string['courseindex:seecourseattributes'] = 'Peut voir les attributs de cours';
 
 // LP Explorer.
 $string['alllevels'] = 'Tous niveaux';
 $string['alltargets'] = 'tous publics';
 $string['alltopics'] = 'tous thèmes';
 $string['backtoroot'] = 'Revenir à la racine';
+$string['browse'] = 'Navigateur';
 $string['browsealltree'] = 'Afficher tout le catalogue';
 $string['browseup'] = 'Remonter d\'un niveau';
 $string['bycategory'] = 'Par catégorie';
 $string['bykeyword'] = 'Par mots clefs';
 $string['byspecialcriteria'] = 'Autres critères';
+$string['configenabled'] = 'Activé';
 $string['configclassificationconstrainttable'] = 'Table des contraintes';
 $string['configclassificationtypetable'] = 'Table des critères';
 $string['configclassificationvaluetable'] = 'Table des valeurs de critères';
@@ -48,18 +51,41 @@ $string['configmaxnavigationdepth'] = 'Profondeur maximum de navigation';
 $string['configmetadatabinding'] = 'Schéma de métadonnées';
 $string['configopenindex'] = 'Catalogue public';
 $string['configrendererimages'] = 'Images pour les renderer';
+$string['configlayoutmodel'] = 'Mise en page';
+$string['configlayoutmodel_desc'] = 'Sélectionne une mise en page pour l\'écran de navigation.';
+$string['configeffectopacity'] = 'Effet d\'opacité';
+$string['configeffecthalo'] = 'Effet de halo';
 $string['courseindex'] = 'L\'Offre de cours';
 $string['courseindexconfigmaxnavigationdepth'] = 'Rechercher dans l\'offre de formation';
+$string['configtopcourselist'] = 'Liste des cours racine';
+$string['configtrimmode'] = 'Méthode de césure';
+$string['configtrimmode_desc'] = 'L\'algorithme utilisé pour couper les textes';
+$string['configtrimlength1'] = 'Césure 1';
+$string['configtrimlength1_desc'] = 'La longueur admise (en unités de césure) pour les textes courts (titres)';
+$string['configtrimlength2'] = 'Césure 2';
+$string['configtrimlength2_desc'] = 'La longueur admise (en unités de césure) pour les textes longs (descriptifs, les balises html sont supprimées)';
 $string['currentcategory'] = 'Catégorie';
 $string['description'] = 'description';
-$string['explore'] = 'Explorateur de formations';
+$string['disabled'] = 'Ce service est désactivé';
+$string['emulatecommunity'] = 'Emuler la version communautaire';
+$string['emulatecommunity_desc'] = 'Bascule le code sur la version communautaire. Le résultat est plus compatible avec d\'autres installations, mais certaines fonctionnalités avancées ne seront plus disponibles.';
+$string['explore'] = 'Recherche approfondie';
+$string['enrolme'] = 'M\'inscrire';
+$string['purchase'] = 'Acheter';
+$string['quicktextsearch'] = 'Recherche rapide';
 $string['gofreesearch'] = 'Chercher';
 $string['gosearch'] = 'Chercher';
 $string['gospecialsearch'] = 'Chercher';
 $string['gotometadataadmin'] = 'Aller à l\'administration des métadonnées';
+$string['goto'] = 'Aller au cours';
 $string['guestallowed'] = 'Ce cours est accessible aux invités';
 $string['hiddencourses'] = ' <span class=\"smalltext\">(caché(s) : $a)</span>';
 $string['information'] = 'information';
+$string['licensestatus'] = 'Etat de la license d\'exploitation';
+$string['licenseprovider'] = 'Fournisseur version Pro';
+$string['licenseprovider_desc'] = 'Entrez la clef de votre distributeur.';
+$string['licensekey'] = 'Clef de license pro';
+$string['licensekey_desc'] = 'Entrez ici la clef de produit que vous avez reçu de votre distributeur.';
 $string['lpsearch'] = 'Moteur de recherche de formations';
 $string['lpsincategory'] = 'Formations dans cette catégorie';
 $string['lpstatus'] = 'Par état de publication';
@@ -71,6 +97,7 @@ $string['novisiblecourses'] = 'Aucun cours visible avec cette recherche';
 $string['novisiblecoursesinsubtree'] = 'Aucune formation dans cette section';
 $string['openenrol'] = 'L\'inscription à ce cours est libre (sauf si un mot de passe est signalé)';
 $string['pluginname'] = 'Catalogue de cours';
+$string['profeatures'] = 'Fonctionnalités additionnelles en version "Pro"';
 $string['reload'] = 'Recharger';
 $string['results'] = 'Résultats de recherche';
 $string['root'] = 'Racine du catalogue';
@@ -82,6 +109,15 @@ $string['subcatsincat'] = 'Sous-catégories';
 $string['targets'] = 'Publics';
 $string['title'] = 'titre';
 $string['topics'] = 'Thèmes';
+$string['topcourses'] = "A la une";
+$string['standard'] = 'Mise en page standard';
+$string['magistere'] = 'Mise en page Magistere';
+$string['domains'] = 'Domaines';
+$string['notrim'] = 'Pas de césure';
+$string['trimchars'] = 'Caractères';
+$string['trimwords'] = 'Mots';
+$string['entries'] = " resultats";
+$string['readmore'] = "Lire plus...";
 
 $string['configopenindex_desc'] = 'Si autorisé, au public, les personnes non connectées peuvent voir l\'offre de cours';
 
@@ -108,6 +144,9 @@ $string['configclassificationconstrainttable_desc'] = 'La table des contraintes 
 entre les différents critères. Ces associations permettent de dessiner les "branches" de classement pertinente en éliminant
 les combinaisons qui ne le sont pas.';
 
+$string['configtopcourselist_desc'] = 'Vous pouvez préciser ici une liste d\'id numériques de cours (séparés par une virgule) qui apparaitront
+dans l\'ordre à la racine absolue du catalogue.';
+
 $string['configcoursemetadatatable_desc'] = 'Cette table gère la relaiton entre un identifiant de cours et une valeur particulière
 de critère.';
 
@@ -127,3 +166,11 @@ les champs "type", "id", et les types utilisés par le catalogue sont "coursefil
 
 $string['rendererimages_desc'] = 'Toutes les images par défaut pour l\'interface de ce composant. Images attendues
 "coursedefaultimage.&lt;ext&gt;". Les images peuvent être en .svg, .png, .jp ou .gif.';
+
+$string['plugindist'] = 'Distribution du plugin';
+$string['plugindist_desc'] = '
+<p>Ce plugin est distribué dans la communauté Moodle pour l\'évaluation de ses fonctions centrales
+correspondant à une utilisation courante du plugin. Une version "professionnelle" de ce plugin existe et est distribuée
+sous certaines conditions, afin de soutenir l\'effort de développement, amélioration; documentation et suivi des versions.</p>
+<p>Contactez un distributeur pour obtenir la version "Pro" et son support.</p>
+<p><a href="http://www.mylearningfactory.com/index.php/documentation/Distributeurs?lang=fr_utf8">Distributeurs MyLF</a></p>';

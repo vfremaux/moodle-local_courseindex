@@ -23,30 +23,28 @@
     * none
 
 }}
-<!-- local_courseindex/filters -->
-<form name="filtering" action="{{{browserurl}}}" method="post">
-<input type="hidden" name="catid" value="{{catid}}"/>
-<input type="hidden" name="catpath" value="{{catpath}}"/>
+<!-- local_courseindex/magisterefilters -->
 
 {{#hasfilters}}
-<fieldset>
-<table class="browser-filters">
-    <tr>
+
 {{#filters}}
 {{#isnotwwwroot}}
-        <td>
-            <b><span style="font-size:80%">{{{fname}}} :</span></b><br/>
-            {{{fselect}}}
-        </td>
+<div class="filter-label">
+    <h3>{{{fname}}} <div class="ftoggle-handle" data-toggle="filter-input-{{fcode}}">{{#pix}}t/expanded{{/pix}}</div></h3>
+</div>
+<div class="filter-input" id="filter-input-{{fcode}}">
+    {{#options}}
+        <div class="filter-option">
+        <input type="checkbox" name="{{fcode}}[]" value="{{id}}" {{checked}}> {{value}} ({{counter}})
+        </div>
+    {{/options}}
+</div>
 {{/isnotwwwroot}}
 {{/filters}}
-        <td>
-            <input type="submit" name="go_btn" value="{{{strreload}}}" />
-        </td>
-    </tr>
-</table>
-</fieldset>
+
+<div class="filter-submit">
+    <input type="submit" name="go_btn" value="{{{strreload}}}" />
+</div>
 {{/hasfilters}}
 
-</form>
-<!-- /local_courseindex/filters -->
+<!-- /local_courseindex/magisterefilters -->

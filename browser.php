@@ -22,7 +22,8 @@
  *
  */
 require('../../config.php');
-require_once($CFG->dirroot.'/local/courseindex/navigationlib.php');
+require_once($CFG->dirroot.'/local/courseindex/lib.php');
+require_once($CFG->dirroot.'/local/courseindex/classes/navigator.class.php');
 
 $SESSION->courseindex = new StdClass;
 $SESSION->courseindex->noheaders = optional_param('noheaders', @$SESSION->courseindex->noheaders, PARAM_BOOL);
@@ -47,94 +48,88 @@ $PAGE->set_context(context_system::instance());
 $PAGE->navbar->add(get_string('courseindex', 'local_courseindex'));
 $PAGE->navbar->add(get_string('browse', 'local_courseindex'));
 $PAGE->requires->jquery();
-$PAGE->requires->jquery_plugin('animatenumber', 'local_courseindex');
-$PAGE->requires->jquery_plugin('slick', 'local_courseindex');
-$PAGE->requires->css('/local/courseindex/jquery/slick/slick.css');
-$PAGE->requires->js('/local/courseindex/js/slickinit.js');
+
+if ($config->layoutmodel == 'standard') {
+    $PAGE->requires->jquery_plugin('animatenumber', 'local_courseindex');
+    $PAGE->requires->jquery_plugin('slick', 'local_courseindex');
+    $PAGE->requires->css('/local/courseindex/jquery/slick/slick.css');
+    $PAGE->requires->js('/local/courseindex/js/slickinit.js');
+} else {
+    $PAGE->set_pagelayout('simplepage');
+    $PAGE->requires->js_call_amd('local_courseindex/magisterecourseindex', 'init');
+}
 
 $PAGE->set_heading($strheading);
 $PAGE->set_title($strheading);
 
-$renderer = $PAGE->get_renderer('local_courseindex');
-
-$filters = null;
+if (local_courseindex_supports_feature('layout/magistere')) {
+    $renderer = $PAGE->get_renderer('local_courseindex', 'extended');
+} else {
+    $renderer = $PAGE->get_renderer('local_courseindex');
+}
 
 // getting all filters
 
 $classificationfilters = \local_courseindex\navigator::get_category_filters();
-
-$i = 0;
-foreach ($classificationfilters as $afilter) {
-
-    $optionsql = "
-        SELECT
-            cv.id,
-            CONCAT(cv.value, ' (',COUNT(cm.id),')') as value
-        FROM
-            {{$config->classification_value_table}} cv
-        LEFT JOIN
-            {{$config->course_metadata_table}} cm
-        ON
-            {$config->course_metadata_value_key} = cv.id
-        LEFT JOIN
-            {course} c
-        ON
-            cm.courseid = c.id
-        WHERE
-            {$config->classification_value_type_key} = ? AND
-            c.visible = 1
-        GROUP BY
-            cv.id
-        ORDER BY
-            cv.sortorder
-    ";
-
-    $options = $DB->get_records_sql_menu($optionsql, array($afilter->id));
-
-    $filters["f$i"] = new StdClass;
-    $filters["f$i"]->name = $afilter->name;
-    $filters["f$i"]->options = $options;
-    $filters["f$i"]->value = optional_param("f$i", '', PARAM_INT);
-    $i++;
-}
+$filters = \local_courseindex\navigator::get_filters_option_values($classificationfilters);
 
 if (empty($SESSION->courseindex->noheaders)) {
+    $PAGE->add_body_classes([$config->layoutmodel]);
     echo $OUTPUT->header();
 }
 
-echo $OUTPUT->heading(get_string('courseindex', 'local_courseindex'), 2);
-
-if (is_dir($CFG->dirroot.'/local/staticguitexts')) {
-    // If static gui texts are installed, add a static text to be edited by administrator.
-    echo '<div class="static">';
-    local_print_static_text('coursecatalog_browser_header', $CFG->wwwroot.'/local/courseindex/browser.php');
-    echo '</div>';
+if (empty($config->enabled)) {
+    print_error('disabled', 'local_courseindex');
 }
-
-// making filters.
-
-echo $renderer->filters($catid, $catpath, $filters);
-
-// Calling navigation.
 
 $catlevels = \local_courseindex\navigator::get_category_levels();
-$cattree = \local_courseindex\navigator::generate_navigation($catid, $catpath, $catlevels, $filters);
 
-// local_courseindex_reduce_tree($cattree, $catlevels);
+if ($config->layoutmodel == 'standard') {
+    echo $OUTPUT->heading(get_string('courseindex', 'local_courseindex'), 2);
 
-echo $renderer->category($cattree, $catpath, \local_courseindex\navigator::count_entries_rec($cattree), 'current', true, $filters);
-
-if ($catid) {
-    // Root of the catalog cannot have courses.
-    if (!empty($cattree->entries)) {
-        echo $renderer->courses_slider(array_keys($cattree->entries));
+    if (is_dir($CFG->dirroot.'/local/staticguitexts')) {
+        // If static gui texts are installed, add a static text to be edited by administrator.
+        echo '<div class="static">';
+        local_print_static_text('coursecatalog_browser_header', $CFG->wwwroot.'/local/courseindex/browser.php');
+        echo '</div>';
     }
-}
 
-echo $renderer->children($cattree, $catpath, $filters);
+    // making filters.
 
-if (!empty($config->enableexplorer)) {
-    echo $renderer->explorerlink();
+    echo $renderer->filters($catid, $catpath, $filters);
+
+    // Calling navigation.
+
+    $cattree = \local_courseindex\navigator::generate_navigation($catid, $catpath, $catlevels, $filters);
+
+    echo $renderer->category($cattree, $catpath, \local_courseindex\navigator::count_entries_rec($cattree), 'current', true, $filters);
+
+    if ($catid) {
+        // Root of the catalog cannot have courses.
+        if (!empty($cattree->entries)) {
+            echo $renderer->courses_slider(array_keys($cattree->entries));
+        }
+    }
+
+    echo $renderer->children($cattree, $catpath, $filters);
+
+    if (!empty($config->enableexplorer)) {
+        echo $renderer->explorerlink();
+    }
+} else {
+    $cattree = \local_courseindex\navigator::generate_category_tree(0, '', $catlevels, $filters);
+    if ($catid) {
+        $entries = \local_courseindex\navigator::get_cat_entries($catid, $catpath, $filters);
+    } else {
+        $entries = [];
+        if (!empty($config->topcourselist)) {
+            $courseids = explode(',', $config->topcourselist);
+            foreach ($courseids as $cid) {
+                $entries[$cid] = $DB->get_record('course', ['id' => $cid]);
+            }
+        }
+    }
+    echo $renderer->magistere_layout($catid, $catpath, $cattree, $entries, $filters);
 }
 
 if (empty($SESSION->courseindex->noheaders)) {

@@ -36,6 +36,10 @@ require_login();
 
 echo $OUTPUT->header();
 
+if (empty($config->enabled)) {
+    print_error('disabled', 'local_courseindex');
+}
+
 $cat = optional_param('cat', null, PARAM_INT);
 $filter = optional_param('filter', 0, PARAM_INT);
 $rcpoptions = new StdClass();

@@ -28,6 +28,7 @@ namespace local_courseindex;
 
 use \StdClass;
 use \context_coursecat;
+use \moodle_url;
 
 defined('MOODLE_INTERNAL') || die();
 
@@ -315,6 +316,133 @@ class navigator {
     }
 
     /**
+     * make a full navigation category tree without courses. Recursive.
+     * elements are shown in category if they have no other qualifiers setup
+     * @param int $startcat if startcat is null, makes full navigation tree from the start. If not null, displays content of a node
+     * @param string $catpath contains tree elements representing the upper branch over the start point.
+     * @param int $levelix the categorization level the startcat is located at
+     * @param $return
+     */
+    public static function generate_category_tree($startcat = null, $catpath = '', $catlevels) {
+        global $CFG, $DB;
+
+        $config = get_config('local_courseindex');
+        $current = optional_param('catpath', '', PARAM_TEXT);
+
+        if (empty($catpath)) {
+            $levelix = 0;
+            $catpatharr = array();
+        } else {
+            $catpatharr = explode(',', $catpath);
+            $levelix = count($catpatharr) - 1;
+        }
+
+        if (empty($catlevels)) {
+            // The course index seems being empty or having no levels.
+            $rootcat = new StdClass();
+            $rootcat->id = 0;
+            $rootcat->parentid = '';
+            $rootcat->parentpath = '';
+            $rootcat->name = get_string('root', 'local_courseindex');
+            $rootcat->cats = array();
+            $rootcat->hascats = 0;
+            $rootcat->catidpath = 0;
+            $rootcat->display = '';
+            $rootcat->caturl = new moodle_url('/local/courseindex/browser.php', array('catid' => 0, 'catpath' => ''));
+            return $rootcat;
+        } else if (empty($startcat)) {
+            // This is the top root cat.
+            $rootcat = new StdClass();
+            $rootcat->id = 0;
+            $rootcat->parentid = '';
+            $rootcat->parentpath = '';
+            $rootcat->name = get_string('root', 'local_courseindex');
+            $rootcat->cats = array();
+            $rootcat->display = '';
+            $rootcat->isroot = 1;
+            $startcatid = 0;
+        } else {
+            if (is_object($startcat)) {
+                $startcatid = $startcat->id;
+            } else {
+                $startcatid = $startcat;
+            }
+            $rootcat = $DB->get_record($config->classification_value_table, array('id' => $startcatid));
+            unset($rootcat->parent); // Do not confuse.
+            $rootcat->name = $rootcat->value;
+            if ($levelix) {
+                $rootcat->display = 'display:none';
+            } else {
+                $rootcat->display = '';
+            }
+
+            /*
+             * We can compute parent from catpath, as the last id in the path.
+             * Path has the full path until the actual cat.
+             */
+            $pathparts = $catpatharr; // Clone the array.
+            array_pop($pathparts); // Remove ourself.
+            $parentcat = array_pop($pathparts); // Get parent.
+            $parentcatpath = implode(',', $pathparts); //
+            $rootcat->parentid = 0 + (int)$parentcat;
+            $rootcat->parentpath = $parentcatpath;
+            $rootcat->isroot = 0;
+        }
+
+        $rootcat->cats = array();
+        $rootcat->hascats = 0;
+        $rootcat->catidpath = str_replace(',', '-', $catpath);
+        $rootcat->level = $levelix;
+        $rootcat->caturl = new moodle_url('/local/courseindex/browser.php', array('catid' => $startcatid, 'catpath' => $catpath));
+        $rootcat->currentclass = '';
+        if ($current == $catpath) {
+            $rootcat->currentclass = 'is-current';
+        }
+
+        // Get candidate subcategories.
+        if ($levelix < count($catlevels)) {
+            $sql = "
+                SELECT DISTINCT
+                   cv.id,
+                   cv.value,
+                   ct.sortorder AS typesortorder
+                FROM
+                   {{$config->classification_value_table}} cv,
+                   {{$config->classification_type_table}} ct
+                WHERE
+                    ct.id = cv.{$config->classification_value_type_key} AND
+                    cv.{$config->classification_value_type_key} = {$catlevels[$levelix]->id}
+                ORDER BY
+                    cv.sortorder
+            ";
+            $levelcats = $DB->get_records_sql($sql);
+
+            if ($levelcats) {
+                $coursescatchedbysubcat = array();
+                foreach ($levelcats as $acat) {
+
+                    if ($rootcat->id && !self::navigation_match_constraints($acat, $rootcat)) {
+                        // Exclude cats that are not matched by constraints.
+                        continue;
+                    }
+
+                    // Recurse to get all tree.
+                    $catobj = self::generate_category_tree($acat, $catpath.','.$acat->id, $catlevels);
+                    $catobj->id = $acat->id;
+                    $catobj->parentid = $startcatid;
+                    $catobj->parentpath = $catpath;
+                    $catobj->name = format_string($acat->value);
+                    $catobj->typesortorder = $acat->typesortorder;
+                    $rootcat->cats[] = $catobj;
+                    $rootcat->hascats = 1;
+                }
+            }
+        }
+
+        return $rootcat;
+    }
+
+    /**
      * get the list of category constructors
      * // TODO complete with a "user profile" strategy
      *
@@ -333,6 +461,84 @@ class navigator {
         }
 
         return $levels;
+    }
+
+    /**
+     * Entries of a cat are entries attached to exaclty all cats in the cat path.
+     */
+    public static function get_cat_entries($catid, $catpath, &$filters) {
+        global $DB;
+
+        $config = get_config('local_courseindex');
+
+        // Get courses entries in the category.
+        $catids = explode(',', $catpath);
+        array_shift($catids); // Drop the root.
+
+        $catcourses = [];
+
+        foreach ($catids as $catid) {
+
+            // Get all course info.
+            $sql = "
+                SELECT DISTINCT
+                    c.id,
+                    c.format,
+                    c.category,
+                    c.shortname,
+                    c.fullname,
+                    c.visible,
+                    c.timecreated,
+                    c.summary
+                FROM
+                    {course} c,
+                    {{$config->course_metadata_table}} cc,
+                    {{$config->classification_value_table}} ccv
+                WHERE
+                    c.id = cc.{$config->course_metadata_course_key} AND
+                    cc.{$config->course_metadata_value_key} = ccv.id AND
+                    cc.valueid = ?
+                GROUP BY
+                    c.id
+                ORDER BY
+                    c.sortorder
+            ";
+
+            $taggedcourses = $DB->get_records_sql($sql, [$catid]);
+
+            if (empty($catcourses)) {
+                // Load with first tag.
+                $catcourses = $taggedcourses;
+            } else {
+                // Calculate an INTERSECT.
+                foreach (array_keys($catcourses) as $cid) {
+                    if (!array_key_exists($cid, $taggedcourses)) {
+                        unset($catcourses[$cid]);
+                    }
+                }
+            }
+        }
+
+        // Finally apply filters.
+        foreach (array_keys($catcourses) as $cid) {
+            foreach($filters as $filter) {
+                if (!empty($filter->value)) {
+                    $noneofthem = true;
+                    foreach ($filter->value as $singlevalue) {
+                        $params = ['courseid' => $cid, 'valueid' => $singlevalue];
+                        if ($DB->record_exists($config->course_metadata_table, $params)) {
+                            $noneofthem = false;
+                        }
+                    }
+
+                    if ($noneofthem) {
+                        unset($catcourses[$cid]);
+                    }
+                }
+            }
+        }
+
+        return $catcourses;
     }
 
     /**
@@ -387,7 +593,7 @@ class navigator {
      *
      *
      */
-    public static function navigation_course_is_visible($course) {
+    public static function course_is_visible($course) {
         global $DB;
 
         if (!$course->visible) {
@@ -443,6 +649,54 @@ class navigator {
                          'topics',
                          'weeks');
         return $formats;
+    }
+
+    public static function get_filters_option_values($classificationfilters) {
+        global $DB;
+
+        $filters = [];
+        $config = get_config('local_courseindex');
+
+        $i = 0;
+        foreach ($classificationfilters as $afilter) {
+
+            $sql = "
+                SELECT
+                    cv.id,
+                    cv.value as value,
+                    COUNT(c.id) as counter
+                FROM
+                    {{$config->classification_value_table}} cv
+                LEFT JOIN
+                    {{$config->course_metadata_table}} cm
+                ON
+                    {$config->course_metadata_value_key} = cv.id
+                LEFT JOIN
+                    {course} c
+                ON
+                    cm.courseid = c.id
+                WHERE
+                    {$config->classification_value_type_key} = ? AND
+                    /* c.visible = 1 */
+                    1 = 1
+                GROUP BY
+                    cv.id
+                ORDER BY
+                    cv.sortorder
+            ";
+
+            $params = array($afilter->id);
+
+            $options = $DB->get_records_sql($sql, $params);
+
+            $filters["f$i"] = new StdClass;
+            $filters["f$i"]->name = $afilter->name;
+            $filters["f$i"]->options = $options;
+            $filters["f$i"]->value = optional_param_array("f$i", '', PARAM_INT);
+            $i++;
+        }
+
+        return $filters;
     }
 
 }

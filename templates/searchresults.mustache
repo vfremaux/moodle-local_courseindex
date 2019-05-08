@@ -1,0 +1,25 @@
+
+
+<!-- local_courseindex/searchresults -->
+<div id="courseindex-search-results">
+{{#courses}}
+    <div class="explorer-course-line">
+
+        <div class="course-image">
+            <img src="{{{imgurl}}}" />
+        </div>
+
+        <div class="course-description">
+            <div class="course-fullname"><a href="{{{courseurl}}}" target="_blank"><h4>{{fullname}}</h4></a></div>
+            <div class="course-description">{{{description}}}</div>
+            <div class="course-tags">
+            {{#tags}}
+                <span class="tagname">{{name}} :</span> <span class="tagvalue" style="padding-right:30px"><b>{{value}}</b></span>
+            {{/tags}}
+            </div>
+        </div>
+
+    </div>
+{{/courses}}
+</div>
+<!-- /local_courseindex/searchresults -->
