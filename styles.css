@@ -400,10 +400,6 @@ body.magistere #page-content {
     padding: 0;
 }
 
-body.magistere .d-flex {
-    display: none !important;
-}
-
 body.magistere #region-main {
     border: none;
 }

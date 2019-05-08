@@ -371,54 +371,11 @@ class local_courseindex_renderer extends plugin_renderer_base {
         return $imgurl;
     }
 
+    /**
+     * Overriden in pro version only.
+     */
     public function magistere_layout($catid, $catpath, &$cattree, &$courses, &$filters) {
-        global $DB;
-
-        $config = get_config('local_courseindex');
-
-        $template = new StdClass;
-
-        $template->explorerurl = new moodle_url('/local/courseindex/explorer.php');
-        $template->currentcatid = optional_param('catid', '', PARAM_INT);
-        $template->currentcatpath = optional_param('catpath', '', PARAM_TEXT);
-
-        $catids = explode(',', $template->currentcatpath);
-        array_shift($catids);
-        $template->category = '';
-        $catnames = [];
-        if (!empty($catids)) {
-            foreach ($catids as $cid) {
-                $catnames[] = $DB->get_field($config->classification_value_table, 'value', ['id' => $cid]);
-            }
-            $template->category = implode(' / ', $catnames);
-        }
-
-        $template->entriescount = count($courses);
-
-        if (!empty($config->effect_opacity)) {
-            $template->withopacityeffect = 'with-opacity-effect';
-        }
-
-        if (!empty($config->effect_halo)) {
-            $template->withhaloeffect = 'with-halo-effect';
-        }
-
-        $template->filters = $this->filters($catid, $catpath, $filters, 'magistere');
-
-        $template->categorytree[0] = $cattree;
-
-        if (empty($courses)) {
-            $template->hascourses = false;
-            $template->nocourses = $this->output->notification(get_string('nocourses', 'local_courseindex'));
-        } else {
-            $template->hascourses = true;
-            foreach ($courses as $cid => $c) {
-                $coursetpl = $this->coursebox($c);
-                $template->coursegridelms[] = $coursetpl;
-            }
-        }
-
-        return $this->output->render_from_template('local_courseindex/magisterepanel', $template);
+        print_error("Only implemented in pro version");
     }
 
     public function course_actions($courseorid) {

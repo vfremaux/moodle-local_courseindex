@@ -35,6 +35,11 @@ if ($hassiteconfig) {
     $label = get_string('configfeatures', 'local_courseindex');
     $settings->add(new admin_setting_heading('featureshdr', $label, ''));
 
+    $key = 'local_courseindex/enabled';
+    $label = get_string('configenabled', 'local_courseindex');
+    $desc = '';
+    $settings->add(new admin_setting_configcheckbox($key, $label, $desc, 1));
+
     $key = 'local_courseindex/indexisopen';
     $label = get_string('configopenindex', 'local_courseindex');
     $desc = get_string('configopenindex_desc', 'local_courseindex');
@@ -43,7 +48,12 @@ if ($hassiteconfig) {
     $key = 'local_courseindex/enableexplorer';
     $label = get_string('configenableexplorer', 'local_courseindex');
     $desc = get_string('configenableexplorer_desc', 'local_courseindex');
-    $settings->add(new admin_setting_configcheckbox($key, $desc, $desc, 1));
+    $settings->add(new admin_setting_configcheckbox($key, $label, $desc, 1));
+
+    $key = 'local_courseindex/topcourselist';
+    $label = get_string('configtopcourselist', 'local_courseindex');
+    $desc = get_string('configtopcourselist_desc', 'local_courseindex');
+    $settings->add(new admin_setting_configtext($key, $label, $desc, ''));
 
     /* Graphics configuration */
 

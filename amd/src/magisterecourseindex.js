@@ -36,42 +36,23 @@ define(['jquery', 'core/log', 'core/config'], function($, log, cfg) {
             $('.ftoggle-handle').bind('click', this.toggle);
             $('#courseindex-modal-shadow').bind('click', this.close_course_detail);
 
+            $('#search-input').bind('keypress', this.search_form_submit);
+
             magisterecourseindex.opencurrenttree();
 
             log.debug("AMD local_courseindex magistere module init.");
         },
 
-        search_form_submit: function() {
-            var statuschoice = document.forms['statusform'].lpstatus;
-            if (statuschoice) {
-                // might not be in page
-                var statusix = statuschoice.selectedIndex;
-                if (statusix) {
-                    document.forms['classifierform'].lpstatus.value = statuschoice.options[statusix].value;
-                }
-            }
-        },
+        search_form_submit: function(ev) {
+            var keycode = (ev.keyCode ? ev.keyCode : ev.which);
+            if (keycode == '13') {
+                var url = cfg.wwwroot + '/local/courseindex/explorer.php';
+                url += '?lpstatus=';
+                url += '&searchtext=' + $('#search-input').val();
+                url += '&title=1&description=1&go_freesearch=Chercher';
 
-        textsearch_form_submit: function() {
-            var statuschoice = document.forms['textsearchform'].lpstatus;
-            if (statuschoice) {
-                // Might not be in page.
-                var statusix = statuschoice.selectedIndex;
-                if (statusix) {
-                    document.forms['textsearchform'].lpstatus.value = statuschoice.options[statusix].value;
-                }
+                window.location = url;
             }
-        },
-
-        special_form_submit: function() {
-            var statuschoice = document.forms['statusform'].lpstatus;
-            if (statuschoice){ // might not be in page
-                var statusix = statuschoice.selectedIndex;
-                if (statusix) {
-                    document.forms['specialform'].lpstatus.value = statuschoice.options[statusix].value;
-                }
-            }
-            // document.forms['specialform'].submit();
         },
 
         // magistere layout related additions.

@@ -78,6 +78,10 @@ if (empty($SESSION->courseindex->noheaders)) {
     echo $OUTPUT->header();
 }
 
+if (empty($config->enabled)) {
+    print_error('disabled', 'local_courseindex');
+}
+
 $catlevels = \local_courseindex\navigator::get_category_levels();
 
 if ($config->layoutmodel == 'standard') {
@@ -114,7 +118,17 @@ if ($config->layoutmodel == 'standard') {
     }
 } else {
     $cattree = \local_courseindex\navigator::generate_category_tree(0, '', $catlevels, $filters);
-    $entries = \local_courseindex\navigator::get_cat_entries($catid, $catpath, $filters);
+    if ($catid) {
+        $entries = \local_courseindex\navigator::get_cat_entries($catid, $catpath, $filters);
+    } else {
+        $entries = [];
+        if (!empty($config->topcourselist)) {
+            $courseids = explode(',', $config->topcourselist);
+            foreach ($courseids as $cid) {
+                $entries[$cid] = $DB->get_record('course', ['id' => $cid]);
+            }
+        }
+    }
     echo $renderer->magistere_layout($catid, $catpath, $cattree, $entries, $filters);
 }
 

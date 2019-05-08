@@ -57,6 +57,10 @@ echo $OUTPUT->header();
 
 echo $OUTPUT->heading(get_string('lpsearch', 'local_courseindex'));
 
+if (empty($config->enabled)) {
+    print_error('disabled', 'local_courseindex');
+}
+
 $filters = null;
 
 /// getting all filters
