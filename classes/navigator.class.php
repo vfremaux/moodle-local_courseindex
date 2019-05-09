@@ -167,9 +167,14 @@ class navigator {
                 {course} c,
                 {{$config->course_metadata_table}} cc,
                 {{$config->classification_value_table}} ccv
+            LEFT JOIN
+                {course_modules} cm
+            ON
+                cc.{$config->course_metadata_cmid_key} = cm.id
             WHERE
                 c.id = cc.{$config->course_metadata_course_key} AND
-                cc.{$config->course_metadata_value_key} = ccv.id
+                cc.{$config->course_metadata_value_key} = ccv.id AND
+                (cm.deletioninprogress = 0 OR cm.deletioninprogress IS NULL)
                 $formatclause
             GROUP BY
                 c.id
@@ -323,7 +328,7 @@ class navigator {
      * @param int $levelix the categorization level the startcat is located at
      * @param $return
      */
-    public static function generate_category_tree($startcat = null, $catpath = '', $catlevels) {
+    public static function generate_category_tree($startcat = null, $catpath = '', $catlevels = [], $filterstring = '') {
         global $CFG, $DB;
 
         $config = get_config('local_courseindex');
@@ -348,7 +353,8 @@ class navigator {
             $rootcat->hascats = 0;
             $rootcat->catidpath = 0;
             $rootcat->display = '';
-            $rootcat->caturl = new moodle_url('/local/courseindex/browser.php', array('catid' => 0, 'catpath' => ''));
+            $params = array('catid' => 0, 'catpath' => '');
+            $rootcat->caturl = new moodle_url('/local/courseindex/browser.php', $params).$filterstring;
             return $rootcat;
         } else if (empty($startcat)) {
             // This is the top root cat.
@@ -393,7 +399,8 @@ class navigator {
         $rootcat->hascats = 0;
         $rootcat->catidpath = str_replace(',', '-', $catpath);
         $rootcat->level = $levelix;
-        $rootcat->caturl = new moodle_url('/local/courseindex/browser.php', array('catid' => $startcatid, 'catpath' => $catpath));
+        $params = array('catid' => $startcatid, 'catpath' => $catpath);
+        $rootcat->caturl = new moodle_url('/local/courseindex/browser.php', $params).$filterstring;
         $rootcat->currentclass = '';
         if ($current == $catpath) {
             $rootcat->currentclass = 'is-current';
@@ -427,7 +434,7 @@ class navigator {
                     }
 
                     // Recurse to get all tree.
-                    $catobj = self::generate_category_tree($acat, $catpath.','.$acat->id, $catlevels);
+                    $catobj = self::generate_category_tree($acat, $catpath.','.$acat->id, $catlevels, $filterstring);
                     $catobj->id = $acat->id;
                     $catobj->parentid = $startcatid;
                     $catobj->parentpath = $catpath;
@@ -464,7 +471,7 @@ class navigator {
     }
 
     /**
-     * Entries of a cat are entries attached to exaclty all cats in the cat path.
+     * Entries of a cat are entries attached to exactly all cats in the cat path.
      */
     public static function get_cat_entries($catid, $catpath, &$filters) {
         global $DB;
@@ -492,12 +499,17 @@ class navigator {
                     c.summary
                 FROM
                     {course} c,
-                    {{$config->course_metadata_table}} cc,
-                    {{$config->classification_value_table}} ccv
+                    {{$config->classification_value_table}} ccv,
+                    {{$config->course_metadata_table}} cc
+                LEFT JOIN
+                    {course_modules} cm
+                ON
+                    cc.{$config->course_metadata_cmid_key} = cm.id
                 WHERE
                     c.id = cc.{$config->course_metadata_course_key} AND
                     cc.{$config->course_metadata_value_key} = ccv.id AND
-                    cc.valueid = ?
+                    cc.valueid = ? AND
+                    (cm.deletioninprogress = 0 OR cm.deletioninprogress IS NULL)
                 GROUP BY
                     c.id
                 ORDER BY

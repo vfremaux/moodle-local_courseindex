@@ -38,7 +38,10 @@ define(['jquery', 'core/log', 'core/config'], function($, log, cfg) {
 
             $('#search-input').bind('keypress', this.search_form_submit);
 
-            magisterecourseindex.opencurrenttree();
+            if ($('#courseindex-nav').length) {
+                // If in browser.
+                magisterecourseindex.opencurrenttree();
+            }
 
             log.debug("AMD local_courseindex magistere module init.");
         },

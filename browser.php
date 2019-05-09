@@ -117,7 +117,24 @@ if ($config->layoutmodel == 'standard') {
         echo $renderer->explorerlink();
     }
 } else {
-    $cattree = \local_courseindex\navigator::generate_category_tree(0, '', $catlevels, $filters);
+
+    // Prepare filter values.
+    $filterattrs = [];
+    foreach ($filters as $k => $filter) {
+        if (is_array($filter->value)) {
+            foreach ($filter->value as $v) {
+                $filterattrs[] = "{$k}[]=".urlencode($v);
+            }
+        } else {
+            $filterattrs[] = "{$k}=".urlencode($filter->value);
+        }
+    }
+    $filterstring = implode('&', $filterattrs);
+    if (!empty($filterstring)) {
+        $filterstring = '&'.$filterstring;
+    }
+
+    $cattree = \local_courseindex\navigator::generate_category_tree(0, '', $catlevels, $filterstring);
     if ($catid) {
         $entries = \local_courseindex\navigator::get_cat_entries($catid, $catpath, $filters);
     } else {

@@ -85,6 +85,11 @@ if ($hassiteconfig) {
     $desc = get_string('configcoursemetadatavaluekey_desc', 'local_courseindex');
     $settings->add(new admin_setting_configtext($key, $label, $desc, 'valueid'));
 
+    $key = 'local_courseindex/course_metadata_cmid_key';
+    $label = get_string('configcoursemetadatacmidkey', 'local_courseindex');
+    $desc = get_string('configcoursemetadatacmidkey_desc', 'local_courseindex');
+    $settings->add(new admin_setting_configtext($key, $label, $desc, 'cmid'));
+
     $key = 'local_courseindex/classification_value_table';
     $label = get_string('configclassificationvaluetable', 'local_courseindex');
     $desc = get_string('configclassificationvaluetable_desc', 'local_courseindex');

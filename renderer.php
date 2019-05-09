@@ -234,6 +234,16 @@ class local_courseindex_renderer extends plugin_renderer_base {
         foreach ($results as $result) {
             $coursetpl = $result;
 
+            $coursetpl->accessmode = '';
+            $context = context_course::instance($result->id);
+            if (local_courseindex_supports_feature('layout/magistere')) {
+                $coursetpl->accessmode = 'detailed';
+                $coursetpl->ismagistere = true;
+                if (has_capability('moodle/course:view', $context)) {
+                    $coursetpl->accessmode = 'direct';
+                }
+            }
+
             if ($config->trimmode == 'words') {
                 if (empty($config->trimlength1)) {
                     $config->trimlength1 = 20;
@@ -286,6 +296,7 @@ class local_courseindex_renderer extends plugin_renderer_base {
                 }
                 $description = $this->trim_char($description, $config->trimlength2);
             }
+            $description = clean_text($description, FORMAT_HTML);
             $coursetpl->description = $description;
             $coursetpl->imgurl = $this->get_course_image_url($result);
             $coursetpl->courseurl = new moodle_url('/course/view.php', array('id' => $result->id));
@@ -308,8 +319,8 @@ class local_courseindex_renderer extends plugin_renderer_base {
 
         foreach ($course->get_course_overviewfiles() as $file) {
             if ($isimage = $file->is_valid_image()) {
-                $path = '/'. $file->get_contextid(). '/'. $file->get_component().'/';
-                $path .= $file->get_filearea().$file->get_filepath().$file->get_filename();
+                $path = '/'. $file->get_contextid(). '/local_courseindex/';
+                $path .= $file->get_filearea().'/0/'.$file->get_filepath().$file->get_filename();
                 $imgurl = file_encode_url("$CFG->wwwroot/pluginfile.php", $path, !$isimage);
                 break;
             }
