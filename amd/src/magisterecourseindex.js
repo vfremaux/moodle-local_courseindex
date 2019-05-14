@@ -25,7 +25,8 @@ define(['jquery', 'core/log', 'core/config'], function($, log, cfg) {
 
     var magisterecourseindex = {
 
-        init: function() {
+        init: function(args) {
+
             $('.courseindex-coursethumb.direct').bind('click', this.goto_course);
             $('.courseindex-coursename.direct').bind('click', this.goto_course);
             $('.courseindex-coursethumb.detailed').bind('click', this.load_course_detail);
@@ -42,6 +43,10 @@ define(['jquery', 'core/log', 'core/config'], function($, log, cfg) {
                 // If in browser.
                 magisterecourseindex.opencurrenttree();
             }
+
+            args = args.replace(/,/g, '-');
+            var cattoopen = '#ftoggle-handle' + args;
+            $(cattoopen).trigger('click');
 
             log.debug("AMD local_courseindex magistere module init.");
         },

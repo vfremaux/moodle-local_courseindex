@@ -56,7 +56,7 @@ if ($config->layoutmodel == 'standard') {
     $PAGE->requires->js('/local/courseindex/js/slickinit.js');
 } else {
     $PAGE->set_pagelayout('simplepage');
-    $PAGE->requires->js_call_amd('local_courseindex/magisterecourseindex', 'init');
+    $PAGE->requires->js_call_amd('local_courseindex/magisterecourseindex', 'init',  array('catpath' => $catpath));
 }
 
 $PAGE->set_heading($strheading);
@@ -126,7 +126,7 @@ if ($config->layoutmodel == 'standard') {
                 $filterattrs[] = "{$k}[]=".urlencode($v);
             }
         } else {
-            $filterattrs[] = "{$k}=".urlencode($filter->value);
+            $filterattrs[] = "{$k}[]=".urlencode($filter->value);
         }
     }
     $filterstring = implode('&', $filterattrs);
