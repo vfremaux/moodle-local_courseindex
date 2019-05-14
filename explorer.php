@@ -24,6 +24,7 @@
 require('../../config.php');
 require_once($CFG->dirroot.'/local/courseindex/classes/navigator.class.php');
 require_once($CFG->dirroot.'/local/courseindex/explorelib.php');
+require_once($CFG->dirroot.'/local/courseindex/lib.php');
 require_once($CFG->dirroot.'/mod/customlabel/lib.php');
 require_once($CFG->dirroot.'/mod/customlabel/locallib.php');
 

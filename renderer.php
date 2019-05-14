@@ -232,6 +232,7 @@ class local_courseindex_renderer extends plugin_renderer_base {
         $config = get_config('local_courseindex');
 
         foreach ($results as $result) {
+
             $coursetpl = $result;
 
             $coursetpl->accessmode = '';

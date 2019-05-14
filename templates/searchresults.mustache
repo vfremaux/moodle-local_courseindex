@@ -3,7 +3,7 @@
 <!-- local_courseindex/searchresults -->
 <div id="courseindex-search-results">
     {{#courses}}
-    <div class="explorer-course-line">
+    <div class="explorer-course-line local-courseindex-fp-coursebox" data-course="{{id}}">
 
         <div class="courseindex-thumb {{accessmode}}">
             <img src="{{{imgurl}}}" />
@@ -22,6 +22,9 @@
                 <span class="tagname">{{name}} :</span> <span class="tagvalue" style="padding-right:30px"><b>{{value}}</b></span>
             {{/tags}}
             </div>
+            {{#ismagistere}}
+            <div class="courseindex-readmorelink">{{#str}}readmore, local_courseindex{{/str}}</div>
+            {{/ismagistere}}
         </div>
 
     </div>
