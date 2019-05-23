@@ -165,8 +165,8 @@ class navigator {
                 GROUP_CONCAT(ccv.id) as tagids
             FROM
                 {course} c,
-                {{$config->course_metadata_table}} cc,
-                {{$config->classification_value_table}} ccv
+                {{$config->classification_value_table}} ccv,
+                {{$config->course_metadata_table}} cc
             LEFT JOIN
                 {course_modules} cm
             ON
@@ -534,18 +534,25 @@ class navigator {
         // Finally apply filters.
         foreach (array_keys($catcourses) as $cid) {
             foreach($filters as $filter) {
-                if (!empty($filter->value)) {
-                    $noneofthem = true;
-                    foreach ($filter->value as $singlevalue) {
-                        $params = ['courseid' => $cid, 'valueid' => $singlevalue];
-                        if ($DB->record_exists($config->course_metadata_table, $params)) {
-                            $noneofthem = false;
-                        }
-                    }
+                if (empty($filter->value)) {
+                    continue;
+                }
 
-                    if ($noneofthem) {
-                        unset($catcourses[$cid]);
+                if ((count(array_keys($filter->value)) == 1) && ($filter->value[0] == 0)) {
+                    // Empty exprimed filter as single element array with 0 in it.
+                    continue;
+                }
+
+                $noneofthem = true;
+                foreach ($filter->value as $singlevalue) {
+                    $params = ['courseid' => $cid, 'valueid' => $singlevalue];
+                    if ($DB->record_exists($config->course_metadata_table, $params)) {
+                        $noneofthem = false;
                     }
+                }
+
+                if ($noneofthem) {
+                    unset($catcourses[$cid]);
                 }
             }
         }

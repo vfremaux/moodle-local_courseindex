@@ -35,16 +35,13 @@
 <div class="filter-input" id="filter-input-{{fcode}}">
     {{#options}}
         <div class="filter-option">
-        <input type="checkbox" name="{{fcode}}[]" value="{{id}}" {{checked}}> {{value}} ({{counter}})
+        <input type="checkbox" name="{{fcode}}[]" class="courseindex-filter-value" value="{{id}}" {{checked}}> {{value}} ({{counter}})
         </div>
     {{/options}}
 </div>
 {{/isnotwwwroot}}
 {{/filters}}
 
-<div class="filter-submit">
-    <input type="submit" name="go_btn" value="{{{strreload}}}" />
-</div>
 {{/hasfilters}}
 
 <!-- /local_courseindex/magisterefilters -->

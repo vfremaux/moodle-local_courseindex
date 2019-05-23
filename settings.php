@@ -25,7 +25,17 @@ require_once($CFG->dirroot.'/local/courseindex/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-if ($hassiteconfig) {
+// settings default init
+if (is_dir($CFG->dirroot.'/local/adminsettings')) {
+    // Integration driven code.
+    require_once($CFG->dirroot.'/local/adminsettings/lib.php');
+    list($hasconfig, $hassiteconfig, $capability) = local_adminsettings_access('local_courseindex');
+} else {
+    // Standard Moodle code.
+    $hasconfig = $hassiteconfig = has_capability('moodle/site:config', context_system::instance());
+}
+
+if ($hasconfig) {
 
     // Needs this condition or there is error on login page.
 

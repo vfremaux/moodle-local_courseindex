@@ -31,15 +31,15 @@
         <input type="hidden" name="catid" value="{{currentcatid}}"/>
         <input type="hidden" name="catpath" value="{{currentcatpath}}"/>
 
-        <div id="courseindex-nav-filters" class="courseindex-nav-menu">
-            {{{filters}}}
-        </div>
-
         <h3>{{#str}}domains, local_courseindex{{/str}}</h3>
         <div id="courseindex-nav-categories" class="courseindex-nav-menu">
             {{#categorytree}}
             {{> local_courseindex/magisterecategories}}
             {{/categorytree}}
+        </div>
+
+        <div id="courseindex-nav-filters" class="courseindex-nav-menu">
+            {{{filters}}}
         </div>
 
         </form>
