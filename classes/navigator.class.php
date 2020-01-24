@@ -26,6 +26,8 @@
  */
 namespace local_courseindex;
 
+require_once($CFG->dirroot.'/local/courseindex/compatlib.php');
+
 use \StdClass;
 use \context_coursecat;
 use \moodle_url;
@@ -151,6 +153,8 @@ class navigator {
             }
         }
 
+        $deletioninprogressclause = courseindex_get_deletioninprogress_sql();
+
         // Get all course info
         $sql = "
             SELECT DISTINCT
@@ -173,9 +177,9 @@ class navigator {
                 cc.{$config->course_metadata_cmid_key} = cm.id
             WHERE
                 c.id = cc.{$config->course_metadata_course_key} AND
-                cc.{$config->course_metadata_value_key} = ccv.id AND
-                (cm.deletioninprogress = 0 OR cm.deletioninprogress IS NULL)
-                $formatclause
+                cc.{$config->course_metadata_value_key} = ccv.id
+                {$deletioninprogressclause}
+                {$formatclause}
             GROUP BY
                 c.id
             ORDER BY
@@ -478,11 +482,17 @@ class navigator {
 
         $config = get_config('local_courseindex');
 
+        if (empty($config->course_metadata_cmid_key)) {
+            set_config('course_metadata_cmid_key', 'cmid', 'local_courseindex');
+            $config->course_metadata_cmid_key = 'cmid';
+        }
+
         // Get courses entries in the category.
         $catids = explode(',', $catpath);
         array_shift($catids); // Drop the root.
 
         $catcourses = [];
+        $deletioninprogressclause = courseindex_get_deletioninprogress_sql();
 
         foreach ($catids as $catid) {
 
@@ -508,8 +518,8 @@ class navigator {
                 WHERE
                     c.id = cc.{$config->course_metadata_course_key} AND
                     cc.{$config->course_metadata_value_key} = ccv.id AND
-                    cc.valueid = ? AND
-                    (cm.deletioninprogress = 0 OR cm.deletioninprogress IS NULL)
+                    cc.valueid = ?
+                    {$deletioninprogressclause}
                 GROUP BY
                     c.id
                 ORDER BY
@@ -558,6 +568,71 @@ class navigator {
         }
 
         return $catcourses;
+    }
+
+    public static function get_all_filtered_courses($filters, $page = 0, $pagesize = 30, &$totalcourses) {
+        global $DB;
+
+        $config = get_config('local_courseindex');
+
+        $allvalues = courseindex_get_all_filter_values($filters);
+
+        list($insql, $inparams) = $DB->get_in_or_equal($allvalues);
+
+        $deletioninprogressclause = courseindex_get_deletioninprogress_sql();
+
+        $sql = "
+            SELECT DISTINCT
+                c.id,
+                c.format,
+                c.category,
+                c.shortname,
+                c.fullname,
+                c.visible,
+                c.timecreated,
+                c.summary
+            FROM
+                {course} c,
+                {{$config->classification_value_table}} ccv,
+                {{$config->course_metadata_table}} cc
+            LEFT JOIN
+                {course_modules} cm
+            ON
+                cc.{$config->course_metadata_cmid_key} = cm.id
+            WHERE
+                c.id = cc.{$config->course_metadata_course_key} AND
+                cc.{$config->course_metadata_value_key} = ccv.id AND
+                cc.valueid $insql
+                {$deletioninprogressclause}
+            GROUP BY
+                c.id
+            ORDER BY
+                c.sortorder
+        ";
+
+        $countsql = "
+            SELECT
+                DISTINCT COUNT(*)
+            FROM
+                {course} c,
+                {{$config->classification_value_table}} ccv,
+                {{$config->course_metadata_table}} cc
+            LEFT JOIN
+                {course_modules} cm
+            ON
+                cc.{$config->course_metadata_cmid_key} = cm.id
+            WHERE
+                c.id = cc.{$config->course_metadata_course_key} AND
+                cc.{$config->course_metadata_value_key} = ccv.id AND
+                cc.valueid $insql
+                {$deletioninprogressclause}
+        ";
+
+        $totalcourses = $DB->count_records_sql($countsql, $inparams);
+        $offset = $page * $pagesize;
+        $filteredcourses = $DB->get_records_sql($sql, $inparams, $offset, $pagesize);
+
+        return $filteredcourses;
     }
 
     /**

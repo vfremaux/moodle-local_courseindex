@@ -34,9 +34,9 @@
 
 <div class="courseindex-courses">
 
-    <div class="title">
+    <!-- div class="title">
         <h2>{{coursecategory}}</h2>
-    </div>
+    </div -->
 
     <div class="content course-grid">
 
@@ -88,7 +88,14 @@
             </div>
         </div>
     {{/coursegridelms}}
+
     {{/hascourses}}
     </div>
+
+    {{#pagingbar}}
+    <div style="text-align: center">
+        {{{pagingbar}}}
+    </div>
+    {{/pagingbar}}
 </div>
 <!-- local_courseindex/magisterecoursegrid -->

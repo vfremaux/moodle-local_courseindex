@@ -27,7 +27,7 @@
 <div id="courseindex-container">
 
     <div id="courseindex-nav">
-        <form name="indexfiltering" action="{{{browserurl}}}" method="get">
+        <form id="courseindex-magistere-filter-form" name="indexfiltering" action="{{{browserurl}}}" method="get">
         <input type="hidden" name="catid" value="{{currentcatid}}"/>
         <input type="hidden" name="catpath" value="{{currentcatpath}}"/>
 
@@ -46,15 +46,14 @@
     </div>
 
     <div id="courseindex-courses">
-        <div id="courseindex-search">
+        <!-- div id="courseindex-search">
             <i class="fa fa-search icon"></i>
             <input type="text" id="search-input" placeholder="{{#str}}quicktextsearch, local_courseindex{{/str}}">
-            <a href="{{{explorerurl}}}">{{#str}}explore, local_courseindex{{/str}}</a>
-        </div>
+        </div -->
 
         <div id="courseindex-courses-panel">
             {{#category}}
-            <h2>{{category}}</h2>
+            <h2>{{{category}}}</h2>
             {{/category}}
 
             <div class="category-data">
