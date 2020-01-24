@@ -15,25 +15,22 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * @package    local_courseindex
+ * @author     Valery Fremaux <valery.fremaux@club-internet.fr>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
+ * @copyright  (C) 1999 onwards Martin Dougiamas  http://dougiamas.com
  *
- * @package local_courseindex
- * @category local
- * @author Valery Fremaux
- * @version $Id: format.php,v 1.10 2012-07-30 15:02:46 vf Exp $
- * @license http://www.gnu.org/copyleft/gpl.html GNU Public License
+ * this file should be used for all tao-specific methods
+ * and will be included automatically in local/lib.php along
+ * with other core libraries.
  */
-require('../../../config.php');
 
-$id = required_param('id', PARAM_INT);
 
-if (!$course = $DB->get_record('course', ['id' => $id])) {
-    print_error('coursemisconf');
+function courseindex_get_deletioninprogress_sql() {
+    return ' AND (cm.deletioninprogress = 0 OR cm.deletioninprogress IS NULL) ';
 }
 
-$url = new moodle_url('/local/courseindex/ajax/courseactions.php', ['id' => $id]);
-$context = context_course::instance($course->id);
-$PAGE->set_context($context);
-
-$renderer = $PAGE->get_renderer('local_courseindex');
-
-echo $renderer->course_actions($id);
+function courseindex_image_url($image, $component = 'local_courseindex') {
+    global $OUTPUT;
+    return $OUTPUT->image_url($image, $component);
+}

@@ -16,6 +16,7 @@
 
 defined('MOODLE_INTERNAL') or die();
 require_once($CFG->dirroot.'/local/courseindex/lib.php');
+require_once($CFG->dirroot.'/local/courseindex/compatlib.php');
 
 /**
  * @package    local_courseindex
@@ -62,7 +63,7 @@ class local_courseindex_renderer extends plugin_renderer_base {
                 }
             }
             $template->upcaturl = new moodle_url('/local/courseindex/browser.php', $params);
-            $template->uppixurl = $this->image_url('up', 'local_courseindex');
+            $template->uppixurl = courseindex_image_url('up');
             $template->catspan = 9;
         } else {
             $template->catspan = 11;
@@ -232,7 +233,18 @@ class local_courseindex_renderer extends plugin_renderer_base {
         $config = get_config('local_courseindex');
 
         foreach ($results as $result) {
+
             $coursetpl = $result;
+
+            $coursetpl->accessmode = '';
+            $context = context_course::instance($result->id);
+            if (local_courseindex_supports_feature('layout/magistere')) {
+                $coursetpl->accessmode = 'detailed';
+                $coursetpl->ismagistere = true;
+                if (has_capability('moodle/course:view', $context)) {
+                    $coursetpl->accessmode = 'direct';
+                }
+            }
 
             if ($config->trimmode == 'words') {
                 if (empty($config->trimlength1)) {
@@ -286,6 +298,7 @@ class local_courseindex_renderer extends plugin_renderer_base {
                 }
                 $description = $this->trim_char($description, $config->trimlength2);
             }
+            $description = clean_text($description, FORMAT_HTML);
             $coursetpl->description = $description;
             $coursetpl->imgurl = $this->get_course_image_url($result);
             $coursetpl->courseurl = new moodle_url('/course/view.php', array('id' => $result->id));
@@ -308,8 +321,8 @@ class local_courseindex_renderer extends plugin_renderer_base {
 
         foreach ($course->get_course_overviewfiles() as $file) {
             if ($isimage = $file->is_valid_image()) {
-                $path = '/'. $file->get_contextid(). '/'. $file->get_component().'/';
-                $path .= $file->get_filearea().$file->get_filepath().$file->get_filename();
+                $path = '/'. $file->get_contextid(). '/local_courseindex/';
+                $path .= $file->get_filearea().'/0/'.$file->get_filepath().$file->get_filename();
                 $imgurl = file_encode_url("$CFG->wwwroot/pluginfile.php", $path, !$isimage);
                 break;
             }
@@ -363,9 +376,9 @@ class local_courseindex_renderer extends plugin_renderer_base {
         }
 
         if ($PAGE->theme->resolve_image_location($imgname, 'theme', true)) {
-            $imgurl = $this->output->image_url($imgname, 'theme');
+            $imgurl = courseindex_image_url($imgname, 'theme');
         } else {
-            return $this->output->image_url($imgname, 'local_courseindex');
+            return courseindex_image_url($imgname);
         }
 
         return $imgurl;
@@ -374,7 +387,7 @@ class local_courseindex_renderer extends plugin_renderer_base {
     /**
      * Overriden in pro version only.
      */
-    public function magistere_layout($catid, $catpath, &$cattree, &$courses, &$filters) {
+    public function magistere_layout($catid, $catpath, &$cattree, &$courses, &$filters, $pagingbar = '', $categoryname) {
         print_error("Only implemented in pro version");
     }
 
@@ -416,10 +429,23 @@ class local_courseindex_renderer extends plugin_renderer_base {
                 include_once($CFG->dirroot.'/local/shop/xlib.php');
                 include_once($CFG->dirroot.'/local/shop/classes/Catalog.class.php');
                 include_once($CFG->dirroot.'/local/shop/classes/CatalogItem.class.php');
+                include_once($CFG->dirroot.'/local/shop/classes/Shop.class.php');
                 $relatedproduct = local_shop_related_product($courseorid);
                 if ($relatedproduct) {
                     $catalog = new \local_shop\Catalog($relatedproduct->catalogid);
-                    $params = ['id' => $catalog->shopid, 'view' => 'shop', $relatedproduct->code => 1, 'origin' => 'courseindex'];
+                    $availableshops = \local_shop\Shop::get_instances(array('catalogid' => $relatedproduct->catalogid));
+                    if (!empty($availableshops)) {
+                        $firstavailable = array_shift($availableshops);
+                        $shopid = $firstavailable->id;
+                    } else {
+                        $shopid = 1;
+                    }
+                    $params = ['shopid' => $shopid,
+                               'view' => 'shop',
+                               'what' => 'import',
+                               $relatedproduct->code => 1,
+                               'origin' => 'courseindex',
+                               'autodrive' => true];
                     $template->purchaseproducturl = new moodle_url('/local/shop/front/view.php', $params);
                     $template->hasshop = 1;
 

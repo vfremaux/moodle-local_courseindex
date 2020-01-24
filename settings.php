@@ -25,7 +25,17 @@ require_once($CFG->dirroot.'/local/courseindex/lib.php');
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-if ($hassiteconfig) {
+// settings default init
+if (is_dir($CFG->dirroot.'/local/adminsettings')) {
+    // Integration driven code.
+    require_once($CFG->dirroot.'/local/adminsettings/lib.php');
+    list($hasconfig, $hassiteconfig, $capability) = local_adminsettings_access('local_courseindex');
+} else {
+    // Standard Moodle code.
+    $hasconfig = $hassiteconfig = has_capability('moodle/site:config', context_system::instance());
+}
+
+if ($hasconfig) {
 
     // Needs this condition or there is error on login page.
 
@@ -84,6 +94,11 @@ if ($hassiteconfig) {
     $label = get_string('configcoursemetadatavaluekey', 'local_courseindex');
     $desc = get_string('configcoursemetadatavaluekey_desc', 'local_courseindex');
     $settings->add(new admin_setting_configtext($key, $label, $desc, 'valueid'));
+
+    $key = 'local_courseindex/course_metadata_cmid_key';
+    $label = get_string('configcoursemetadatacmidkey', 'local_courseindex');
+    $desc = get_string('configcoursemetadatacmidkey_desc', 'local_courseindex');
+    $settings->add(new admin_setting_configtext($key, $label, $desc, 'cmid'));
 
     $key = 'local_courseindex/classification_value_table';
     $label = get_string('configclassificationvaluetable', 'local_courseindex');

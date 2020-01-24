@@ -24,6 +24,7 @@
 require('../../config.php');
 require_once($CFG->dirroot.'/local/courseindex/classes/navigator.class.php');
 require_once($CFG->dirroot.'/local/courseindex/explorelib.php');
+require_once($CFG->dirroot.'/local/courseindex/lib.php');
 require_once($CFG->dirroot.'/mod/customlabel/lib.php');
 require_once($CFG->dirroot.'/mod/customlabel/locallib.php');
 
@@ -39,6 +40,9 @@ if (empty($config->indexisopen)) {
 
 $PAGE->requires->js_call_amd('mod_customlabel/customlabel', 'init');
 $PAGE->requires->js_call_amd('local_courseindex/courseindex', 'init');
+if (local_courseindex_supports_feature('layout/magistere')) {
+    $PAGE->requires->js_call_amd('local_courseindex/magisterecourseindex', 'init');
+}
 
 $strheading = get_string('explore', 'local_courseindex');
 
