@@ -25,22 +25,35 @@ define(['jquery', 'core/log', 'core/config'], function($, log, cfg) {
 
     var magisterecourseindex = {
 
-        init: function() {
+        init: function(args) {
+
             $('.courseindex-coursethumb.direct').bind('click', this.goto_course);
             $('.courseindex-coursename.direct').bind('click', this.goto_course);
             $('.courseindex-coursethumb.detailed').bind('click', this.load_course_detail);
             $('.courseindex-coursename.detailed').bind('click', this.load_course_detail);
             $('.courseindex-readmorelink').bind('click', this.load_course_detail);
             $('.modal-close').bind('click', this.close_course_detail);
+            $('.courseindex-filter-value').bind('change', this.submitfilters);
 
             $('.ftoggle-handle').bind('click', this.toggle);
             $('#courseindex-modal-shadow').bind('click', this.close_course_detail);
 
             $('#search-input').bind('keypress', this.search_form_submit);
 
-            magisterecourseindex.opencurrenttree();
+            if ($('#courseindex-nav').length) {
+                // If in browser.
+                magisterecourseindex.opencurrenttree();
+            }
+
+            args = args.replace(/,/g, '-');
+            var cattoopen = '#ftoggle-handle' + args;
+            $(cattoopen).trigger('click');
 
             log.debug("AMD local_courseindex magistere module init.");
+        },
+
+        submitfilters: function () {
+            $('#courseindex-magistere-filter-form').submit();
         },
 
         search_form_submit: function(ev) {
