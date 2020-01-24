@@ -179,3 +179,54 @@ function local_courseindex_pluginfile($course, $cmid, $context, $filearea, $args
     // Finally send the file.
     send_stored_file($file, 0, 0, true, $options); // Download MUST be forced - security!
 }
+
+/**
+ * Checks if at least one filter value is used.
+ * @param array $filters the active filters.
+ * @return bool
+ */
+function courseindex_is_filtering($filters) {
+
+    foreach ($filters as $f) {
+
+        if (empty($f->value)) {
+            continue;
+        }
+
+        if ((count(array_keys($f->value)) == 1) && ($f->value[0] == 0)) {
+            // Empty exprimed filter as single element array with 0 in it.
+            continue;
+        }
+        // At least one filter value has been proposed.
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Get all active filter values from filters.
+ * @param array $filters
+ * @return array of value ids.
+ */
+function courseindex_get_all_filter_values($filters) {
+
+    $allvalues = [];
+
+    foreach ($filters as $filter) {
+        if (empty($filter->value)) {
+            continue;
+        }
+
+        if ((count(array_keys($filter->value)) == 1) && ($filter->value[0] == 0)) {
+            // Empty exprimed filter as single element array with 0 in it.
+            continue;
+        }
+
+        $noneofthem = true;
+        foreach ($filter->value as $singlevalue) {
+            $allvalues[] = $singlevalue;
+        }
+
+    }
+    return $allvalues;
+}

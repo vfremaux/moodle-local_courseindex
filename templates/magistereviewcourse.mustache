@@ -25,6 +25,7 @@
 }}
 <!-- local_courseindex/magistereviewcourse -->
 <div class="standard-course-detail">
+    {{^usecourseheading}}
     <h1>{{fullname}}</h1>
 
     {{#hasimage}}
@@ -36,6 +37,11 @@
     <div class="course-summary">
         {{{description}}}
     </div>
+    {{/usecourseheading}}
+
+    {{#usecourseheading}}
+    {{{courseheading}}}
+    {{/usecourseheading}}
 
     {{#usecustomlabelmtd}}
 
