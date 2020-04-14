@@ -192,7 +192,11 @@ class local_courseindex_renderer extends plugin_renderer_base {
                 $ftpl->isnotwwwroot = ($key != 'wwwroot');
                 $ftpl->fname = $afilter->name;
 
-                $filtervalue = optional_param_array($key, '', PARAM_INT);
+                if (is_array(@$_REQUEST[$key])) {
+                    $filtervalue = optional_param_array($key, '', PARAM_INT);
+                } else {
+                    $filtervalue = optional_param($key, '', PARAM_INT);
+                }
 
                 // For magistere template.
                 $ftpl->fcode = $key;
