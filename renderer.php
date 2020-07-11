@@ -192,7 +192,11 @@ class local_courseindex_renderer extends plugin_renderer_base {
                 $ftpl->isnotwwwroot = ($key != 'wwwroot');
                 $ftpl->fname = $afilter->name;
 
-                $filtervalue = optional_param_array($key, '', PARAM_INT);
+                if (is_array(@$_REQUEST[$key])) {
+                    $filtervalue = optional_param_array($key, '', PARAM_INT);
+                } else {
+                    $filtervalue = optional_param($key, '', PARAM_INT);
+                }
 
                 // For magistere template.
                 $ftpl->fcode = $key;
@@ -313,7 +317,7 @@ class local_courseindex_renderer extends plugin_renderer_base {
         global $CFG;
 
         if ($course instanceof stdClass) {
-            $course = new \core_course_list_element($course);
+            $course = courseindex_get_course_list($course);
         }
 
         $imgurl = false; // Initiate search.
@@ -540,7 +544,7 @@ class local_courseindex_renderer extends plugin_renderer_base {
         }
 
         if ($course instanceof stdClass) {
-            $course = new \core_course_list_element($course);
+            $course = courseindex_get_course_list($course);
         }
 
         $context = context_course::instance($course->id);

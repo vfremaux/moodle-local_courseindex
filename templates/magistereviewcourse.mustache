@@ -25,6 +25,11 @@
 }}
 <!-- local_courseindex/magistereviewcourse -->
 <div class="standard-course-detail">
+
+    {{#css}}
+    <link rel="stylesheet" type="text/css" href="{{{css}}}" />
+    {{/css}}
+
     {{^usecourseheading}}
     <h1>{{fullname}}</h1>
 
@@ -52,5 +57,7 @@
     {{{classifiers}}}
 
     {{/usecustomlabelmtd}}
+
+    {{{requestcontact}}}
 </div>
 <!-- /local_courseindex/magistereviewcourse -->
