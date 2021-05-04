@@ -423,7 +423,7 @@ class local_courseindex_renderer extends plugin_renderer_base {
                 }
 
                 $template->canenrol = true;
-                $template->enrolurl = new moodle_url('/course/view.php', ['id' => $courseorid]);
+                $template->courseenrolurl = new moodle_url('/course/view.php', ['id' => $courseorid]);
             }
 
             $fs = get_file_storage();
