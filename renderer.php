@@ -317,7 +317,7 @@ class local_courseindex_renderer extends plugin_renderer_base {
         global $CFG;
 
         if ($course instanceof stdClass) {
-            $course = new \core_course_list_element($course);
+            $course = courseindex_get_course_list($course);
         }
 
         $imgurl = false; // Initiate search.
@@ -423,7 +423,7 @@ class local_courseindex_renderer extends plugin_renderer_base {
                 }
 
                 $template->canenrol = true;
-                $template->enrolurl = new moodle_url('/course/view.php', ['id' => $courseorid]);
+                $template->courseenrolurl = new moodle_url('/course/view.php', ['id' => $courseorid]);
             }
 
             $fs = get_file_storage();
@@ -544,7 +544,7 @@ class local_courseindex_renderer extends plugin_renderer_base {
         }
 
         if ($course instanceof stdClass) {
-            $course = new \core_course_list_element($course);
+            $course = courseindex_get_course_list($course);
         }
 
         $context = context_course::instance($course->id);
