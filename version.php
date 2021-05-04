@@ -35,3 +35,5 @@ $plugin->maturity = MATURITY_RC;
 // Non moodle attributes.
 $plugin->codeincrement = '3.5.0002';
 $plugin->privacy = 'dualrelease';
+// This is not a hard dependency. Just a dependency if this optional feature is used. This is for info purpose only.
+$plugin->expectedoptionversion = ['mod_customlabel' => 2020063000];

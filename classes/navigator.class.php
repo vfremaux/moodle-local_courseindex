@@ -786,7 +786,11 @@ class navigator {
             $filters["f$i"] = new StdClass;
             $filters["f$i"]->name = $afilter->name;
             $filters["f$i"]->options = $options;
-            $filters["f$i"]->value = optional_param_array("f$i", '', PARAM_INT);
+            if (is_array(@$_REQUEST["f$i"])) {
+                $filters["f$i"]->value = optional_param_array("f$i", '', PARAM_INT);
+            } else {
+                $filters["f$i"]->value = optional_param("f$i", '', PARAM_INT);
+            }
             $i++;
         }
 

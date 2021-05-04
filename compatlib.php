@@ -34,3 +34,7 @@ function courseindex_image_url($image, $component = 'local_courseindex') {
     global $OUTPUT;
     return $OUTPUT->image_url($image, $component);
 }
+
+function courseindex_get_course_list($course) {
+    return new \course_in_list($course);
+}

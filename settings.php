@@ -35,7 +35,7 @@ if (is_dir($CFG->dirroot.'/local/adminsettings')) {
     $hasconfig = $hassiteconfig = has_capability('moodle/site:config', context_system::instance());
 }
 
-if ($hasconfig) {
+if ($hassiteconfig) {
 
     // Needs this condition or there is error on login page.
 
@@ -75,6 +75,43 @@ if ($hasconfig) {
     $desc = get_string('configrendererimages_desc', 'local_courseindex');
     $options = array('subdirs' => false, 'maxfiles' => 20);
     $settings->add(new admin_setting_configstoredfile($key, $label, $desc, 'rendererimages', 0, $options));
+
+    $key = 'local_courseindex/courseboxwidth';
+    $label = get_string('configcourseboxwidth', 'local_courseindex');
+    $desc = get_string('configcourseboxwidth_desc', 'local_courseindex');
+    $options = [
+        '250px' => '250px',
+        '300px' => '300px',
+        '350px' => '350px',
+        '400px' => '400px',
+        '450px' => '450px',
+        '20%' => '20%',
+        '25%' => '25%',
+        '33%' => '33%',
+    ];
+    $default = '350px';
+    $settings->add(new admin_setting_configselect($key, $label, $desc, $default, $options));
+
+    $key = 'local_courseindex/trimmode';
+    $label = get_string('configtrimmode', 'local_courseindex');
+    $desc = get_string('configtrimmode_desc', 'local_courseindex');
+    $options = array('' => get_string('notrim', 'local_courseindex'),
+                     'chars' => get_string('trimchars', 'local_courseindex'),
+                     'words' => get_string('trimwords', 'local_courseindex'));
+    $default = 'chars';
+    $settings->add(new admin_setting_configselect($key, $label, $desc, $default, $options));
+
+    $key = 'local_courseindex/trimlength1';
+    $label = get_string('configtrimlength1', 'local_courseindex');
+    $desc = get_string('configtrimlength1_desc', 'local_courseindex');
+    $default = 40;
+    $settings->add(new admin_setting_configtext($key, $label, $desc, $default));
+
+    $key = 'local_courseindex/trimlength2';
+    $label = get_string('configtrimlength2', 'local_courseindex');
+    $desc = get_string('configtrimlength2_desc', 'local_courseindex');
+    $default = 250;
+    $settings->add(new admin_setting_configtext($key, $label, $desc, $default));
 
     $label = get_string('configmetadatabinding', 'local_courseindex');
     $desc = get_string('configmetadatabinding_desc', 'local_courseindex');
