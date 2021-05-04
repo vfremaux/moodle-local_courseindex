@@ -1,0 +1,50 @@
+{{!
+    This file is part of The Courseindex plugin
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_courseindex/category
+
+    Shows displayes rendering of a a course category level
+
+    Classes required for JS:
+    * none
+
+}}
+<!-- local_courseindex/category -->
+<div class="browser-{{current}}-category row-fluid">
+
+{{#hasup}}
+    <div class="browser-{{current}}-category-label span2">
+        <a href="{{{upcaturl}}}"><img src="{{{uppixurl}}}" class="courseindex-browse-up"></a>
+    </div>
+{{/hasup}}
+
+    <div class="browser-{{current}}-category-info span{{catspan}}">
+    {{#issub}}
+            <a href="{{{caturl}}}">{{{catname}}}</a>
+    {{/issub}}
+    {{^issub}}
+        {{{catname}}}
+    {{/issub}}
+
+    </div>
+
+    <div id="browser-cat{{catid}}" class="browser-{{current}}-category-count span1">
+        <script type="text/javascript">$('#browser-cat{{catid}}').animateNumber({ number: {{coursecount}} });</script>
+    </div>
+
+</div>
+<!-- /local_courseindex/category -->

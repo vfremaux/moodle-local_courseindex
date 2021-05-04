@@ -1,0 +1,101 @@
+{{!
+    This file is part of The local course index
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_courseindex/magisterecoursegrid
+
+    Shows displayes rendering of a course grid as category content or filtered content
+    Adopts the m@gistere tuning.
+
+    Classes required for JS:
+    * none
+
+}}
+<!-- local_courseindex/magisterecoursegrid -->
+
+{{#debuginfo}}
+<pre>
+{{debuginfo}}
+</pre>
+{{/debuginfo}}
+
+<div class="courseindex-courses">
+
+    <!-- div class="title">
+        <h2>{{coursecategory}}</h2>
+    </div -->
+
+    <div class="content course-grid">
+
+    {{^hascourses}}
+        {{{nocourses}}}
+    {{/hascourses}}
+
+    {{#hascourses}}
+    {{#coursegridelms}}
+        <div class="local-courseindex-promowrap">
+            <div class="local-courseindex-fp-coursebox {{selfenrolclass}} {{guestenrolclass}}" data-format="{{format}}" data-course="{{courseid}}">
+                <div class="local-courseindex-fp-coursethumb">
+
+                    <!-- course thumb -->
+                    <div class="courseindex-fp-coursename {{withopacityeffect}} {{withhaloeffect}}">
+                        <div id="courseindex-course-thumb" class="courseindex-coursethumb {{accessmode}}">
+                            <img src="{{{imgurl}}}" width="100%" height="125" title="{{fullname}}" />
+                        </div>
+                    </div>
+
+                    <!-- course title -->
+                    <div class="courseindex-fp-courseinfo">
+                        <h5>
+                            <div id="courseindex-course" title="{{fullname}}" class="courseindex-coursename {{accessmode}}">
+                                {{trimtitle}}
+                            </div>
+                        </h5>
+                    </div>
+
+                    <!-- No summary needed as detail panel gives it -->
+                    <!-- div class="local-courseindex-fp-summary">{{{summary}}}</div -->
+
+                    {{#hasattributes}}
+                    <div class="attributes-container">
+                        <div class="local-courseindex-fp-attributes">
+                            {{{hiddenattribute}}}
+                            {{{selfattribute}}}
+                            {{{guestattribute}}}
+                            {{{futureattribute}}}
+                            {{{editingattribute}}}
+                        </div>
+                    </div>
+                    {{/hasattributes}}
+
+                </div>
+                <div class="courseindex-readmorelink">
+                    {{#str}}readmore, local_courseindex{{/str}}
+                </div>
+            </div>
+        </div>
+    {{/coursegridelms}}
+
+    {{/hascourses}}
+    </div>
+
+    {{#pagingbar}}
+    <div style="text-align: center">
+        {{{pagingbar}}}
+    </div>
+    {{/pagingbar}}
+</div>
+<!-- local_courseindex/magisterecoursegrid -->

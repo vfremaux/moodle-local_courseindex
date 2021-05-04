@@ -1,0 +1,47 @@
+
+
+<!-- local_courseindex/searchresults -->
+<div id="courseindex-search-results">
+    {{#courses}}
+    <div class="explorer-course-line local-courseindex-fp-coursebox" data-course="{{id}}">
+
+        <div class="courseindex-thumb {{accessmode}}">
+            <img src="{{{imgurl}}}" />
+        </div>
+
+        <div class="course-description">
+            {{^ismagistere}}
+            <div class="courseindex-coursename"><a href="{{{courseurl}}}" target="_blank"><h4>{{fullname}}</h4></a></div>
+            {{/ismagistere}}
+            {{#ismagistere}}
+            <div class="courseindex-coursename {{accessmode}}"><h4>{{fullname}}</h4></div>
+            {{/ismagistere}}
+            <div class="course-description">{{{description}}}</div>
+            <div class="course-tags">
+            {{#tags}}
+                <span class="tagname">{{name}} :</span> <span class="tagvalue" style="padding-right:30px"><b>{{value}}</b></span>
+            {{/tags}}
+            </div>
+            {{#ismagistere}}
+            <div class="courseindex-readmorelink">{{#str}}readmore, local_courseindex{{/str}}</div>
+            {{/ismagistere}}
+        </div>
+
+    </div>
+    {{/courses}}
+
+    <!-- dynamically loadable panel -->
+    <div id="courseindex-course-detail" style="z-index:12000">
+        <div class="modal-close">
+            {{#pix}}close, local_courseindex{{/pix}}
+        </div>
+        <div id="courseindex-course-detail-actions">
+        </div>
+        <div id="courseindex-course-detail-content">
+        </div>
+    </div>
+
+    <div id="courseindex-modal-shadow" style="z-index:10000">
+    </div>
+</div>
+<!-- /local_courseindex/searchresults -->

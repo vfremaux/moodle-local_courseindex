@@ -1,0 +1,52 @@
+{{!
+    This file is part of The local course index
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
+}}
+{{!
+    @template local_courseindex/filters
+
+    Shows displayes rendering of a a course category level
+
+    Classes required for JS:
+    * none
+
+}}
+<!-- local_courseindex/filters -->
+<form name="filtering" action="{{{browserurl}}}" method="post">
+<input type="hidden" name="catid" value="{{catid}}"/>
+<input type="hidden" name="catpath" value="{{catpath}}"/>
+
+{{#hasfilters}}
+<fieldset>
+<table class="browser-filters">
+    <tr>
+{{#filters}}
+{{#isnotwwwroot}}
+        <td>
+            <b><span style="font-size:80%">{{{fname}}} :</span></b><br/>
+            {{{fselect}}}
+        </td>
+{{/isnotwwwroot}}
+{{/filters}}
+        <td>
+            <input type="submit" name="go_btn" value="{{{strreload}}}" />
+        </td>
+    </tr>
+</table>
+</fieldset>
+{{/hasfilters}}
+
+</form>
+<!-- /local_courseindex/filters -->
