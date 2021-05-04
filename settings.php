@@ -31,7 +31,7 @@ if ($hassiteconfig) {
 
     // Needs this condition or there is error on login page.
 
-    $settings = new admin_settingpage('local_courseindex', get_string('pluginname', 'local_courseindex'));
+    $settings = new admin_settingpage('localsettingcourseindex', get_string('pluginname', 'local_courseindex'));
     $ADMIN->add('localplugins', $settings);
 
     $label = get_string('configfeatures', 'local_courseindex');
