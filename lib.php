@@ -33,11 +33,13 @@ defined('MOODLE_INTERNAL') || die();
  * implementation path where to fetch resources.
  * @param string $feature a feature key to be tested.
  */
-function local_courseindex_supports_feature($feature = null) {
+function local_courseindex_supports_feature($feature = null, $getsupported = false) {
     global $CFG;
     static $supports;
 
-    $config = get_config('local_courseindex');
+    if (!during_initial_install()) {
+        $config = get_config('local_courseindex');
+    }
 
     if (!isset($supports)) {
         $supports = array(
@@ -48,6 +50,10 @@ function local_courseindex_supports_feature($feature = null) {
             'community' => array(
             ),
         );
+    }
+
+    if ($getsupported) {
+        return $supports;
     }
 
     // Check existance of the 'pro' dir in plugin.
