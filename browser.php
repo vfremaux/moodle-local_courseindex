@@ -78,6 +78,15 @@ if (empty($SESSION->courseindex->noheaders)) {
     echo $OUTPUT->header();
 }
 
+$boxwidth = $config->courseboxwidth;
+echo "
+<style>
+.local-courseindex-fp-coursebox {
+    width: {$boxwidth};
+}
+</style>
+";
+
 if (empty($config->enabled)) {
     print_error('disabled', 'local_courseindex');
 }

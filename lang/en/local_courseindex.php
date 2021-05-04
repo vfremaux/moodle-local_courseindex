@@ -70,12 +70,12 @@ $string['configtrimlength1'] = 'Trim length 1';
 $string['configtrimlength1_desc'] = 'Trim length units for short strings';
 $string['configtrimlength2'] = 'Trim length 2';
 $string['configtrimlength2_desc'] = 'Trim length units for descriptions or summaries texts (note that trim do remove all tags)';
+$string['configcourseboxwidth'] = 'Course box width';
+$string['configcourseboxwidth_desc'] = '';
 $string['courseindex'] = 'Course catalog';
 $string['currentcategory'] = 'Category';
 $string['description'] = 'description';
 $string['disabled'] = 'This service is disabled';
-$string['emulatecommunity'] = 'Emulate the community version.';
-$string['emulatecommunity_desc'] = 'Switches the code to the community version. The result will be more compatible, but some features will not be available anymore.';
 $string['explore'] = 'Detailed search';
 $string['enrolme'] = 'Enrol me';
 $string['purchase'] = 'Purchase';
@@ -88,11 +88,6 @@ $string['guestallowed'] = 'This course allows guest entry';
 $string['quicktextsearch'] = 'Quick search';
 $string['hiddencourses'] = ' <span class=\"smalltext\">(hidden : $a)</span>';
 $string['information'] = 'information';
-$string['licensestatus'] = 'Pro License status';
-$string['licenseprovider'] = 'Pro License provider';
-$string['licenseprovider_desc'] = 'Input here your provider key';
-$string['licensekey'] = 'Pro license key';
-$string['licensekey_desc'] = 'Input here the product license key you got from your provider';
 $string['lpcatalog'] = 'Search in the Learning Offer ';
 $string['lpsearch'] = 'Course Search';
 $string['lpsincategory'] = 'Training courses in this category';
@@ -173,10 +168,4 @@ $string['configrendererimages_desc'] = 'Use this file area to store alternative 
 
 $string['configtopcourselist_desc'] = 'You can give an ordered, coma separated, list of course ids that will appear at the top root';
 
-$string['plugindist'] = 'Plugin distribution';
-$string['plugindist_desc'] = '
-<p>This plugin is the community version and is published for anyone to use as is and check the plugin\'s
-core application. A "pro" version of this plugin exists and is distributed under conditions to feed the life cycle, upgrade, documentation
-and improvement effort.</p>
-<p>Please contact one of our distributors to get "Pro" version support.</p>
-<p><a href="http://www.mylearningfactory.com/index.php/documentation/Distributeurs?lang=en_utf8">MyLF Distributors</a></p>';
+include(__DIR__.'/pro_additional_strings.php');
