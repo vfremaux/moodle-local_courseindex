@@ -39,7 +39,7 @@ if ($hassiteconfig) {
 
     // Needs this condition or there is error on login page.
 
-    $settings = new admin_settingpage('local_courseindex', get_string('pluginname', 'local_courseindex'));
+    $settings = new admin_settingpage('localsettingcourseindex', get_string('pluginname', 'local_courseindex'));
     $ADMIN->add('localplugins', $settings);
 
     $label = get_string('configfeatures', 'local_courseindex');
@@ -180,7 +180,8 @@ if ($hassiteconfig) {
 
     if (local_courseindex_supports_feature('emulate/community') == 'pro') {
         include_once($CFG->dirroot.'/local/courseindex/pro/prolib.php');
-        \local_courseindex\pro_manager::add_settings($ADMIN, $settings);
+        $promanager = \local_courseindex\pro_manager::instance();
+        $promanager->add_settings($ADMIN, $settings);
     } else {
         $label = get_string('plugindist', 'local_courseindxex');
         $desc = get_string('plugindist_desc', 'local_courseindex');
