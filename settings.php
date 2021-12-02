@@ -1,5 +1,5 @@
 <?php
-// This file is NOT part of Moodle - http://moodle.org/
+// This file is part of Moodle - http://moodle.org/
 //
 // Moodle is free software: you can redistribute it and/or modify
 // it under the terms of the GNU General Public License as published by
@@ -14,16 +14,15 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
-require_once($CFG->dirroot.'/local/courseindex/lib.php');
-
 /**
  * @package    local_courseindex
  * @category   local
  * @author     Valery Fremaux <valery.fremaux@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+defined('MOODLE_INTERNAL') || die();
+
+require_once($CFG->dirroot.'/local/courseindex/lib.php');
 
 // settings default init
 if (is_dir($CFG->dirroot.'/local/adminsettings')) {
@@ -39,7 +38,7 @@ if ($hassiteconfig) {
 
     // Needs this condition or there is error on login page.
 
-    $settings = new admin_settingpage('local_courseindex', get_string('pluginname', 'local_courseindex'));
+    $settings = new admin_settingpage('localsettingcourseindex', get_string('pluginname', 'local_courseindex'));
     $ADMIN->add('localplugins', $settings);
 
     $label = get_string('configfeatures', 'local_courseindex');
@@ -180,7 +179,8 @@ if ($hassiteconfig) {
 
     if (local_courseindex_supports_feature('emulate/community') == 'pro') {
         include_once($CFG->dirroot.'/local/courseindex/pro/prolib.php');
-        \local_courseindex\pro_manager::add_settings($ADMIN, $settings);
+        $promanager = local_courseindex\pro_manager::instance();
+        $promanager->add_settings($ADMIN, $settings);
     } else {
         $label = get_string('plugindist', 'local_courseindxex');
         $desc = get_string('plugindist_desc', 'local_courseindex');

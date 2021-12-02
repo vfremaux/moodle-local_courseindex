@@ -425,9 +425,29 @@ body.magistere #region-main {
     width: 100%;
 }
 
-.explorer-course-line .courseindex-readmorelink {
-    margin-top:10px;
+.courseindex-readmorelink {
+    width: 50%;
+    margin: 5px auto;
+    border-radius: 20px;
     text-align: center;
     padding:10px;
     background-color: #eee;
+}
+
+.courseindex-coursethumb img {
+    height: 100%;
+}
+
+.courseindex-coursename,
+.courseindex-readmorelink {
+    cursor: pointer;
+}
+
+#courseindex-nav {
+    border-radius: 4px;
+}
+
+#courseindex-courses-panel h2 {
+    border-radius:4px;
+    padding-left: 20px;
 }
