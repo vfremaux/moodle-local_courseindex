@@ -11,6 +11,7 @@ addons:
 
 services:
    - mysql
+   - postgresql
 
 cache:
   directories:
@@ -23,6 +24,7 @@ php:
 env:
   global:
     - MOODLE_BRANCH=MOODLE_39_STABLE
+    - PLUGINS_BRANCH=MOODLE_39_WORKING
   matrix:
     - DB=mariadb
     - DB=pgsql
