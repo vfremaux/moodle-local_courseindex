@@ -17,7 +17,7 @@
 /**
  *
  * @package    local
- * @subpackage coursecatalog
+ * @subpackage courseindex
  * @copyright  2015 Wafa Adham <wafa@trainer.zone>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */

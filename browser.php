@@ -16,7 +16,7 @@
 
 /**
  * @package    local_courseindex
- * @author     Valery Fremaux <valery.fremaux@club-internet.fr>
+ * @author     Valery Fremaux <valery.fremaux@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @copyright  (C) 1999 onwards Martin Dougiamas  http://dougiamas.com
  *
@@ -55,8 +55,8 @@ if ($config->layoutmodel == 'standard') {
     $PAGE->requires->css('/local/courseindex/jquery/slick/slick.css');
     $PAGE->requires->js('/local/courseindex/js/slickinit.js');
 } else {
-    $PAGE->set_pagelayout('simplepage');
-    $PAGE->requires->js_call_amd('local_courseindex/magisterecourseindex', 'init');
+    $PAGE->set_pagelayout('base');
+    $PAGE->requires->js_call_amd('local_courseindex/magisterecourseindex', 'init',  array('catpath' => $catpath));
 }
 
 $PAGE->set_heading($strheading);
@@ -77,6 +77,15 @@ if (empty($SESSION->courseindex->noheaders)) {
     $PAGE->add_body_classes([$config->layoutmodel]);
     echo $OUTPUT->header();
 }
+
+$boxwidth = $config->courseboxwidth;
+echo "
+<style>
+.local-courseindex-fp-coursebox {
+    width: {$boxwidth};
+}
+</style>
+";
 
 if (empty($config->enabled)) {
     print_error('disabled', 'local_courseindex');
@@ -117,19 +126,54 @@ if ($config->layoutmodel == 'standard') {
         echo $renderer->explorerlink();
     }
 } else {
-    $cattree = \local_courseindex\navigator::generate_category_tree(0, '', $catlevels, $filters);
+
+    // Prepare filter values.
+    $filterattrs = [];
+    foreach ($filters as $k => $filter) {
+        if (is_array($filter->value)) {
+            foreach ($filter->value as $v) {
+                $filterattrs[] = "{$k}[]=".urlencode($v);
+            }
+        } else {
+            $filterattrs[] = "{$k}[]=".urlencode($filter->value);
+        }
+    }
+    $filterstring = implode('&', $filterattrs);
+    if (!empty($filterstring)) {
+        $filterstring = '&'.$filterstring;
+    }
+
+    $pagingbar = '';
+    $categoryname = '';
+    $cattree = \local_courseindex\navigator::generate_category_tree(0, '', $catlevels, $filterstring);
     if ($catid) {
         $entries = \local_courseindex\navigator::get_cat_entries($catid, $catpath, $filters);
     } else {
-        $entries = [];
-        if (!empty($config->topcourselist)) {
-            $courseids = explode(',', $config->topcourselist);
-            foreach ($courseids as $cid) {
-                $entries[$cid] = $DB->get_record('course', ['id' => $cid]);
+        if (!courseindex_is_filtering($filters)) {
+            // No filter, use "toplist"
+            $entries = [];
+            if (!empty($config->topcourselist)) {
+                $courseids = explode(',', $config->topcourselist);
+                foreach ($courseids as $cid) {
+                    $entries[$cid] = $DB->get_record('course', ['id' => $cid]);
+                }
             }
+            $categoryname = get_string('topcourses', 'local_courseindex');
+        } else {
+            // Filter, use filter.
+            $pagesize = 20;
+            $page = optional_param('page', 0, PARAM_INT);
+            $entries = \local_courseindex\navigator::get_all_filtered_courses($filters, $page, $pagesize, $totalcount);
+
+            if ($totalcount > $pagesize) {
+                $thisurl = new moodle_url('/local/courseindex/browser.php?', ['catid' => 0, 'catpath' => '']).$filterstring;
+                $pagingbar = $OUTPUT->paging_bar($totalcount, $page, $pagesize, $thisurl);
+            }
+            $categoryname = '';
         }
     }
-    echo $renderer->magistere_layout($catid, $catpath, $cattree, $entries, $filters);
+
+    echo $renderer->magistere_layout($catid, $catpath, $cattree, $entries, $filters, $pagingbar, $categoryname);
 }
 
 if (empty($SESSION->courseindex->noheaders)) {

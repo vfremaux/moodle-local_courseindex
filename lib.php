@@ -14,18 +14,14 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') || die();
-
 /**
- * This file contains necessary functions to output
- * cms content on site or course level.
- *
  * @package    local_courseindex
  * @category   local
- * @author Gustav Delius
  * @author     Moodle 2.x Valery Fremaux <valery.fremaux@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
+
+defined('MOODLE_INTERNAL') || die();
 
 /**
  * This is part of the dual release distribution system.
@@ -33,11 +29,13 @@ defined('MOODLE_INTERNAL') || die();
  * implementation path where to fetch resources.
  * @param string $feature a feature key to be tested.
  */
-function local_courseindex_supports_feature($feature = null) {
+function local_courseindex_supports_feature($feature = null, $getsupported = false) {
     global $CFG;
     static $supports;
 
-    $config = get_config('local_courseindex');
+    if (!during_initial_install()) {
+        $config = get_config('local_courseindex');
+    }
 
     if (!isset($supports)) {
         $supports = array(
@@ -48,6 +46,10 @@ function local_courseindex_supports_feature($feature = null) {
             'community' => array(
             ),
         );
+    }
+
+    if ($getsupported) {
+        return $supports;
     }
 
     // Check existance of the 'pro' dir in plugin.
@@ -178,4 +180,55 @@ function local_courseindex_pluginfile($course, $cmid, $context, $filearea, $args
 
     // Finally send the file.
     send_stored_file($file, 0, 0, true, $options); // Download MUST be forced - security!
+}
+
+/**
+ * Checks if at least one filter value is used.
+ * @param array $filters the active filters.
+ * @return bool
+ */
+function courseindex_is_filtering($filters) {
+
+    foreach ($filters as $f) {
+
+        if (empty($f->value)) {
+            continue;
+        }
+
+        if ((count(array_keys($f->value)) == 1) && ($f->value[0] == 0)) {
+            // Empty exprimed filter as single element array with 0 in it.
+            continue;
+        }
+        // At least one filter value has been proposed.
+        return true;
+    }
+    return false;
+}
+
+/**
+ * Get all active filter values from filters.
+ * @param array $filters
+ * @return array of value ids.
+ */
+function courseindex_get_all_filter_values($filters) {
+
+    $allvalues = [];
+
+    foreach ($filters as $filter) {
+        if (empty($filter->value)) {
+            continue;
+        }
+
+        if ((count(array_keys($filter->value)) == 1) && ($filter->value[0] == 0)) {
+            // Empty exprimed filter as single element array with 0 in it.
+            continue;
+        }
+
+        $noneofthem = true;
+        foreach ($filter->value as $singlevalue) {
+            $allvalues[] = $singlevalue;
+        }
+
+    }
+    return $allvalues;
 }

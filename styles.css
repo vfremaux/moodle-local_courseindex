@@ -44,7 +44,7 @@
     background-color:#f0f0f0;
     padding:10px;
     display:table-cell;
-    width:90%;
+    width:84%;
     height:40px;
 }
 
@@ -415,4 +415,39 @@ body.magistere #region-main {
 
 .standard-course-detail {
     padding: 20px;
+}
+
+.explorer-course-line.local-courseindex-fp-coursebox {
+    text-align: left;
+}
+
+.explorer-course-line .course-description {
+    width: 100%;
+}
+
+.courseindex-readmorelink {
+    width: 50%;
+    margin: 5px auto;
+    border-radius: 20px;
+    text-align: center;
+    padding:10px;
+    background-color: #eee;
+}
+
+.courseindex-coursethumb img {
+    height: 100%;
+}
+
+.courseindex-coursename,
+.courseindex-readmorelink {
+    cursor: pointer;
+}
+
+#courseindex-nav {
+    border-radius: 4px;
+}
+
+#courseindex-courses-panel h2 {
+    border-radius:4px;
+    padding-left: 20px;
 }

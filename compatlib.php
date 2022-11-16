@@ -20,34 +20,21 @@
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @copyright  (C) 1999 onwards Martin Dougiamas  http://dougiamas.com
  *
+ * this file should be used for all tao-specific methods
+ * and will be included automatically in local/lib.php along
+ * with other core libraries.
  */
 
-require('../../config.php');
-require_once($CFG->dirroot.'/local/lib.php');
-require_once($CFG->dirroot.'/local/courseindex/rpclib.php');
 
-$url = new moodle_url('/local/courseindex/testbrowse.php');
-$PAGE->set_url($url);
-
-$context = context_system::instance();
-$PAGE->set_context($context);
-
-require_login();
-
-echo $OUTPUT->header();
-
-if (empty($config->enabled)) {
-    print_error('disabled', 'local_courseindex');
+function courseindex_get_deletioninprogress_sql() {
+    return ' AND (cm.deletioninprogress = 0 OR cm.deletioninprogress IS NULL) ';
 }
 
-$cat = optional_param('cat', null, PARAM_INT);
-$filter = optional_param('filter', 0, PARAM_INT);
-$rcpoptions = new StdClass();
-/*
-$cattree = tao_generate_navigation($cat, $filter);
-// print_object($cattree);
-$str = '';
-tao_print_navigation($str, $cattree, 0, 2, null, $filter, false, $rcpoptions);
-*/
-echo courseindex_get_catalog('admin', 'http://ac-test1.prfcommon.fr:8080', 'http://ac-test1.prfcommon.fr:8080', 0, 0, $filters = '');
-echo "<br/><a href=\"?cat=0\">revenir</a>";
+function courseindex_image_url($image, $component = 'local_courseindex') {
+    global $OUTPUT;
+    return $OUTPUT->image_url($image, $component);
+}
+
+function courseindex_get_course_list($course) {
+    return new \core_course_list_element($course);
+}
