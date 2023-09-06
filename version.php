@@ -30,6 +30,7 @@ $plugin->version = 2021102100;   // The (date) version of this plugin.
 $plugin->requires = 2020060900;   // Requires this Moodle version.
 $plugin->component = 'local_courseindex';
 $plugin->release = '3.9.0 (Build 2021102100)';
+$plugin->supported = [39, 311];
 $plugin->maturity = MATURITY_RC;
 
 // Non moodle attributes.

@@ -32,6 +32,9 @@ $SESSION->courseindex = new StdClass;
 $SESSION->courseindex->headers = optional_param('headers', @$SESSION->courseindex->headers, PARAM_BOOL);
 
 $config = get_config('local_courseindex');
+if (!local_courseindex_supports_feature('metadata/tunable')) {
+    local_courseindex_load_defaults($config);
+}
 
 // hidden key to open the catalog to the unlogged area
 if (empty($config->indexisopen)) {
@@ -83,7 +86,10 @@ foreach ($classificationfilters as $afilter) {
 }
 
 // Including page text.
-local_print_static_text('courseindex_explore_courses_text', $url);
+if (is_dir($CFG->dirroot.'/local/staticguitexts')) {
+    require_once($CFG->dirroot.'/local/staticguitexts/lib.php');
+    local_print_static_text('courseindex_explore_courses_text', $url);
+}
 
 // Print search engine.
 $search = optional_param('go_search', '', PARAM_RAW);
@@ -140,17 +146,22 @@ if ($search) {
     $form->topics = '';
 }
 
-if (local_has_capability_somewhere('block/course_status:viewcoursestatus')) {
+if (local_courseindex_has_capability_somewhere('block/course_status:viewcoursestatus')) {
     include($CFG->dirroot.'/local/courseindex/status_filter_form.html');
 }
 
-echo $OUTPUT->heading(get_string('bycategory', 'local_courseindex'));
-local_print_static_text('courseindex_explore_classifier_text', $url);
+echo $OUTPUT->heading(get_string('bycategory', 'local_courseindex'), 2);
+
+if (is_dir($CFG->dirroot.'/local/staticguitexts')) {
+    local_print_static_text('courseindex_explore_classifier_text', $url);
+}
 
 echo $indexform->html;
 
-echo $OUTPUT->heading(get_string('bykeyword', 'local_courseindex'));
-local_print_static_text('courseindex_explore_freetext_text', $url);
+echo $OUTPUT->heading(get_string('bykeyword', 'local_courseindex'), 2);
+if (is_dir($CFG->dirroot.'/local/staticguitexts')) {
+    local_print_static_text('courseindex_explore_freetext_text', $url);
+}
 
 $template = new StdClass;
 
@@ -163,7 +174,9 @@ echo $OUTPUT->render_from_template('local_courseindex/textsearchform', $template
 
 if (\local_courseindex\explorer::has_special_fields($specialfields)) {
     echo $OUTPUT->heading(get_string('byspecialcriteria', 'local_courseindex'));
-    local_print_static_text('courseindex_explore_targets_text', $url);
+    if (is_dir($CFG->dirroot.'/local/staticguitexts')) {
+        local_print_static_text('courseindex_explore_targets_text', $url);
+    }
 
     $template = new StdClass;
 
