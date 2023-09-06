@@ -29,6 +29,9 @@ $SESSION->courseindex = new StdClass;
 $SESSION->courseindex->noheaders = optional_param('noheaders', @$SESSION->courseindex->noheaders, PARAM_BOOL);
 
 $config = get_config('local_courseindex');
+if (!local_courseindex_supports_feature('metadata/tunable')) {
+    local_courseindex_load_defaults($config);
+}
 
 // hidden key to open the catalog to the unlogged area.
 if (empty($config->indexisopen)) {
@@ -93,8 +96,7 @@ if (empty($config->enabled)) {
 
 $catlevels = \local_courseindex\navigator::get_category_levels();
 
-if ($config->layoutmodel == 'standard') {
-    echo $OUTPUT->heading(get_string('courseindex', 'local_courseindex'), 2);
+if ($config->layoutmodel == 'standard' || !local_courseindex_supports_feature('layout/magistere')) {
 
     if (is_dir($CFG->dirroot.'/local/staticguitexts')) {
         // If static gui texts are installed, add a static text to be edited by administrator.
@@ -126,7 +128,7 @@ if ($config->layoutmodel == 'standard') {
         echo $renderer->explorerlink();
     }
 } else {
-
+    // magistere layout.
     // Prepare filter values.
     $filterattrs = [];
     foreach ($filters as $k => $filter) {

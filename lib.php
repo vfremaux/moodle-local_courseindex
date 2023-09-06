@@ -42,6 +42,7 @@ function local_courseindex_supports_feature($feature = null, $getsupported = fal
             'pro' => array(
                 'layout' => array('magistere'),
                 'bindings' => array('shop'),
+                'metadata' => array('tunable'),
             ),
             'community' => array(
             ),
@@ -231,4 +232,73 @@ function courseindex_get_all_filter_values($filters) {
 
     }
     return $allvalues;
+}
+
+function local_courseindex_load_defaults(&$config) {
+    $config->course_metadata_table = 'customlabel_course_metadata';
+    $config->course_metadata_course_key = 'courseid';
+    $config->course_metadata_value_key = 'valueid';
+    $config->course_metadata_cmid_key = 'cmid';
+    $config->classification_value_table = 'customlabel_mtd_value';
+    $config->classification_value_type_key = 'typeid';
+    $config->classification_type_table = 'customlabel_mtd_type';
+    $config->classification_constraint_table = 'customlabel_mtd_constraint';
+}
+
+/**
+ * checks if a user has a some named capability effective somewhere in a course.
+ * @param string $capability;
+ * @param bool $excludesystem
+ * @param bool $excludesite
+ * @param bool $doanything
+ * @param string $contextlevels restrict to some contextlevel may speedup the query.
+ */
+function local_courseindex_has_capability_somewhere($capability, $excludesystem = true, $excludesite = true, $doanything = false, $contextlevels = '') {
+    global $USER, $DB;
+
+    $contextclause = '';
+
+    if ($contextlevels) {
+        list($sql, $params) = $DB->get_in_or_equal(explode(',', $contextlevels), SQL_PARAMS_QM);
+        $contextclause = "
+           AND ctx.contextlevel $sql
+        ";
+    }
+    $params[] = $capability;
+    $params[] = $USER->id;
+
+    // this is a a quick rough query that may not handle all role override possibility
+
+    $sql = "
+        SELECT
+            COUNT(DISTINCT ra.id)
+        FROM
+            {role_capabilities} rc,
+            {role_assignments} ra,
+            {context} ctx
+        WHERE
+            rc.roleid = ra.roleid AND
+            ra.contextid = ctx.id AND
+            rc.capability = ?
+            $contextclause
+            AND ra.userid = ? AND
+            rc.permission = 1
+    ";
+    $hassome = $DB->count_records_sql($sql, $params);
+
+    // $hassome = get_user_capability_course($capability, $USER->id, false);
+    if ($excludesite && !empty($hassome) && array_key_exists(SITEID, $hassome)) {
+        unset($hassome[SITEID]);
+    }
+
+    if (!empty($hassome)) {
+        return true;
+    }
+
+    $systemcontext = context_system::instance();
+    if (!$excludesystem && has_capability($capability, $systemcontext, $USER->id, $doanything)) {
+        return true;
+    }
+
+    return false;
 }

@@ -2,88 +2,88 @@
 /* Course block */
 
 .browser-courseblock {
-    margin:5px;
-    border:1px solid #f0f0f0;
-    border-radius:5px;
-    padding:0px;
+    margin: 5px;
+    border: 1px solid #f0f0f0;
+    border-radius: 4px;
+    padding: 0px;
 }
 
 .browser-courseblock .title {
-    font-size:24px;
-    font-family:Verdana,sans-serif;
-    padding:20px;
-    background-color:#f0f0f0;
-    font-weight:thin;
+    font-size: 24px;
+    font-family: Verdana,sans-serif;
+    padding: 20px;
+    background-color: #f0f0f0;
+    font-weight: thin;
 }
 
 .browser-courseblock .courseimage {
-    padding:20px;
+    padding: 20px;
 }
 
 .browser-courseblock .summary {
-    font-size:12px;
-    font-family:Verdana,sans-serif;
-    padding:10px;
-    background-color:#f8f8f8;
+    font-size: 12px;
+    font-family: Verdana,sans-serif;
+    padding: 10px;
+    background-color: #f8f8f8;
 }
 
 .browser-current-category-label {
-    font-size:24px;
-    color:#b0b0b0;
-    font-weight:lighter;
-    background-color:#f8f8f8;
-    padding:10px;
-    width:150px;
-    display:table-cell;
-    height:40px;
+    font-size: 24px;
+    color: #b0b0b0;
+    font-weight: lighter;
+    background-color: #f8f8f8;
+    padding: 10px;
+    width: 150px;
+    display: table-cell;
+    height: 40px;
 }
 
 .browser-current-category-info {
     color:#808080;
-    font-size:24px;
-    background-color:#f0f0f0;
-    padding:10px;
-    display:table-cell;
-    width:84%;
-    height:40px;
+    font-size: 24px;
+    background-color: #f0f0f0;
+    padding: 10px;
+    display: table-cell;
+    width: 84%;
+    height: 40px;
 }
 
 .browser-current-category-count {
-    color:#f0f0f0;
-    font-size:24px;
-    background-color:#808080;
-    padding:10px;
-    display:table-cell;
-    width:55px;
-    height:40px;
+    color: #f0f0f0;
+    font-size: 24px;
+    background-color: #808080;
+    padding: 10px;
+    display: table-cell;
+    width: 55px;
+    height: 40px;
 }
 
 .browser-sub-category-label {
-    font-size:18px;
-    color:#b0b0b0;
-    font-weight:lighter;
-    background-color:#f8f8f8;
-    padding:10px;
-    width:150px;
-    display:table-cell;
+    font-size: 18px;
+    color: #b0b0b0;
+    font-weight: lighter;
+    background-color: #f8f8f8;
+    padding: 10px;
+    width: 150px;
+    display: table-cell;
 }
 
 .browser-sub-category-info {
-    color:#808080;
-    font-size:18px;
-    background-color:#f0f0f0;
-    padding:10px;
-    display:table-cell;
-    width:90%;
+    color: #808080;
+    font-size: 18px;
+    background-color: #f0f0f0;
+    padding: 10px;
+    display: table-cell;
+    width: 90%;
 }
 
 .browser-sub-category-count {
-    color:#f0f0f0;
-    font-size:18px;
-    background-color:#808080;
-    padding:10px;
-    display:table-cell;
-    width:55px;
+    color: #f0f0f0;
+    font-size: 18px;
+    background-color: #808080;
+    padding: 10px;
+    display: table-cell;
+    width: 55px;
 }
 
 .courseindex-browse-up {
@@ -93,13 +93,13 @@
 
 #browser-link-to-explorer,
 #browser-link-to-browser {
-    margin-top:20px;
+    margin-top: 20px;
     text-align: center;
 }
 
 .catname .category {
-    padding-top:10px !important;
-    font-size:16px;
+    padding-top: 10px !important;
+    font-size: 16px;
 }
 
 #subnav1 > .browser-category-info > .catname {
@@ -450,4 +450,40 @@ body.magistere #region-main {
 #courseindex-courses-panel h2 {
     border-radius:4px;
     padding-left: 20px;
+}
+
+@media all and (max-width: 576px) {
+
+    #courseindex-nav {
+        font-size: 70%;
+    }
+
+    #courseindex-nav .indent-1 {
+        padding-left: 0.25rem;
+    }
+
+    #courseindex-nav .indent-2 {
+        padding-left: 0.5rem;
+    }
+
+    #courseindex-nav .indent-3 {
+        padding-left: 0.5rem;
+    }
+
+    #courseindex-courses-panel h2 {
+        font-size: 1.2rem;
+    }
+
+    .courseindex-detail-open #courseindex-course-detail {
+        width: 100%;
+    }
+
+    .course-index-detail .modal-close {
+        float: none;
+    }
+
+    .course-index-detail #page {
+        box-shadow: none;
+        margin-top: 0;
+    }
 }
