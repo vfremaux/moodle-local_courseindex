@@ -79,6 +79,7 @@ $string['disabled'] = 'This service is disabled';
 $string['explore'] = 'Detailed search';
 $string['enrolme'] = 'Enrol me';
 $string['purchase'] = 'Purchase';
+$string['getleaflet'] = 'Get leaflet';
 $string['gofreesearch'] = 'Search';
 $string['gosearch'] = 'Search';
 $string['gospecialsearch'] = 'Search';
