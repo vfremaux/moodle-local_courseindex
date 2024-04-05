@@ -47,6 +47,7 @@ $strheading = get_string('courseindex', 'local_courseindex');
 
 $url = new moodle_url('/local/courseindex/browser.php');
 $PAGE->set_url($url);
+$PAGE->set_pagelayout('standard');
 $PAGE->set_context(context_system::instance());
 $PAGE->navbar->add(get_string('courseindex', 'local_courseindex'));
 $PAGE->navbar->add(get_string('browse', 'local_courseindex'));

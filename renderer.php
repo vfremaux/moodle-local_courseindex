@@ -583,7 +583,7 @@ class local_courseindex_renderer extends plugin_renderer_base {
         }
 
         $out = "";
-        $small = substr($str, 0, $n);
+        $small = mb_substr($str, 0, $n);
         $out = $small.$endchar;
         return $out;
     }

@@ -452,6 +452,11 @@ body.magistere #region-main {
     padding-left: 20px;
 }
 
+#courseindex-course-detail #page {
+    box-shadow: none;
+    margin-top: 0;
+}
+
 @media all and (max-width: 576px) {
 
     #courseindex-nav {
@@ -480,10 +485,5 @@ body.magistere #region-main {
 
     .course-index-detail .modal-close {
         float: none;
-    }
-
-    .course-index-detail #page {
-        box-shadow: none;
-        margin-top: 0;
     }
 }

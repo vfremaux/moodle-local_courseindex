@@ -493,6 +493,7 @@ class navigator {
 
         $catcourses = [];
         $deletioninprogressclause = courseindex_get_deletioninprogress_sql();
+        $start = true;
 
         foreach ($catids as $catid) {
 
@@ -528,7 +529,7 @@ class navigator {
 
             $taggedcourses = $DB->get_records_sql($sql, [$catid]);
 
-            if (empty($catcourses)) {
+            if (empty($catcourses) && ($start == true)) {
                 // Load with first tag.
                 $catcourses = $taggedcourses;
             } else {
@@ -539,6 +540,7 @@ class navigator {
                     }
                 }
             }
+            $start = false;
         }
 
         // Finally apply filters.

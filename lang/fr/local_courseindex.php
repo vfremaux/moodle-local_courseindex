@@ -75,6 +75,7 @@ $string['explore'] = 'Recherche approfondie';
 $string['enrolme'] = 'M\'inscrire';
 $string['purchase'] = 'Acheter';
 $string['quicktextsearch'] = 'Recherche rapide';
+$string['getleaflet'] = 'Télécharger la brochure';
 $string['gofreesearch'] = 'Chercher';
 $string['gosearch'] = 'Chercher';
 $string['gospecialsearch'] = 'Chercher';
