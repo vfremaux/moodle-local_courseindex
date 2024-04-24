@@ -47,6 +47,7 @@ $strheading = get_string('courseindex', 'local_courseindex');
 
 $url = new moodle_url('/local/courseindex/browser.php');
 $PAGE->set_url($url);
+$PAGE->set_pagelayout('standard');
 $PAGE->set_context(context_system::instance());
 $PAGE->navbar->add(get_string('courseindex', 'local_courseindex'));
 $PAGE->navbar->add(get_string('browse', 'local_courseindex'));
@@ -59,7 +60,9 @@ if ($config->layoutmodel == 'standard') {
     $PAGE->requires->js('/local/courseindex/js/slickinit.js');
 } else {
     $PAGE->set_pagelayout('base');
-    $PAGE->requires->js_call_amd('local_courseindex/magisterecourseindex', 'init',  array('catpath' => $catpath));
+    if (local_courseindex_supports_feature('layout/magistere')) {
+        $PAGE->requires->js_call_amd('local_courseindex/magisterecourseindex', 'init',  array('catpath' => $catpath));
+    }
 }
 
 $PAGE->set_heading($strheading);
