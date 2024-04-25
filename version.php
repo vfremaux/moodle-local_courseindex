@@ -27,14 +27,14 @@
 defined('MOODLE_INTERNAL') || die();
 
 $plugin->version = 2021102100;   // The (date) version of this plugin.
-$plugin->requires = 2020060900;   // Requires this Moodle version.
+$plugin->requires = 2022112801;   // Requires this Moodle version.
 $plugin->component = 'local_courseindex';
-$plugin->release = '3.9.0 (Build 2021102100)';
-$plugin->supported = [39, 311];
+$plugin->release = '4.1.0 (Build 2021102100)';
+$plugin->supported = [401, 402];
 $plugin->maturity = MATURITY_RC;
 
 // Non moodle attributes.
-$plugin->codeincrement = '3.9.0003';
+$plugin->codeincrement = '4.1.0004';
 $plugin->privacy = 'dualrelease';
 // This is not a hard dependency. Just a dependency if this optional feature is used. This is for info purpose only.
 $plugin->expectedoptionversion = ['mod_customlabel' => 2020063000];
