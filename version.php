@@ -18,7 +18,6 @@
  * Version details.
  *
  * @package    local_courseindex
- * @category   local
  * @author     Valery Fremaux <valery.fremaux@gmail.com>
  * @copyright  2010 onwards Valery Fremaux <valery.fremaux@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
@@ -26,15 +25,15 @@
 
 defined('MOODLE_INTERNAL') || die();
 
-$plugin->version = 2021102100;   // The (date) version of this plugin.
+$plugin->version = 2025011400;   // The (date) version of this plugin.
 $plugin->requires = 2022112801;   // Requires this Moodle version.
 $plugin->component = 'local_courseindex';
-$plugin->release = '4.1.0 (Build 2021102100)';
-$plugin->supported = [401, 402];
-$plugin->maturity = MATURITY_RC;
+$plugin->release = '4.5.0 (Build 2025011400)';
+$plugin->supported = [401, 405];
+$plugin->maturity = MATURITY_STABLE;
 
 // Non moodle attributes.
-$plugin->codeincrement = '4.1.0004';
+$plugin->codeincrement = '4.5.0004';
 $plugin->privacy = 'dualrelease';
 // This is not a hard dependency. Just a dependency if this optional feature is used. This is for info purpose only.
 $plugin->expectedoptionversion = ['mod_customlabel' => 2020063000];

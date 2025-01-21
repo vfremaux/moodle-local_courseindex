@@ -15,12 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Catalog browser
+ *
  * @package    local_courseindex
  * @author     Valery Fremaux <valery.fremaux@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @copyright  (C) 1999 onwards Martin Dougiamas  http://dougiamas.com
  *
  */
+
 require('../../config.php');
 require_once($CFG->dirroot.'/local/courseindex/lib.php');
 require_once($CFG->dirroot.'/local/courseindex/classes/navigator.class.php');
@@ -33,7 +36,7 @@ if (!local_courseindex_supports_feature('metadata/tunable')) {
     local_courseindex_load_defaults($config);
 }
 
-// hidden key to open the catalog to the unlogged area.
+// Hidden key to open the catalog to the unlogged area.
 if (empty($config->indexisopen)) {
     require_login();
     $sitecontext = context_course::instance(SITEID);
@@ -74,7 +77,7 @@ if (local_courseindex_supports_feature('layout/magistere')) {
     $renderer = $PAGE->get_renderer('local_courseindex');
 }
 
-// getting all filters
+// Getting all filters.
 
 $classificationfilters = \local_courseindex\navigator::get_category_filters();
 $filters = \local_courseindex\navigator::get_filters_option_values($classificationfilters);
@@ -94,7 +97,7 @@ echo "
 ";
 
 if (empty($config->enabled)) {
-    print_error('disabled', 'local_courseindex');
+    throw new moodle_exception('disabled', 'local_courseindex');
 }
 
 $catlevels = \local_courseindex\navigator::get_category_levels();
@@ -108,7 +111,7 @@ if ($config->layoutmodel == 'standard' || !local_courseindex_supports_feature('l
         echo '</div>';
     }
 
-    // making filters.
+    // Making filters.
 
     echo $renderer->filters($catid, $catpath, $filters);
 
@@ -131,7 +134,7 @@ if ($config->layoutmodel == 'standard' || !local_courseindex_supports_feature('l
         echo $renderer->explorerlink();
     }
 } else {
-    // magistere layout.
+    // Magistere layout.
     // Prepare filter values.
     $filterattrs = [];
     foreach ($filters as $k => $filter) {
@@ -155,7 +158,7 @@ if ($config->layoutmodel == 'standard' || !local_courseindex_supports_feature('l
         $entries = \local_courseindex\navigator::get_cat_entries($catid, $catpath, $filters);
     } else {
         if (!courseindex_is_filtering($filters)) {
-            // No filter, use "toplist"
+            // No filter, use "toplist".
             $entries = [];
             if (!empty($config->topcourselist)) {
                 $courseids = explode(',', $config->topcourselist);

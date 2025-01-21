@@ -15,16 +15,18 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Global settings.
+ *
  * @package    local_courseindex
- * @category   local
  * @author     Valery Fremaux <valery.fremaux@gmail.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
+ * @copyright  (C) 1999 onwards Martin Dougiamas  http://dougiamas.com
  */
 defined('MOODLE_INTERNAL') || die();
 
 require_once($CFG->dirroot.'/local/courseindex/lib.php');
 
-// settings default init
+// Settings default init.
 
 if ($hassiteconfig) {
 
@@ -56,7 +58,9 @@ if ($hassiteconfig) {
     $desc = get_string('configtopcourselist_desc', 'local_courseindex');
     $settings->add(new admin_setting_configtext($key, $label, $desc, ''));
 
-    /* Graphics configuration */
+    /*
+     * Graphics configuration
+     */
 
     $label = get_string('configgraphics', 'local_courseindex');
     $settings->add(new admin_setting_heading('graphicshdr', $label, ''));
@@ -114,4 +118,3 @@ if ($hassiteconfig) {
         $settings->add(new admin_setting_heading('plugindisthdr', $label, $desc));
     }
 }
-

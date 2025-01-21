@@ -15,13 +15,13 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * General plugin's library
+ *
  * @package    local_courseindex
- * @category   local
- * @author     Moodle 2.x Valery Fremaux <valery.fremaux@gmail.com>
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author     Valery Fremaux <valery.fremaux@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
+ * @copyright  (C) 1999 onwards Martin Dougiamas  http://dougiamas.com
  */
-
-defined('MOODLE_INTERNAL') || die();
 
 /**
  * This is part of the dual release distribution system.
@@ -88,9 +88,9 @@ function local_courseindex_supports_feature($feature = null, $getsupported = fal
 /**
  * Cut the String content content.
  *
- * @param $str
- * @param $n
- * @param $end_char
+ * @param string $str
+ * @param int $n
+ * @param string $endchar
  * @return string
  */
 function local_courseindex_course_trim_char($str, $n = 500, $endchar = '&#8230;') {
@@ -109,12 +109,18 @@ function local_courseindex_course_trim_char($str, $n = 500, $endchar = '&#8230;'
     return $out;
 }
 
+/**
+ * Strip tags.
+ * @param string $text
+ * @param string $format
+ */
 function local_courseindex_strip_html_tags($text, $format) {
     return strip_tags($text);
 }
 
 /**
  * Local clone of local/my for modularity.
+ * @param mixed $courseorid
  */
 function local_courseindex_is_selfenrolable_course($courseorid) {
     global $DB;
@@ -132,6 +138,7 @@ function local_courseindex_is_selfenrolable_course($courseorid) {
 
 /**
  * Local clone of local/my for modularity.
+ * @param mixed $courseorid
  */
 function local_courseindex_is_guestenrolable_course($courseorid) {
     global $DB;
@@ -149,6 +156,13 @@ function local_courseindex_is_guestenrolable_course($courseorid) {
 
 /**
  * Willby pass internal course protections for course description attached files or thumbnails.
+ * @param object $course
+ * @param int $cmid
+ * @param object $context
+ * @param string $filearea
+ * @param array $args
+ * @param bool $forcedownload
+ * @param array $options
  */
 function local_courseindex_pluginfile($course, $cmid, $context, $filearea, $args, $forcedownload, array $options = array()) {
 
@@ -180,7 +194,8 @@ function local_courseindex_pluginfile($course, $cmid, $context, $filearea, $args
     }
 
     // Finally send the file.
-    send_stored_file($file, 0, 0, true, $options); // Download MUST be forced - security!
+    $forcedownload = true;
+    send_stored_file($file, 0, 0, $forcedownload, $options); // Download MUST be forced - security!
 }
 
 /**
@@ -234,7 +249,11 @@ function courseindex_get_all_filter_values($filters) {
     return $allvalues;
 }
 
-function local_courseindex_load_defaults(&$config) {
+/**
+ * Load default config bindings.
+ * @param object $config
+ */
+function local_courseindex_load_defaults(& $config) {
     $config->course_metadata_table = 'customlabel_course_metadata';
     $config->course_metadata_course_key = 'courseid';
     $config->course_metadata_value_key = 'valueid';
@@ -247,13 +266,14 @@ function local_courseindex_load_defaults(&$config) {
 
 /**
  * checks if a user has a some named capability effective somewhere in a course.
- * @param string $capability;
+ * @param string $capability
  * @param bool $excludesystem
  * @param bool $excludesite
  * @param bool $doanything
  * @param string $contextlevels restrict to some contextlevel may speedup the query.
  */
-function local_courseindex_has_capability_somewhere($capability, $excludesystem = true, $excludesite = true, $doanything = false, $contextlevels = '') {
+function local_courseindex_has_capability_somewhere($capability, $excludesystem = true, $excludesite = true, $doanything = false,
+                $contextlevels = '') {
     global $USER, $DB;
 
     $contextclause = '';
@@ -267,7 +287,7 @@ function local_courseindex_has_capability_somewhere($capability, $excludesystem 
     $params[] = $capability;
     $params[] = $USER->id;
 
-    // this is a a quick rough query that may not handle all role override possibility
+    // This is a a quick rough query that may not handle all role override possibility.
 
     $sql = "
         SELECT
@@ -286,7 +306,6 @@ function local_courseindex_has_capability_somewhere($capability, $excludesystem 
     ";
     $hassome = $DB->count_records_sql($sql, $params);
 
-    // $hassome = get_user_capability_course($capability, $USER->id, false);
     if ($excludesite && !empty($hassome) && array_key_exists(SITEID, $hassome)) {
         unset($hassome[SITEID]);
     }

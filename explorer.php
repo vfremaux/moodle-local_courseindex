@@ -15,12 +15,15 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Category explorer
+ *
  * @package    local_courseindex
  * @author     Valery Fremaux <valery.fremaux@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @copyright  (C) 1999 onwards Martin Dougiamas  http://dougiamas.com
  *
  */
+
 require('../../config.php');
 require_once($CFG->dirroot.'/local/courseindex/classes/navigator.class.php');
 require_once($CFG->dirroot.'/local/courseindex/explorelib.php');
@@ -28,7 +31,10 @@ require_once($CFG->dirroot.'/local/courseindex/lib.php');
 require_once($CFG->dirroot.'/mod/customlabel/lib.php');
 require_once($CFG->dirroot.'/mod/customlabel/locallib.php');
 
-$SESSION->courseindex = new StdClass;
+use local_courseindex\navigator;
+use local_courseindex\explorer;
+
+$SESSION->courseindex = new StdClass();
 $SESSION->courseindex->headers = optional_param('headers', @$SESSION->courseindex->headers, PARAM_BOOL);
 
 $config = get_config('local_courseindex');
@@ -36,7 +42,7 @@ if (!local_courseindex_supports_feature('metadata/tunable')) {
     local_courseindex_load_defaults($config);
 }
 
-// hidden key to open the catalog to the unlogged area
+// Hidden key to open the catalog to the unlogged area.
 if (empty($config->indexisopen)) {
     require_login();
 }
@@ -65,15 +71,15 @@ echo $OUTPUT->header();
 echo $OUTPUT->heading(get_string('lpsearch', 'local_courseindex'));
 
 if (empty($config->enabled)) {
-    print_error('disabled', 'local_courseindex');
+    throw new moodle_exception('disabled', 'local_courseindex');
 }
 
 $filters = null;
 
-/// getting all filters
+// Getting all filters.
 
-$classificationfilters = \local_courseindex\navigator::get_category_filters();
-$catlevels = \local_courseindex\navigator::get_category_levels();
+$classificationfilters = navigator::get_category_filters();
+$catlevels = navigator::get_category_levels();
 
 $i = 0;
 foreach ($classificationfilters as $afilter) {
@@ -96,7 +102,7 @@ $search = optional_param('go_search', '', PARAM_RAW);
 $freesearch = optional_param('go_freesearch', '', PARAM_RAW);
 $specialsearch = optional_param('go_specialsearch', '', PARAM_RAW);
 
-$indexform = \local_courseindex\explorer::prepare_form('indexsearch');
+$indexform = explorer::prepare_form('indexsearch');
 
 $form = new StdClass;
 if ($search) {
@@ -114,7 +120,7 @@ if ($search) {
     $form->description = '';
     $form->information = '';
     $searching = true;
-    $results = \local_courseindex\explorer::explore($form);
+    $results = explorer::explore($form);
 } else if ($freesearch) {
     $form->freesearch = $freesearch;
     $form->lpstatus = optional_param('lpstatus', '', PARAM_INT);
@@ -123,7 +129,7 @@ if ($search) {
     $form->description = optional_param('description', '', PARAM_INT);
     $form->information = optional_param('information', '', PARAM_INT);
     $searching = true;
-    $results = \local_courseindex\explorer::explore($form);
+    $results = explorer::explore($form);
 } else if ($specialsearch) {
     $form->specialsearch = 1;
     $form->lpstatus = optional_param('lpstatus', '', PARAM_INT);
@@ -133,7 +139,7 @@ if ($search) {
     $form->information = 0;
     $form->searchtext = '';
     $searching = true;
-    $results = \local_courseindex\explorer::explore($form);
+    $results = explorer::explore($form);
 } else {
     $searching = false;
     $form = new StdClass();
@@ -163,7 +169,7 @@ if (is_dir($CFG->dirroot.'/local/staticguitexts')) {
     local_print_static_text('courseindex_explore_freetext_text', $url);
 }
 
-$template = new StdClass;
+$template = new StdClass();
 
 $template->searchtext = $form->searchtext;
 $template->titlechecked = ($form->title) ? 'checked="checked"' : '' ;
@@ -172,7 +178,7 @@ $template->infochecked = ($form->information) ? 'checked="checked"' : '' ;
 
 echo $OUTPUT->render_from_template('local_courseindex/textsearchform', $template);
 
-if (\local_courseindex\explorer::has_special_fields($specialfields)) {
+if (explorer::has_special_fields($specialfields)) {
     echo $OUTPUT->heading(get_string('byspecialcriteria', 'local_courseindex'));
     if (is_dir($CFG->dirroot.'/local/staticguitexts')) {
         local_print_static_text('courseindex_explore_targets_text', $url);
@@ -217,8 +223,6 @@ if (!empty($results)) {
 
     // $restrictions = get_records_list('course_classification', 'course', implode(',', array_keys($results)));
     $rcpoptions = new StdClass();
-
-    // $filters = array();
 
     echo $OUTPUT->box_start('search-results');
     echo $renderer->search_results($results);

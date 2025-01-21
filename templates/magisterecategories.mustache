@@ -24,27 +24,29 @@
 
 }}
 <!-- local_courseindex/magisterecategories -->
-<div id="courseindex-category{{catidpath}}" class="courseindex-category">
+<ul id="courseindex-category{{catidpath}}" class="courseindex-category">
 
     {{^hascats}}
-    <div class="category-name  {{currentclass}}">
+    <li class="category-name  {{currentclass}}">
     <a href="{{{caturl}}}" class="indent-{{level}}">{{name}}</a>
-    </div>
+    </li>
     {{/hascats}}
 
     {{#hascats}}
-    <div class="category-name  {{currentclass}}">
+    <li class="category-name  {{currentclass}}">
     <a href="{{{caturl}}}" class="indent-{{level}}">{{name}}</a>
     {{^isroot}}
-    <span id="ftoggle-handle{{catidpath}}" class="ftoggle-handle" data-toggle="toggle{{catidpath}}">{{#pix}}t/collapsed{{/pix}}</span>
+    <span id="ftoggle-handle{{catidpath}}" class="ftoggle-handle"
+          data-toggle="toggle{{catidpath}}" role="button" aria-label="{{#str}}expand{{/str}}"
+          tabindex="0">{{#pix}}t/more{{/pix}}</span>
     {{/isroot}}
-    </div>
     <div class="subcats" id="toggle{{catidpath}}" style="{{display}}">
     {{#cats}}
     {{> local_courseindex/magisterecategories}}
     {{/cats}}
     </div>
+    </li>
     {{/hascats}}
 
-</div>
+</ul>
 <!-- /local_courseindex/magisterecategories -->

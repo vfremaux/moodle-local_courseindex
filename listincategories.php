@@ -15,12 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * learning path list - meant to duplicate http://aoc.ssatrust.org.uk/index?s=13
+ *
  * @package    local_courseindex
  * @author     Valery Fremaux <valery.fremaux@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @copyright  (C) 1999 onwards Martin Dougiamas  http://dougiamas.com
- *
- * learning path list - meant to duplicate http://aoc.ssatrust.org.uk/index?s=13
  */
 require('../../../config.php');
 require_once($CFG->dirroot.'/local/courseindex/classes/navigator.class.php');

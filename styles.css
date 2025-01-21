@@ -404,6 +404,15 @@ body.magistere #region-main {
     border: none;
 }
 
+.courseindex-nav-menu ul {
+    padding-left: 0;
+    list-style: none;
+}
+
+.courseindex-nav-menu li > a.indent-0 {
+    padding: 5px 2px 5px 2px;
+}
+
 .course-actions {
     padding: 10px;
 }

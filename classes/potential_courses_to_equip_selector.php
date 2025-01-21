@@ -15,10 +15,12 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Potential courses selector
  *
  * @package    local_courseindex
- * @copyright  1999 onwards Martin Dougiamas (http://dougiamas.com)
- * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
+ * @author     Valery Fremaux <valery.fremaux@gmail.com>
+ * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
+ * @copyright  (C) 1999 onwards Martin Dougiamas  http://dougiamas.com
  */
 namespace local_courseindex\selectors;
 
@@ -33,6 +35,10 @@ defined('MOODLE_INTERNAL') || die();
  */
 class potential_courses_to_map_selector extends \course_selector_base {
 
+    /**
+     * Find courses to select.
+     * @param string $search
+     */
     public function find_courses($search) {
         global $DB;
 

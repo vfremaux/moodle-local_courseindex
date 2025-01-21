@@ -14,22 +14,23 @@
 // You should have received a copy of the GNU General Public License
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
-defined('MOODLE_INTERNAL') or die();
-require_once($CFG->dirroot.'/local/courseindex/lib.php');
-require_once($CFG->dirroot.'/local/courseindex/compatlib.php');
-
 /**
+ * Main plugin renderer
+ *
  * @package    local_courseindex
  * @author     Valery Fremaux <valery.fremaux@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @copyright  (C) 1999 onwards Martin Dougiamas  http://dougiamas.com
- *
- * this file should be used for all tao-specific methods
- * and will be included automatically in local/lib.php along
- * with other core libraries.
  */
 
+defined('MOODLE_INTERNAL') or die();
 
+require_once($CFG->dirroot.'/local/courseindex/lib.php');
+require_once($CFG->dirroot.'/local/courseindex/compatlib.php');
+
+/**
+ * Main renderer class.
+ */
 class local_courseindex_renderer extends plugin_renderer_base {
 
     /**
@@ -390,9 +391,16 @@ class local_courseindex_renderer extends plugin_renderer_base {
 
     /**
      * Overriden in pro version only.
+     * @param int $catid starting category id
+     * @param string $catpath
+     * @param array $cattree
+     * @param array $courses
+     * @param array $filters
+     * @param string $pagingbar
+     * @param string $categoryname
      */
-    public function magistere_layout($catid, $catpath, &$cattree, &$courses, &$filters, $pagingbar = '', $categoryname) {
-        print_error("Only implemented in pro version");
+    public function magistere_layout($catid, $catpath, $cattree, $courses, $filters, $pagingbar = '', $categoryname = '') {
+        throw new moodle_exception("Only implemented in pro version");
     }
 
     public function course_actions($courseorid) {

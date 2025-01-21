@@ -15,24 +15,22 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Resolves all navigation calculation
+ *
  * @package    local_courseindex
  * @author     Valery Fremaux <valery.fremaux@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @copyright  (C) 1999 onwards Martin Dougiamas  http://dougiamas.com
- *
- * this file should be used for all tao-specific methods
- * and will be included automatically in local/lib.php along
- * with other core libraries.
  */
 namespace local_courseindex;
 
+defined('MOODLE_INTERNAL') || die();
+
 require_once($CFG->dirroot.'/local/courseindex/compatlib.php');
 
-use \StdClass;
-use \context_coursecat;
-use \moodle_url;
-
-defined('MOODLE_INTERNAL') || die();
+use StdClass;
+use context_coursecat;
+use moodle_url;
 
 // Constants for display control.
 
@@ -52,6 +50,9 @@ if (is_dir($CFG->dirroot.'/blocks/course_status')) {
     require_once($CFG->dirroot.'/blocks/course_status/locallib.php');
 }
 
+/**
+ * The course insdex navigation manager.
+ */
 class navigator {
 
     /**
@@ -59,11 +60,11 @@ class navigator {
      * elements are shown in category if they have no other qualifiers setup
      * @param int $startcat if startcat is null, makes full navigation tree from the start. If not null, displays content of a node
      * @param string $catpath contains tree elements representing the upper branch over the start point.
-     * @param int $levelix the categorization level the startcat is located at
+     * @param int $catlevels the categorization level the startcat is located at
      * @param array $filters are there filters to apply ? Here they are described.
      * @param $return
      */
-    public static function generate_navigation($startcat = null, $catpath = '', $catlevels, &$filters, $restrictions = array()) {
+    public static function generate_navigation($startcat = null, $catpath = '', $catlevels = 1, $filters = [], $restrictions = []) {
         global $CFG, $DB;
 
         $config = get_config('local_courseindex');
@@ -307,7 +308,7 @@ class navigator {
                 }
             }
 
-            // finally cleanup rootcategory entries from course that are actually in subcats.
+            // Finally cleanup rootcategory entries from course that are actually in subcats.
             foreach ($allcourses as $cid => $c) {
                 if (array_key_exists($c->id, $coursescatchedbysubcat)) {
                     if ($debug) {
@@ -476,8 +477,11 @@ class navigator {
 
     /**
      * Entries of a cat are entries attached to exactly all cats in the cat path.
+     * @param int $catid
+     * @param string $catpath
+     * @param array $filters
      */
-    public static function get_cat_entries($catid, $catpath, &$filters) {
+    public static function get_cat_entries($catid, $catpath, $filters) {
         global $DB;
 
         $config = get_config('local_courseindex');
@@ -572,7 +576,14 @@ class navigator {
         return $catcourses;
     }
 
-    public static function get_all_filtered_courses($filters, $page = 0, $pagesize = 30, &$totalcourses) {
+    /**
+     * Get all courses after filtering
+     * @param array $filters
+     * @param int $page
+     * @param int $pagesize
+     * @param array $totalcourses
+     */
+    public static function get_all_filtered_courses($filters, $page = 0, $pagesize = 30, & $totalcourses =  null) {
         global $DB;
 
         $config = get_config('local_courseindex');
@@ -640,14 +651,14 @@ class navigator {
     /**
      * get the lost of category constructors
      * // TODO complete with a "user profile" strategy
-     *
      */
     public static function get_category_filters() {
         global $CFG, $DB;
 
         $config = get_config('local_courseindex');
 
-        if (!$filters = array_values($DB->get_records($config->classification_type_table, array('type' => 'coursefilter'), 'sortorder'))) {
+        $params = ['type' => 'coursefilter'];
+        if (!$filters = array_values($DB->get_records($config->classification_type_table, $params, 'sortorder'))) {
             return array();
         }
         return $filters;
@@ -664,30 +675,21 @@ class navigator {
 
         $config = get_config('local_courseindex');
 
-        // check for exclude
-        // cat is discarded if IT IS not mapped or in an exclude list
-        $count = $DB->count_records_select($config->classification_constraint_table, " `const` = 1 AND ((value1 = ? AND value2 = ? ) OR (value1 = ? AND value2 = ? )) ", array($acat->id, $cat->id, $cat->id, $acat->id));
+        // Check for exclude.
+        // Cat is discarded if IT IS not mapped or in an exclude list.
+        $select = " `const` = 1 AND ((value1 = ? AND value2 = ? ) OR (value1 = ? AND value2 = ? )) ";
+        $params = [$acat->id, $cat->id, $cat->id, $acat->id];
+        $count = $DB->count_records_select($config->classification_constraint_table, $select, $params);
         if ($count) {
             return true;
         }
 
-        /*
-        // check for include
-        // Cat is discarded if it IS NOT IN in include list
-        // IT IS IN include list. Get it.
-        if ($DB->count_records_select($config->classification_constraint_table, " `const` = 1 AND ((value1 = {$acat->id} AND value2 = {$cat->id}) OR (value1 = {$cat->id} AND value2 = {$acat->id})) ")) 
-            return false;
-        // THERE ARE OTHER includes for upper cat. Get it NOT.
-        if ($DB->count_records_select($config->classification_constraint_table, " `const` = 1 AND ((value1 != {$acat->id} AND value2 = {$cat->id}) OR (value1 = {$cat->id} AND value2 != {$acat->id})) ")) 
-            return true;
-        // No explicit rules
-        */
         return false;
     }
 
     /**
-     *
-     *
+     * Is course visible ?
+     * @param object $course
      */
     public static function course_is_visible($course) {
         global $DB;
@@ -696,7 +698,7 @@ class navigator {
             return false;
         }
 
-        $coursecat = $DB->get_record('course_categories', array('id' => $course->category));
+        $coursecat = $DB->get_record('course_categories', ['id' => $course->category]);
         $cat = $coursecat;
         $catcontext = context_coursecat::instance($cat->id);
 
@@ -706,10 +708,10 @@ class navigator {
 
         while ($cat->parent) {
             $catcontext = context_coursecat::instance($cat->id);
-            if (!$cat->visible && !has_capability('moodle/category:viewhiddencategories')) {
+            if (!$cat->visible && !has_capability('moodle/category:viewhiddencategories', $catcontext)) {
                 return false;
             }
-            $cat = $DB->get_record('course_categories', array('id' => $cat->parent));
+            $cat = $DB->get_record('course_categories', ['id' => $cat->parent]);
         };
         return true;
     }

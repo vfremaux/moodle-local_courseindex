@@ -35,7 +35,7 @@
 <div class="filter-input" id="filter-input-{{fcode}}">
     {{#options}}
         <div class="filter-option">
-        <input type="checkbox" name="{{fcode}}[]" class="courseindex-filter-value" value="{{id}}" {{checked}}> {{value}} ({{counter}})
+        <input type="checkbox" name="{{fcode}}[]" class="courseindex-filter-value" value="{{id}}" {{{checked}}} aria-labelledby="chck-{{fcode}}"><label id="chck-{{fcode}}">{{value}}</label> ({{counter}})
         </div>
     {{/options}}
 </div>

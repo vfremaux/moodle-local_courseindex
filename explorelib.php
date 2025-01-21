@@ -15,16 +15,21 @@
 // along with Moodle.  If not, see <http://www.gnu.org/licenses/>.
 
 /**
+ * Library for catalog exploration
+ *
  * @package    local_courseindex
  * @author     Valery Fremaux <valery.fremaux@gmail.com>
  * @license    http://www.gnu.org/copyleft/gpl.html GNU GPL
  * @copyright  (C) 1999 onwards Martin Dougiamas  http://dougiamas.com
- *
  */
+
 namespace local_courseindex;
 
-defined('MOODLE_INTERNAL') || die();
+use StdClass;
 
+/**
+ * Categories explorer.
+ */
 class explorer {
 
     /**
@@ -36,7 +41,7 @@ class explorer {
         $config = get_config('local_courseindex');
 
         if (!empty($data->specialsearch)) {
-            // special search using topic and targets
+            // Special search using topic and targets.
             $results1 = array();
 
             if (!empty($data->targets)) {
@@ -105,7 +110,7 @@ class explorer {
 
             // Free search implementation.
             if ($tokens = preg_split("/\\s+/", $data->searchtext)) {
-                $i = 0; // we need to keep orderfrom the search string.
+                $i = 0; // We need to keep orderfrom the search string.
                 $resultspertoken = array();
                 foreach($tokens as $token) {
                     $searchclauses = array();
@@ -164,7 +169,7 @@ class explorer {
                 }
                 if (!empty($resultspertoken)) {
 
-                    // implements a manual array intersection as array_instersect fails with associative arrays
+                    // Implements a manual array intersection as array_instersect fails with associative arrays.
                     $results = $resultspertoken[0];
                     $set = array_keys($results);
                     for ($i = 1 ; $i < count($resultspertoken) ; $i++) {
@@ -194,7 +199,7 @@ class explorer {
             return $results;
 
         } else {
-            // list driven implementation
+            // List driven implementation.
 
             $customlabel = new \StdClass();
             $customlabel->labelclass = 'courseclassifier';
@@ -220,13 +225,6 @@ class explorer {
 
                     list($insql, $inparams) = $DB->get_in_or_equal($inputarr);
 
-                    /*
-                    // OLD
-                    $catarr = $data->level0;
-                    $lastcatid = count($catarr) - 1;
-                    $allvalues = self::get_all_linked_values($catarr[$lastcatid]);
-                    $level0list = implode("','", $allvalues);
-                    */
                     $sql = "
                         SELECT DISTINCT
                             c.id,
@@ -263,59 +261,12 @@ class explorer {
                 return array();
             }
             return $masterresults;
-
-            /*
-            $results2 = array();
-            if (!empty($data->level1) && !(count($data->level1) == 1 && $data->level1[0] == 0)) {
-                $level1list = implode("','", $data->level1);
-                $sql = "
-                    SELECT DISTINCT
-                        c.id,
-                        c.shortname,
-                        c.fullname,
-                        c.visible
-                    FROM
-                        {course} c,
-                        {{$config->course_metadata_table}} cc
-                    WHERE
-                        cc.courseid = c.id AND
-                        cc.{$config->course_metadata_value_key} IN ('$level1list')
-                    ORDER BY
-                        c.sortorder
-                ";
-
-                $results2 = $DB->get_records_sql($sql);
-            }
-
-            // debug_trace($results1);
-            // debug_trace($results2);
-
-            // manual intersect of results1 in results 2
-            if (!empty($results1) && !empty($results2)) {
-                $res2keys = array_keys($results2);
-                $res1keys = array_keys($results1);
-                $resultarr = array();
-                foreach ($results1 as $key => $result) {
-                    if (in_array($key, $res2keys) && in_array($key, $res1keys)) {
-                        $resultarr[$key] = $result;
-                    }
-                }
-                return $resultarr;
-            }
-            if (!empty($results2) && empty($data->level0)) {
-                return $results2;
-            }
-            if (!empty($results1) && (empty($data->level1) || (count($data->level1) == 1 && $data->level1[0] == 0))) {
-                return $results1;
-            }
-            return array();
-            */
         }
     }
 
     /**
-     *
-     *
+     * Get linked values to a value
+     * @param int $valueid
      */
     public static function get_all_linked_values($valueid) {
         global $CFG, $DB;
@@ -381,10 +332,14 @@ class explorer {
         return $peoplefieldid || $topicfieldid;
     }
 
+    /**
+     * Prepare explore form.
+     * @param string $formname
+     */
     public static function prepare_form($formname) {
         global $OUTPUT;
 
-        $form = new \StdClass;
+        $form = new StdClass();
 
         if ($formname == 'indexsearch') {
             $customlabel = new \StdClass();
@@ -424,16 +379,7 @@ class explorer {
                     $classifiertpl->fieldhelp = $field->help;
                 }
 
-                // Very similar to lists, except options come from an external datasource
-                /*
-                if ($field->type == '_error_') {
-                    echo '<div id="div_menu_'.$field->name.'">';
-                    echo $OUTPUT->notification($field->error, 'notifyproblem');
-                    echo '</div>';
-                    echo '</td></tr>';
-                    continue;
-                }
-                */
+                // Very similar to lists, except options come from an external datasource.
                 $multiple = (isset($field->multiple)) ? $field->multiple : '';
                 $options = $classifier->get_datasource_options($field);
                 $params = array();
