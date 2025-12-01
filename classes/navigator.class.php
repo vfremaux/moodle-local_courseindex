@@ -68,11 +68,12 @@ class navigator {
         global $CFG, $DB;
 
         $config = get_config('local_courseindex');
+        $customlabelconfig = get_config('customlabel');
         $publishconfig = get_config('block_publishflow');
 
         if (empty($catpath)) {
             $levelix = 0;
-            $catpatharr = array();
+            $catpatharr = [];
         } else {
             $catpatharr = explode(',', $catpath);
             $levelix = count($catpatharr);
@@ -86,8 +87,8 @@ class navigator {
             $rootcat->parent->id = 0;
             $rootcat->parent->catpath = '';
             $rootcat->name = get_string('root', 'local_courseindex');
-            $rootcat->cats = array();
-            $rootcat->entries = array();
+            $rootcat->cats = [];
+            $rootcat->entries = [];
             return $rootcat;
         } else if (empty($startcat)) {
             $rootcat = new StdClass();
@@ -96,10 +97,10 @@ class navigator {
             $rootcat->parent->id = 0;
             $rootcat->parent->catpath = '';
             $rootcat->name = get_string('root', 'local_courseindex');
-            $rootcat->cats = array();
-            $rootcat->entries = array();
+            $rootcat->cats = [];
+            $rootcat->entries = [];
         } else {
-            $rootcat = $DB->get_record($config->classification_value_table, array('id' => $startcat));
+            $rootcat = $DB->get_record($customlabelconfig->classification_value_table, ['id' => $startcat]);
             $rootcat->name = $rootcat->value;
 
             /*
@@ -170,15 +171,15 @@ class navigator {
                 GROUP_CONCAT(ccv.id) as tagids
             FROM
                 {course} c,
-                {{$config->classification_value_table}} ccv,
-                {{$config->course_metadata_table}} cc
+                {{$customlabelconfig->classification_value_table}} ccv,
+                {{$customlabelconfig->course_metadata_table}} cc
             LEFT JOIN
                 {course_modules} cm
             ON
-                cc.{$config->course_metadata_cmid_key} = cm.id
+                cc.{$customlabelconfig->course_metadata_cmid_key} = cm.id
             WHERE
-                c.id = cc.{$config->course_metadata_course_key} AND
-                cc.{$config->course_metadata_value_key} = ccv.id
+                c.id = cc.{$customlabelconfig->course_metadata_course_key} AND
+                cc.{$customlabelconfig->course_metadata_value_key} = ccv.id
                 {$deletioninprogressclause}
                 {$formatclause}
             GROUP BY
@@ -255,7 +256,7 @@ class navigator {
             }
         }
 
-        $rootcat->cats = array();
+        $rootcat->cats = [];
 
         // Get candidate subcategories.
         if ($levelix < count($catlevels)) {
@@ -265,11 +266,11 @@ class navigator {
                    cv.value,
                    ct.sortorder AS typesortorder
                 FROM
-                   {{$config->classification_value_table}} cv,
-                   {{$config->classification_type_table}} ct
+                   {{$customlabelconfig->classification_value_table}} cv,
+                   {{$customlabelconfig->classification_type_table}} ct
                 WHERE
-                    ct.id = cv.{$config->classification_value_type_key} AND
-                    cv.{$config->classification_value_type_key} = {$catlevels[$levelix]->id}
+                    ct.id = cv.{$customlabelconfig->classification_value_type_key} AND
+                    cv.{$customlabelconfig->classification_value_type_key} = {$catlevels[$levelix]->id}
                 ORDER BY
                     cv.sortorder
             ";
@@ -337,6 +338,7 @@ class navigator {
         global $CFG, $DB;
 
         $config = get_config('local_courseindex');
+        $customlabelconfig = get_config('customlabel');
         $current = optional_param('catpath', '', PARAM_TEXT);
 
         if (empty($catpath)) {
@@ -378,7 +380,7 @@ class navigator {
             } else {
                 $startcatid = $startcat;
             }
-            $rootcat = $DB->get_record($config->classification_value_table, array('id' => $startcatid));
+            $rootcat = $DB->get_record($customlabelconfig->classification_value_table, ['id' => $startcatid]);
             unset($rootcat->parent); // Do not confuse.
             $rootcat->name = $rootcat->value;
             if ($levelix) {
@@ -400,11 +402,11 @@ class navigator {
             $rootcat->isroot = 0;
         }
 
-        $rootcat->cats = array();
+        $rootcat->cats = [];
         $rootcat->hascats = 0;
         $rootcat->catidpath = str_replace(',', '-', $catpath);
         $rootcat->level = $levelix;
-        $params = array('catid' => $startcatid, 'catpath' => $catpath);
+        $params = ['catid' => $startcatid, 'catpath' => $catpath];
         $rootcat->caturl = new moodle_url('/local/courseindex/browser.php', $params).$filterstring;
         $rootcat->currentclass = '';
         if ($current == $catpath) {
@@ -419,18 +421,18 @@ class navigator {
                    cv.value,
                    ct.sortorder AS typesortorder
                 FROM
-                   {{$config->classification_value_table}} cv,
-                   {{$config->classification_type_table}} ct
+                   {{$customlabelconfig->classification_value_table}} cv,
+                   {{$customlabelconfig->classification_type_table}} ct
                 WHERE
-                    ct.id = cv.{$config->classification_value_type_key} AND
-                    cv.{$config->classification_value_type_key} = {$catlevels[$levelix]->id}
+                    ct.id = cv.{$customlabelconfig->classification_value_type_key} AND
+                    cv.{$customlabelconfig->classification_value_type_key} = {$catlevels[$levelix]->id}
                 ORDER BY
                     cv.sortorder
             ";
             $levelcats = $DB->get_records_sql($sql);
 
             if ($levelcats) {
-                $coursescatchedbysubcat = array();
+                $coursescatchedbysubcat = [];
                 foreach ($levelcats as $acat) {
 
                     if ($rootcat->id && !self::navigation_match_constraints($acat, $rootcat)) {
@@ -465,9 +467,10 @@ class navigator {
 
         if (is_null($levels)) {
             $config = get_config('local_courseindex');
+            $customlabelconfig = get_config('customlabel');
 
-            if (!$levels = $DB->get_records_select($config->classification_type_table, " type LIKE '%category' ", array(), 'sortorder')) {
-                return array();
+            if (!$levels = $DB->get_records_select($customlabelconfig->classification_type_table, " type LIKE '%category' ", [], 'sortorder')) {
+                return [];
             }
             $levels = array_values($levels);
         }
@@ -485,10 +488,11 @@ class navigator {
         global $DB;
 
         $config = get_config('local_courseindex');
+        $customlabelconfig = get_config('customlabel');
 
-        if (empty($config->course_metadata_cmid_key)) {
-            set_config('course_metadata_cmid_key', 'cmid', 'local_courseindex');
-            $config->course_metadata_cmid_key = 'cmid';
+        if (empty($customlabelconfig->course_metadata_cmid_key)) {
+            set_config('course_metadata_cmid_key', 'cmid', 'customlabel');
+            $customlabelconfig->course_metadata_cmid_key = 'cmid';
         }
 
         // Get courses entries in the category.
@@ -514,15 +518,15 @@ class navigator {
                     c.summary
                 FROM
                     {course} c,
-                    {{$config->classification_value_table}} ccv,
-                    {{$config->course_metadata_table}} cc
+                    {{$customlabelconfig->classification_value_table}} ccv,
+                    {{$customlabelconfig->course_metadata_table}} cc
                 LEFT JOIN
                     {course_modules} cm
                 ON
-                    cc.{$config->course_metadata_cmid_key} = cm.id
+                    cc.{$customlabelconfig->course_metadata_cmid_key} = cm.id
                 WHERE
-                    c.id = cc.{$config->course_metadata_course_key} AND
-                    cc.{$config->course_metadata_value_key} = ccv.id AND
+                    c.id = cc.{$customlabelconfig->course_metadata_course_key} AND
+                    cc.{$customlabelconfig->course_metadata_value_key} = ccv.id AND
                     cc.valueid = ?
                     {$deletioninprogressclause}
                 GROUP BY
@@ -587,6 +591,7 @@ class navigator {
         global $DB;
 
         $config = get_config('local_courseindex');
+        $customlabelconfig = get_config('customlabel');
 
         $allvalues = courseindex_get_all_filter_values($filters);
 
@@ -606,15 +611,15 @@ class navigator {
                 c.summary
             FROM
                 {course} c,
-                {{$config->classification_value_table}} ccv,
-                {{$config->course_metadata_table}} cc
+                {{$customlabelconfig->classification_value_table}} ccv,
+                {{$customlabelconfig->course_metadata_table}} cc
             LEFT JOIN
                 {course_modules} cm
             ON
-                cc.{$config->course_metadata_cmid_key} = cm.id
+                cc.{$customlabelconfig->course_metadata_cmid_key} = cm.id
             WHERE
-                c.id = cc.{$config->course_metadata_course_key} AND
-                cc.{$config->course_metadata_value_key} = ccv.id AND
+                c.id = cc.{$customlabelconfig->course_metadata_course_key} AND
+                cc.{$customlabelconfig->course_metadata_value_key} = ccv.id AND
                 cc.valueid $insql
                 {$deletioninprogressclause}
             GROUP BY
@@ -628,15 +633,15 @@ class navigator {
                 DISTINCT COUNT(*)
             FROM
                 {course} c,
-                {{$config->classification_value_table}} ccv,
-                {{$config->course_metadata_table}} cc
+                {{$customlabelconfig->classification_value_table}} ccv,
+                {{$customlabelconfig->course_metadata_table}} cc
             LEFT JOIN
                 {course_modules} cm
             ON
-                cc.{$config->course_metadata_cmid_key} = cm.id
+                cc.{$customlabelconfig->course_metadata_cmid_key} = cm.id
             WHERE
-                c.id = cc.{$config->course_metadata_course_key} AND
-                cc.{$config->course_metadata_value_key} = ccv.id AND
+                c.id = cc.{$customlabelconfig->course_metadata_course_key} AND
+                cc.{$customlabelconfig->course_metadata_value_key} = ccv.id AND
                 cc.valueid $insql
                 {$deletioninprogressclause}
         ";
@@ -656,10 +661,11 @@ class navigator {
         global $CFG, $DB;
 
         $config = get_config('local_courseindex');
+        $customlabelconfig = get_config('customlabel');
 
         $params = ['type' => 'coursefilter'];
-        if (!$filters = array_values($DB->get_records($config->classification_type_table, $params, 'sortorder'))) {
-            return array();
+        if (!$filters = array_values($DB->get_records($customlabelconfig->classification_type_table, $params, 'sortorder'))) {
+            return [];
         }
         return $filters;
     }
@@ -674,12 +680,13 @@ class navigator {
         global $CFG, $DB;
 
         $config = get_config('local_courseindex');
+        $customlabelconfig = get_config('customlabel');
 
         // Check for exclude.
         // Cat is discarded if IT IS not mapped or in an exclude list.
         $select = " `const` = 1 AND ((value1 = ? AND value2 = ? ) OR (value1 = ? AND value2 = ? )) ";
         $params = [$acat->id, $cat->id, $cat->id, $acat->id];
-        $count = $DB->count_records_select($config->classification_constraint_table, $select, $params);
+        $count = $DB->count_records_select($customlabelconfig->classification_constraint_table, $select, $params);
         if ($count) {
             return true;
         }
@@ -754,6 +761,7 @@ class navigator {
 
         $filters = [];
         $config = get_config('local_courseindex');
+        $customlabelconfig = get_config('customlabel');
 
         $i = 0;
         foreach ($classificationfilters as $afilter) {
@@ -764,17 +772,17 @@ class navigator {
                     cv.value as value,
                     COUNT(c.id) as counter
                 FROM
-                    {{$config->classification_value_table}} cv
+                    {{$customlabelconfig->classification_value_table}} cv
                 LEFT JOIN
-                    {{$config->course_metadata_table}} cm
+                    {{$customlabelconfig->course_metadata_table}} cm
                 ON
-                    {$config->course_metadata_value_key} = cv.id
+                    {$customlabelconfig->course_metadata_value_key} = cv.id
                 LEFT JOIN
                     {course} c
                 ON
                     cm.courseid = c.id
                 WHERE
-                    {$config->classification_value_type_key} = ? AND
+                    {$customlabelconfig->classification_value_type_key} = ? AND
                     /* c.visible = 1 */
                     1 = 1
                 GROUP BY

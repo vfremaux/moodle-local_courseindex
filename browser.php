@@ -29,7 +29,7 @@ require_once($CFG->dirroot.'/local/courseindex/lib.php');
 require_once($CFG->dirroot.'/local/courseindex/classes/navigator.class.php');
 
 $SESSION->courseindex = new StdClass;
-$SESSION->courseindex->noheaders = optional_param('noheaders', @$SESSION->courseindex->noheaders, PARAM_BOOL);
+$SESSION->courseindex->noheaders = optional_param('noheaders', $SESSION->courseindex->noheaders ?? 0, PARAM_BOOL);
 
 $config = get_config('local_courseindex');
 if (!local_courseindex_supports_feature('metadata/tunable')) {
@@ -64,7 +64,7 @@ if ($config->layoutmodel == 'standard') {
 } else {
     $PAGE->set_pagelayout('base');
     if (local_courseindex_supports_feature('layout/magistere')) {
-        $PAGE->requires->js_call_amd('local_courseindex/magisterecourseindex', 'init',  array('catpath' => $catpath));
+        $PAGE->requires->js_call_amd('local_courseindex/magisterecourseindex', 'init',  ['catpath' => $catpath]);
     }
 }
 

@@ -43,10 +43,10 @@ define(['jquery', 'core/log', 'core/config'], function($, log, cfg) {
 
             var calculated = localcourseindexpro.checksum(payload);
 
-            var validicon = ' <img src="' + cfg.wwwroot + '/pix/i/valid.svg' + '">';
-            var cautionicon = ' <img src="' + cfg.wwwroot + '/pix/i/warning.svg' + '">';
-            var invalidicon = ' <img src="' + cfg.wwwroot + '/pix/i/invalid.svg' + '">';
-            var waiticon = ' <img src="' + cfg.wwwroot + '/pix/i/loading.svg' + '">';
+            var validicon = ' <img class="icon" src="' + cfg.wwwroot + '/pix/i/valid.svg' + '">';
+            var cautionicon = ' <img class="icon" src="' + cfg.wwwroot + '/pix/i/warning.svg' + '">';
+            var invalidicon = ' <img class="icon" src="' + cfg.wwwroot + '/pix/i/invalid.svg' + '">';
+            var waiticon = ' <img class="icon" src="' + cfg.wwwroot + '/pix/i/loading.svg' + '">';
 
             if (crc === calculated) {
                 var url = cfg.wwwroot + '/' + localcourseindexpro.componentpath + '/pro/ajax/services.php?';
@@ -80,6 +80,7 @@ define(['jquery', 'core/log', 'core/config'], function($, log, cfg) {
 
         /**
          * Calculates a checksum on 2 chars.
+         * @param {String} keypayload
          */
         checksum: function(keypayload) {
 

@@ -31,7 +31,7 @@
         <input type="hidden" name="catid" value="{{currentcatid}}"/>
         <input type="hidden" name="catpath" value="{{currentcatpath}}"/>
 
-        <h3>{{#str}}domains, local_courseindex{{/str}}</h3>
+        <h3>{{{toptreename}}}</h3>
         <nav id="courseindex-nav-categories" class="courseindex-nav-menu" aria-label="{{#str}}courseindex, local_courseindex{{/str}}">
             {{#categorytree}}
             {{> local_courseindex/magisterecategories}}
@@ -55,6 +55,8 @@
             {{#category}}
             <h2>{{{category}}}</h2>
             {{/category}}
+
+            {{{staticguitext}}}
 
             <div class="category-data">
                 <div class="cat-count">
