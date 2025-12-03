@@ -503,3 +503,7 @@ body.magistere #region-main {
         float: none;
     }
 }
+
+#courseindex-map-container #courseindex-nav {
+    margin-top: 0;
+}

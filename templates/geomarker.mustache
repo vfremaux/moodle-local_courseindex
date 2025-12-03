@@ -1,0 +1,32 @@
+
+
+<!-- local_courseindex/geomarker -->
+<div class="popup-title">{{location}}</div>
+<div class="popup-address">{{coursename}}</div>
+
+{{#hascost}}
+<div class="popup-info-row">
+    <div class="popup-info-label"><span class="popup-icon">•</span>{{#str}}cost, local_courseindex{{/str}} :</div>
+    <div class="popup-info-value">{{cost}}</div>
+</div>
+{{/hascost}}
+
+{{#timestart}}
+<div class="popup-info-row">
+    <div class="popup-info-label"><span class="popup-icon">•</span>{{#str}}timestart, local_courseindex{{/str}} :</div>
+    <div class="popup-info-value">{{timestart}}</div>
+</div>
+{{/timestart}}
+
+{{#timeend}}
+<div class="popup-info-row">
+    <div class="popup-info-label"><span class="popup-icon">•</span>{{#str}}timeend, local_courseindex{{/str}} :</div>
+    <div class="popup-info-value">{{timeend}}</div>
+</div>
+{{/timeend}}
+
+<div class="popup-instructions">
+    <div class="popup-instructions-label">{{#str}}{{/str}} :</div>
+    <div class="popup-instructions-text">Cliquez sur le marqueur pour voir les détails. Vous pouvez zoomer et vous déplacer sur la carte.</div>
+</div>
+<!-- /local_courseindex/geomarker -->

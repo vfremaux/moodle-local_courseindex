@@ -1,0 +1,26 @@
+
+
+
+<!-- local_courseindex/geomap -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.js"></script>
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/leaflet/1.9.4/leaflet.min.css" />
+<div class="map-overlay" id="mapOverlay">
+    <div class="map-container">
+        <!-- map Header -->
+        <!-- div class="map-header">
+            <div>
+                <h2>Localisation des formations</h2>
+                <div class="location-info" id="locationInfo">{{#str}}loading, local_courseindex{{/str}}</div>
+            </div>
+        </div -->
+
+        <!-- map Body -->
+        <div class="map-body">
+            <div id="map" role="region" aria-label="{{#str}}mapname, local_courseindex{{/str}}"></div>
+            <div class="info-box">
+                <strong>Instructions:</strong> Cliquez sur le marqueur pour voir les détails du site de formation. Vous pouvez zoomer et vous déplacer sur la carte.
+            </div>
+        </div>
+    </div>
+</div>
+<!-- /local_courseindex/geomap -->
