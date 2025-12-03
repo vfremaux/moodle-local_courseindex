@@ -19,14 +19,12 @@ define(['jquery', 'core/prefetch', 'core/templates', 'core/log'], function($, Pr
             if (this.map) {
                 return;
             }
-            log.debug(data);
 
             var centerloc, zoomLevel;
 
             this.markers = data.markers;
             this.defaultmapcenter = data.defaultcenterloc;
             this.defaultzoom = data.defaultzoom;
-            log.debug("map center " + this.defaultmapcenter);
             if (this.defaultmapcenter != '') {
                 var centerlocdata = geolocate.geocodeLocation(this.defaultmapcenter);
                 log.debug(centerlocdata);
@@ -40,7 +38,7 @@ define(['jquery', 'core/prefetch', 'core/templates', 'core/log'], function($, Pr
             } else {
                 zoomLevel = 6;
             }
-            log.debug("map center " + centerloc);
+            log.debug(centerloc);
 
             this.map = L.map('map', {
                 zoomControl: true,
