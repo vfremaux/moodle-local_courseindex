@@ -13,23 +13,34 @@ define(['jquery', 'core/prefetch', 'core/templates', 'core/log'], function($, Pr
 
         /**
          * Initialise la carte Leaflet
-         * @param {string} markers
+         * @param {string} data
          */
         init: function(data) {
             if (this.map) {
-                return; // Évite les initialisations multiples.
+                return;
             }
+            log.debug(data);
+
+            var centerloc, zoomLevel;
 
             this.markers = data.markers;
             this.defaultmapcenter = data.defaultcenterloc;
             this.defaultzoom = data.defaultzoom;
+            log.debug("map center " + this.defaultmapcenter);
+            if (this.defaultmapcenter != '') {
+                var centerlocdata = geolocate.geocodeLocation(this.defaultmapcenter);
+                log.debug(centerlocdata);
+                centerloc = [centerlocdata.lat, centerlocdata.lon];
+            } else {
+                centerloc = [46.2276, 2.2137];
+            }
 
-            var centerlocdata = geolocate.geocodeLocation(this.defaultmapcenter);
-            var centerloc = [centerlocdata.lat, centerlocdata.lon];
-
-            // Centre initial sur la France
-            // const franceCenter = [46.2276, 2.2137];
-            var zoomLevel = this.defaultzoom;
+            if (this.defaultzoom > 0) {
+                zoomLevel = this.defaultzoom;
+            } else {
+                zoomLevel = 6;
+            }
+            log.debug("map center " + centerloc);
 
             this.map = L.map('map', {
                 zoomControl: true,
@@ -163,7 +174,7 @@ define(['jquery', 'core/prefetch', 'core/templates', 'core/log'], function($, Pr
 
             const locationInfo = $('#locationInfo');
             if (locationInfo) {
-                locationInfo.html('Géolocalisation en cours...');
+                locationInfo.html('G?olocalisation en cours...');
             }
 
             // Geocode location
@@ -177,14 +188,14 @@ define(['jquery', 'core/prefetch', 'core/templates', 'core/log'], function($, Pr
                 }
             } else {
                 if (locationInfo) {
-                    locationInfo.html('? Localisation non trouvée');
+                    locationInfo.html('Localisation non trouv?e');
                 }
-                log.warn('La localité "' + locationName + '" n\'a pas pu être géolocalisée');
+                log.warn('La localit? "' + locationName + '" n\'a pas pu ?tre g?olocalis?e');
             }
         },
 
         /**
-         * Échappe les caractères HTML
+         * Escape HTML chars
          * @param {string} text
          */
         escapeHtml: function(text) {
