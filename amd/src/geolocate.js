@@ -14,7 +14,7 @@ define(['jquery', 'core/prefetch', 'core/templates',
 
         centerloc: null,
 
-        strs: null,
+        strs: Array(),
 
         /**
          * Initialise la carte Leaflet
@@ -121,7 +121,7 @@ define(['jquery', 'core/prefetch', 'core/templates',
                 );
 
                 if (!response.ok) {
-                    throw new Error('Network error');
+                    throw new Error(geolocate.strs['notavailable']);
                 }
 
                 const data = await response.json();
