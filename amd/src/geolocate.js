@@ -209,9 +209,9 @@ define(['jquery', 'core/prefetch', 'core/templates',
                 }
             } else {
                 if (locationInfo) {
-                    locationInfo.html(geolocale.strs['notfound']);
+                    locationInfo.html(geolocate.strs['notfound']);
                 }
-                log.warn(geolocale.strs['notfoundwarn'].replace('{{locname}}', locationName));
+                log.warn(geolocate.strs['notfoundwarn'].replace('{{locname}}', locationName));
             }
         },
 
