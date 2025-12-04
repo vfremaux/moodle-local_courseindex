@@ -22,7 +22,7 @@ define(['jquery', 'core/prefetch', 'core/templates',
          */
         init: async function(data) {
 
-            if (this.map) {
+            if (geolocate.map) {
                 return;
             }
 
@@ -40,26 +40,26 @@ define(['jquery', 'core/prefetch', 'core/templates',
                 key: 'geonotavailable',
                 component: 'local_courseindex'
             }]).then(function(results) {
-                this.strs['fetch'] = results[0];
-                this.strs['notfound'] = results[1];
-                this.strs['notfoundwarn'] = results[2];
-                this.strs['notavailable'] = results[3];
+                geolocate.strs['fetch'] = results[0];
+                geolocate.strs['notfound'] = results[1];
+                geolocate.strs['notfoundwarn'] = results[2];
+                geolocate.strs['notavailable'] = results[3];
             });
 
             var zoomLevel;
 
-            this.markers = data.markers;
-            this.defaultmapcenter = data.defaultcenterloc;
-            this.defaultzoom = data.defaultzoom;
-            if (this.defaultmapcenter != '') {
-                var result = await geolocate.geocodeLocation(this.defaultmapcenter);
-                this.centerloc = [result.lat, result.lon];
+            geolocate.markers = data.markers;
+            geolocate.defaultmapcenter = data.defaultcenterloc;
+            geolocate.defaultzoom = data.defaultzoom;
+            if (geolocate.defaultmapcenter != '') {
+                var result = await geolocate.geocodeLocation(geolocate.defaultmapcenter);
+                geolocate.centerloc = [result.lat, result.lon];
             } else {
-                this.centerloc = [46.2276, 2.2137];
+                geolocate.centerloc = [46.2276, 2.2137];
             }
 
-            if (this.defaultzoom > 0) {
-                zoomLevel = this.defaultzoom;
+            if (geolocate.defaultzoom > 0) {
+                zoomLevel = geolocate.defaultzoom;
             } else {
                 zoomLevel = 8;
             }
@@ -70,7 +70,7 @@ define(['jquery', 'core/prefetch', 'core/templates',
                 dragging: true,
                 touchZoom: true,
                 scrollWheelZoom: true
-            }).setView(this.centerloc, zoomLevel);
+            }).setView(geolocate.centerloc, zoomLevel);
 
             // Add OpenStreetMap tiles
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -78,7 +78,7 @@ define(['jquery', 'core/prefetch', 'core/templates',
                 maxZoom: 19,
                 minZoom: 4,
                 preferCanvas: true
-            }).addTo(this.map);
+            }).addTo(geolocate.map);
 
             // Invalidate map size.
             /*
@@ -93,8 +93,8 @@ define(['jquery', 'core/prefetch', 'core/templates',
             log.debug('AMD courseindex geocode initialized');
 
             // Locate all markers.
-            for (i = 0; i < this.markers.length; i++) {
-                let m = this.markers[i];
+            for (i = 0; i < geolocate.markers.length; i++) {
+                let m = geolocate.markers[i];
                 let result = await geolocate.geocodeLocation(m.location);
                 geolocate.markers[i].lon = result.lon;
                 geolocate.markers[i].lat = result.lat;
@@ -181,7 +181,7 @@ define(['jquery', 'core/prefetch', 'core/templates',
             });
 
             // Centrer et zoomer sur le marqueur
-            this.map.setView([marker.lat, marker.lon], 12);
+            geolocate.map.setView([marker.lat, marker.lon], 12);
         },
 
         /**
