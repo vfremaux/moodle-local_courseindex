@@ -68,7 +68,6 @@ body {
 /* map Overlay */
 .map-overlay {
     width: 100%;
-    height: 450px;
     background-color: rgba(0, 0, 0, 0.5);
     z-index: 1000;
     animation: fadeIn 0.3s ease-in-out;
@@ -108,9 +107,8 @@ body {
     box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
     -webkit-box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
     -moz-box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
-    width: 90%;
-    max-width: 900px;
-    height: 90vh;
+    width: 100%;
+    height: 80vh;
     max-height: 700px;
     display: flex;
     display: -webkit-flex;
@@ -389,10 +387,7 @@ body {
 /* Tablet and larger screens (1024px and up) */
 @media screen and (min-width: 1025px) {
     .map-container {
-        width: 90%;
-        max-width: 900px;
-        height: 90vh;
-        max-height: 700px;
+        height: 80vh;
     }
     
     .map-header {
@@ -407,8 +402,7 @@ body {
 /* iPad and medium tablets (768px to 1024px) */
 @media screen and (min-width: 768px) and (max-width: 1024px) {
     .map-container {
-        width: 95%;
-        max-height: 85vh;
+        max-height: 80vh;
     }
 
     .map-header {

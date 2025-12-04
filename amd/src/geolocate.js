@@ -95,12 +95,15 @@ define(['jquery', 'core/prefetch', 'core/templates',
             // Locate all markers.
             for (i = 0; i < geolocate.markers.length; i++) {
                 let m = geolocate.markers[i];
-                let result = await geolocate.geocodeLocation(m.location);
-                geolocate.markers[i].lon = result.lon;
-                geolocate.markers[i].lat = result.lat;
-                geolocate.markers[i].locname = result.name;
-                geolocate.markers[i].locdisplayname = result.displayName;
-                geolocate.addMarker(geolocate.markers[i]);
+                if (m.location != undefined && m.location != '') {
+                    // Only place explicit markers.
+                    let result = await geolocate.geocodeLocation(m.location);
+                    geolocate.markers[i].lon = result.lon;
+                    geolocate.markers[i].lat = result.lat;
+                    geolocate.markers[i].locname = result.name;
+                    geolocate.markers[i].locdisplayname = result.displayName;
+                    geolocate.addMarker(geolocate.markers[i]);
+                }
             }
 
             log.debug('AMD courseindex geocode markers initialized');
