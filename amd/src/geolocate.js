@@ -81,13 +81,11 @@ define(['jquery', 'core/prefetch', 'core/templates',
             }).addTo(geolocate.map);
 
             // Invalidate map size.
-            /*
             setTimeout(() => {
                 if (this.map) {
                     this.map.invalidateSize();
                 }
             }, 350);
-            */
 
             Prefetch.prefetchTemplates(['local_courseindex/geomarker']);
             log.debug('AMD courseindex geocode initialized');
@@ -166,10 +164,10 @@ define(['jquery', 'core/prefetch', 'core/templates',
 
             // Create the marker.
             Templates.render('local_courseindex/geomarker', {
-                    hascost:marker.hascost,
-                    cost:marker.cost,
-                    timestart:marker.timestart,
-                    timeend:marker.timeend,
+                    hascost: marker.hascost,
+                    cost: marker.cost,
+                    timestart: marker.timestart,
+                    timeend: marker.timeend,
                     coursename: marker.course,
                     location: marker.location,
                     mode: marker.mode
@@ -183,7 +181,7 @@ define(['jquery', 'core/prefetch', 'core/templates',
                         className: 'custom-popup'
                     }).openPopup());
             }).catch((error) => {
-                log.debug("Could not resolve template for " + marker.location);
+                log.debug("Could not resolve template for " + marker.location + " with error " + error);
             });
 
             // Centrer et zoomer sur le marqueur.
