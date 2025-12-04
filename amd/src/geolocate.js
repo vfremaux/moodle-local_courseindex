@@ -174,6 +174,7 @@ define(['jquery', 'core/prefetch', 'core/templates',
                     location: marker.location,
                     mode: marker.mode
             }).then(function(html) {
+                log.debug("Setting marker popup for " + marker.location);
                 geolocate.popupmarkers.push(L.marker([marker.lat, marker.lon], { icon: icon })
                     .addTo(geolocate.map)
                     .bindPopup(html, {
@@ -181,9 +182,11 @@ define(['jquery', 'core/prefetch', 'core/templates',
                         maxHeight: 250,
                         className: 'custom-popup'
                     }).openPopup());
+            }).catch((error) => {
+                log.debug("Could not resolve template for " + marker.location);
             });
 
-            // Centrer et zoomer sur le marqueur
+            // Centrer et zoomer sur le marqueur.
             geolocate.map.setView([marker.lat, marker.lon], 12);
         },
 
