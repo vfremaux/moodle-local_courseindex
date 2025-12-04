@@ -89,7 +89,7 @@ define(['jquery', 'core/prefetch', 'core/templates',
             }, 350);
             */
 
-            Prefetch.prefetchTemplate('local_courseindex/geomarker');
+            Prefetch.prefetchTemplates(['local_courseindex/geomarker']);
             log.debug('AMD courseindex geocode initialized');
 
             // Locate all markers.
