@@ -153,7 +153,7 @@ define(['jquery', 'core/prefetch', 'core/templates',
 
             // Create a custom icon.
             const icon = L.icon({
-                iconUrl: cfg.wwwroot + '/local/courseindex/pix/location/jpg',
+                iconUrl: cfg.wwwroot + '/local/courseindex/pix/location_with_alpha.png',
                 iconSize: [32, 40],
                 iconAnchor: [16, 40],
                 popupAnchor: [0, -40],
