@@ -55,7 +55,7 @@ $PAGE->navbar->add(get_string('map', 'local_courseindex'));
 $PAGE->requires->jquery();
 $markers = local_courseindex\helper::get_all_geomarkers();
 $data = ['markers' => array_values($markers), 'defaultcenterloc' => $config->defaultcenterloc, 'defaultzoom' => $config->defaultzoom];
-$PAGE->requires->js_call_amd('local_courseindex/geolocate', 'init', $data);
+$PAGE->requires->js_call_amd('local_courseindex/geolocate', 'init', [$data]);
 $PAGE->requires->css('/local/courseindex/geomap.css');
 
 $PAGE->set_heading($strheading);

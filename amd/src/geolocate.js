@@ -1,7 +1,8 @@
 
 /* eslint no-undef: "off" */
 
-define(['jquery', 'core/prefetch', 'core/templates', 'core/log'], function($, Prefetch, Templates, log) {
+define(['jquery', 'core/prefetch', 'core/templates',
+        'core/str', 'core/log', 'core/config'], function($, Prefetch, Templates, Strings, log, cfg) {
 
     var geolocate = {
 
@@ -11,34 +12,53 @@ define(['jquery', 'core/prefetch', 'core/templates', 'core/log'], function($, Pr
 
         popupmarkers: Array(),
 
+        centerloc: null,
+
+        strs: null,
+
         /**
          * Initialise la carte Leaflet
          * @param {string} data
          */
-        init: function(data) {
+        init: async function(data) {
+
             if (this.map) {
                 return;
             }
 
-            var centerloc, zoomLevel;
+            // Fetch some strings.
+            Strings.get_strings([{
+                key: 'geofetch',
+                component: 'local_courseindex'
+            }, {
+                key: 'geonotfound',
+                component: 'local_courseindex'
+            }, {
+                key: 'geonotfoundwarn',
+                component: 'local_courseindex'
+            }]).then(function(results) {
+                this.strs['fetch'] = results[0];
+                this.strs['notfound'] = results[1];
+                this.strs['notfoundwarn'] = results[2];
+            });
+
+            var zoomLevel;
 
             this.markers = data.markers;
             this.defaultmapcenter = data.defaultcenterloc;
             this.defaultzoom = data.defaultzoom;
             if (this.defaultmapcenter != '') {
-                var centerlocdata = geolocate.geocodeLocation(this.defaultmapcenter);
-                log.debug(centerlocdata);
-                centerloc = [centerlocdata.lat, centerlocdata.lon];
+                var result = await geolocate.geocodeLocation(this.defaultmapcenter);
+                this.centerloc = [result.lat, result.lon];
             } else {
-                centerloc = [46.2276, 2.2137];
+                this.centerloc = [46.2276, 2.2137];
             }
 
             if (this.defaultzoom > 0) {
                 zoomLevel = this.defaultzoom;
             } else {
-                zoomLevel = 6;
+                zoomLevel = 8;
             }
-            log.debug(centerloc);
 
             this.map = L.map('map', {
                 zoomControl: true,
@@ -46,7 +66,7 @@ define(['jquery', 'core/prefetch', 'core/templates', 'core/log'], function($, Pr
                 dragging: true,
                 touchZoom: true,
                 scrollWheelZoom: true
-            }).setView(centerloc, zoomLevel);
+            }).setView(this.centerloc, zoomLevel);
 
             // Add OpenStreetMap tiles
             L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
@@ -57,11 +77,13 @@ define(['jquery', 'core/prefetch', 'core/templates', 'core/log'], function($, Pr
             }).addTo(this.map);
 
             // Invalidate map size.
+            /*
             setTimeout(() => {
                 if (this.map) {
                     this.map.invalidateSize();
                 }
             }, 350);
+            */
 
             Prefetch.prefetchTemplate('local_courseindex/geomarker');
             log.debug('AMD courseindex geocode initialized');
@@ -69,15 +91,16 @@ define(['jquery', 'core/prefetch', 'core/templates', 'core/log'], function($, Pr
             // Locate all markers.
             for (i = 0; i < this.markers.length; i++) {
                 let m = this.markers[i];
-                let locdata = geolocate.geocodeLocation(m.location);
-                this.markers[i].lon = locdata.lon;
-                this.markers[i].lat = locdata.lat;
-                this.markers[i].locname = locdata.name;
-                this.markers[i].locdisplayname = locdata.displayName;
-                geolocate.addMarker(this.markers[i]);
+                let result = await geolocate.geocodeLocation(m.location);
+                geolocate.markers[i].lon = result.lon;
+                geolocate.markers[i].lat = result.lat;
+                geolocate.markers[i].locname = result.name;
+                geolocate.markers[i].locdisplayname = result.displayName;
+                geolocate.addMarker(geolocate.markers[i]);
             }
 
-            // Focus to region center
+            log.debug('AMD courseindex geocode markers initialized');
+            // Focus to region center.
             geolocate.showLocation();
         },
 
@@ -122,15 +145,11 @@ define(['jquery', 'core/prefetch', 'core/templates', 'core/log'], function($, Pr
          * Ajoute un marqueur sur la carte
          * @param {object} marker
          */
-        addMarker: function(marker) {
+        addMarker: async function(marker) {
 
             // Create a custom icon.
             const icon = L.icon({
-                iconUrl: 'data:image/svg+xml;base64,PHN2ZyB4bWxucz0iaHR0cDovL3d3dy53My5vcmcvMjAwMC9' +
-                'zdmciIHdpZHRoPSIzMiIgaGVpZ2h0PSI0MCIgdmlld0JveD0iMCAwIDMyIDQwIj48cGF0aCBkPSJNMTYgMEM' +
-                '4LjI3IDAgMiA2LjI3IDIgMTRjMCA0IDAgMTggMTQgMjZzMTQtMjIgMTQtMjZjMC03LjczLTYuMjctMTQtMTQtM' +
-                'TR6TTEyIDIwYzAgMi4yMiAxLjc4IDQgNCA0czQtMS43OCA0LTQtMS43OC00LTQtNC00IDEuNzgtNCA0eiIgZml' +
-                'sbD0iIzY2N2VlYSIvPjwvc3ZnPg==',
+                iconUrl: cfg.wwwroot + '/local/courseindex/pix/location/jpg',
                 iconSize: [32, 40],
                 iconAnchor: [16, 40],
                 popupAnchor: [0, -40],
@@ -138,7 +157,8 @@ define(['jquery', 'core/prefetch', 'core/templates', 'core/log'], function($, Pr
                 className: 'custom-marker'
             });
 
-            let popupContent = Templates.render('local_courseindex/geomarker', {
+            // Create the marker.
+            Templates.render('local_courseindex/geomarker', {
                     hascost:marker.hascost,
                     cost:marker.cost,
                     timestart:marker.timestart,
@@ -146,17 +166,15 @@ define(['jquery', 'core/prefetch', 'core/templates', 'core/log'], function($, Pr
                     coursename: marker.course,
                     location: marker.location,
                     mode: marker.mode
+            }).then(function(html) {
+                geolocate.popupmarkers.push(L.marker([marker.lat, marker.lon], { icon: icon })
+                    .addTo(geolocate.map)
+                    .bindPopup(html, {
+                        maxWidth: 250,
+                        maxHeight: 250,
+                        className: 'custom-popup'
+                    }).openPopup());
             });
-
-            // Create the markers
-
-            this.popupmarkers.push(L.marker([marker.lat, marker.lon], { icon: icon })
-                .addTo(this.map)
-                .bindPopup(popupContent, {
-                    maxWidth: 250,
-                    maxHeight: 250,
-                    className: 'custom-popup'
-                }).openPopup());
 
             // Centrer et zoomer sur le marqueur
             this.map.setView([marker.lat, marker.lon], 12);
@@ -168,27 +186,28 @@ define(['jquery', 'core/prefetch', 'core/templates', 'core/log'], function($, Pr
          */
         showLocation: async function(locationName) {
 
-            this.initMap();
+            // If necessary.
+            geolocate.init();
 
             const locationInfo = $('#locationInfo');
             if (locationInfo) {
-                locationInfo.html('G?olocalisation en cours...');
+                locationInfo.html(geolocate.strs['fetch']);
             }
 
             // Geocode location
-            const location = await this.geocodeLocation(locationName);
+            const location = await geolocate.geocodeLocation(locationName);
 
             if (location) {
-                this.currentLocation = location;
-                this.addMarker(location.lat, location.lon, location.name);
+                geolocate.currentLocation = location;
+                geolocate.addMarker(location.lat, location.lon, location.name);
                 if (locationInfo) {
-                    locationInfo.html('?? ' + location.name);
+                    locationInfo.html(location.name);
                 }
             } else {
                 if (locationInfo) {
-                    locationInfo.html('Localisation non trouv?e');
+                    locationInfo.html(geolocale.strs['notfound']);
                 }
-                log.warn('La localit? "' + locationName + '" n\'a pas pu ?tre g?olocalis?e');
+                log.warn(geolocale.strs['notfoundwarn'].replace('{{locname}}', locationName));
             }
         },
 
