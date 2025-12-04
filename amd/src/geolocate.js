@@ -36,10 +36,14 @@ define(['jquery', 'core/prefetch', 'core/templates',
             }, {
                 key: 'geonotfoundwarn',
                 component: 'local_courseindex'
+            }, {
+                key: 'geonotavailable',
+                component: 'local_courseindex'
             }]).then(function(results) {
                 this.strs['fetch'] = results[0];
                 this.strs['notfound'] = results[1];
                 this.strs['notfoundwarn'] = results[2];
+                this.strs['notavailable'] = results[3];
             });
 
             var zoomLevel;
